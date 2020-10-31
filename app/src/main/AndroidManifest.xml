@@ -11,7 +11,9 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ToolbarActivity"></activity>
         <activity android:name=".Bus" />
-        <activity android:name=".addWordActivity" />
+        <activity
+            android:name=".AddWordActivity"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
