@@ -13,6 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             android:orientation="horizontal"
             android:weightSum="1">
 
@@ -25,6 +26,7 @@
                 <TableRow>
 
                     <EditText
+                        android:id="@+id/rv_word"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
@@ -33,6 +35,7 @@
                         android:privateImeOptions="defaultInputmode=english" />
 
                     <EditText
+                        android:id="@+id/rv_mean"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
@@ -41,6 +44,7 @@
                         android:privateImeOptions="defaultInputmode=korean" />
 
                     <Button
+                        android:id="@+id/rv_remove_word"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
                         android:background="@drawable/ic_baseline_close_24" />

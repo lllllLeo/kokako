@@ -72,7 +72,6 @@
             android:id="@+id/input_word"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:layout_weight="0.5"
             android:hint="  Word"
             android:inputType="text"
@@ -86,13 +85,12 @@
             android:id="@+id/input_mean"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
             android:layout_toRightOf="@+id/add_word"
             android:layout_weight="0.5"
             android:hint="  뜻"
             android:inputType="text"
             android:privateImeOptions="defaultInputmode=korean" />
-
+        <!-- 동그라미안에있는 x로 모든 텍스트 삭제 -->
         <Button
             android:layout_width="30dp"
             android:layout_height="30dp"
@@ -107,10 +105,15 @@
         android:layout_below="@id/input_layout"
         android:layout_above="@id/btn_bottom">
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv"
+            android:id="@+id/rv_list_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp" />
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/list_item"
+            />
     </FrameLayout>
 
     <LinearLayout
@@ -120,6 +123,14 @@
     android:gravity="bottom"
     android:layout_alignParentBottom="true"
     android:weightSum="1">
+
+    <Button
+        android:id="@+id/btn_remove_add"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:stateListAnimator="@null"
+        android:text="초기화"
+        android:theme="@style/ButtonStyle" />
 
     <ImageButton
         android:id="@+id/btn_move_left"
@@ -141,7 +152,7 @@
 
     <Button
         android:id="@+id/btn_add_word"
-        android:layout_width="60dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:text="추가"
         android:theme="@style/ButtonStyle"
