@@ -125,7 +125,7 @@
     android:weightSum="1">
 
     <Button
-        android:id="@+id/btn_remove_add"
+        android:id="@+id/btn_remove_text"
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:stateListAnimator="@null"

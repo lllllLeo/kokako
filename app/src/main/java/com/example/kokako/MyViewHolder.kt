@@ -1,0 +1,78 @@
+package com.example.kokako
+
+import android.content.DialogInterface
+import android.util.Log
+import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
+import com.example.kokako.model.WordDTO
+import kotlinx.android.synthetic.main.list_item.view.*
+
+// 커스텀 뷰홀더 를 어댑터에 넣어줌
+class MyViewHolder(itemView: View,
+                   recyclerViewInterface: MyRecyclerViewInterface)
+                    : RecyclerView.ViewHolder(itemView),
+                    View.OnClickListener{
+
+    private var wordEditText = itemView.rv_word
+    private var meanEditText = itemView.rv_mean
+    private var removeButton = itemView.rv_remove_word
+    private var myRecyclerViewInterface : MyRecyclerViewInterface? = null
+
+    // 기본 생성자
+    init {
+        Log.d("로그","MyViewHolder - init() called")
+        /*
+        * this는 View.OnClickListener.
+        * */
+        itemView.setOnClickListener(this)
+        this.myRecyclerViewInterface = recyclerViewInterface
+    }
+
+    //뷰와 데이터 묶기
+
+    fun bind(wordDto: ArrayList<WordDTO>, position:Int){
+        Log.d("로그","MyViewHolder - bind() called")
+        wordEditText.setText(wordDto[position].toString())
+        meanEditText.setText(wordDto[position].toString())
+        removeButton.setOnClickListener {
+            val mBuilder = AlertDialog.Builder(it.context)
+            mBuilder.setTitle("삭제")
+                .setMessage("단어 : "+wordEditText.text.toString() + "\n뜻 : "+ meanEditText.text.toString() + "\n이 항목을 삭제하시겠습니까?")
+                .setPositiveButton("확인",
+                    DialogInterface.OnClickListener { dialog, which ->
+                        Toast.makeText(App.instance,"또 있다.", Toast.LENGTH_LONG).show()
+//                        removeWord(wordDto,position)
+
+                    })
+                .setNegativeButton("취소",
+                    DialogInterface.OnClickListener { dialog, which ->
+                        dialog.cancel()
+                    })
+            mBuilder.show()
+        }
+    }
+
+
+
+//    뷰홀더에서 아이템이 클릭된걸 암
+    // 리사이클러 인터페이스에 알려줌
+    // 이메소드가 발동이 되는걸 AddWordActivity가 알도록 할거임
+    /*
+    * 이렇게해야 아래 onClick가 발동. 발동되면서
+    * this.myRecyclerViewInterface?.onItemClicked()가 발동
+    * myRecyclerViewInterface를 설정한 애들한테 소식을 알려줌->Add~Activity가 알게되고
+    * onItemClicked() 를 실행하게 됨
+    * */
+    override fun onClick(v: View?) {
+    // adapterPosition 뷰홀더에서 현재 어답터의 포지션을 알 수 있음
+        this.myRecyclerViewInterface?.onItemClicked(adapterPosition)
+    }
+    /*
+    * 아이템 클릭시
+    * MyViewHolder onClick() called
+    * AddWordActivity onItemClicked() called
+    * */
+
+}

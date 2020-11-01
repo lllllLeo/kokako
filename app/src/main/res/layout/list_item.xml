@@ -17,13 +17,6 @@
             android:orientation="horizontal"
             android:weightSum="1">
 
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:stretchColumns="1">
-
-                <TableRow>
 
                     <EditText
                         android:id="@+id/rv_word"
@@ -49,9 +42,7 @@
                         android:layout_height="30dp"
                         android:background="@drawable/ic_baseline_close_24" />
                     <!-- 삭제하시겠습니까 dialog-->
-                </TableRow>
 
-            </TableLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </FrameLayout>

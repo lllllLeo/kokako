@@ -6,22 +6,21 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.Toast
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.activity_add_word.*
 import kotlinx.android.synthetic.main.list_item.*
-import kotlinx.android.synthetic.main.list_item.view.*
+import java.text.FieldPosition
 
-class AddWordActivity : AppCompatActivity() {
-    lateinit var adapter: RecyclerAdapterWords
+class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
+    lateinit var myRecyclerAdapter: MyRecyclerAdapter
+    var wordDto = ArrayList<WordDTO>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_word)
-        val list = ArrayList<WordDTO>()
+
         // Forcing the Soft Keyboard open
         var imm: InputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -29,7 +28,7 @@ class AddWordActivity : AppCompatActivity() {
 
         var btnListener = View.OnClickListener { view ->
             when (view.id) {
-                R.id.btn_remove_add -> {
+                R.id.btn_remove_text -> {
                     input_word.text.clear()
                     input_mean.text.clear()
                 }
@@ -65,14 +64,33 @@ class AddWordActivity : AppCompatActivity() {
                     } else {
 //                        btn_add_word.isClickable = true
 //                        btn_add_word.isEnabled = true
-                        list.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
+
+                        // adapter 인스턴스 생성
+                        wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
+                        myRecyclerAdapter = MyRecyclerAdapter(this)
+                        myRecyclerAdapter.submitList(this.wordDto)
+
+                        // 리사이클러뷰 설정
+                        rv_list_item.apply {
+                            //
+                            layoutManager = LinearLayoutManager(this@AddWordActivity, LinearLayoutManager.VERTICAL, true)
+                            (layoutManager as LinearLayoutManager).stackFromEnd = true
+
+                            // 어답터 장착
+                            adapter = myRecyclerAdapter
+                        }
+
+                        /*list.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
                         adapter = RecyclerAdapterWords(list)
-//                        var recyclerView = Recy.adapter = adapter
-//                        val manager = LinearLayoutManager(this)
-//                        manager.reverseLayout = true
-//                        manager.stackFromEnd = true
-//                        recy
                         rv_list_item.adapter = adapter
+                        Log.v("","buttonbuttonbuttonbutton")
+                        val llm = LinearLayoutManager(this)
+                        llm.reverseLayout = true  //reverseLayout: 아이템이 보이는 방향. true 지정시 아래에서 위로 올라감
+                        llm.stackFromEnd = true // 이게 false였을때 지우면 안올라갔는데 true하니까 삭제된 자리 빼고 위로 채워짐
+                        rv_list_item.layoutManager = llm
+//                      item이 추가되거나 삭제될 때 RecyclerView의 크기가 변경될 수도 있고, 그렇게 되면 계층 구조의 다른 View 크기가 변경될 가능성이 있기 때문이다. 특히 item이 자주 추가/삭제되면 오류가 날 수도 있기에 setHasFixedSize true를 설정
+                        rv_list_item.setHasFixedSize(true)*/
+
                         input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
@@ -80,29 +98,15 @@ class AddWordActivity : AppCompatActivity() {
                 }
             }
         }
-        btn_remove_add.setOnClickListener(btnListener)
+        btn_remove_text.setOnClickListener(btnListener)
         btn_move_left.setOnClickListener(btnListener)
         btn_move_right.setOnClickListener(btnListener)
         btn_add_word.setOnClickListener(btnListener)
 
+    }
 
-/*        list.add(WordDTO("치킨", "콜라"))
-        list.add(WordDTO("치킨2", "콜라2"))
-        list.add(WordDTO("치킨3", "콜라3"))
-        list.add(WordDTO("치킨4", "콜라4"))
-        list.add(WordDTO("치킨5", "콜라5"))
-        list.add(WordDTO("치킨6", "콜라6"))
-        list.add(WordDTO("치킨7", "콜라7"))
-        list.add(WordDTO("치킨8", "콜라8"))
-        list.add(WordDTO("치킨9", "콜라9"))
-        list.add(WordDTO("치킨10", "콜라10"))
-        list.add(WordDTO("치킨11", "콜라11"))
-        list.add(WordDTO("치킨12", "콜라12"))
-        list.add(WordDTO("치킨13", "콜라13"))
-        list.add(WordDTO("치킨14", "콜라14"))*/
-        Log.v("  ","ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ")
-
-
+    override fun onItemClicked(position: Int) {
+        TODO("Not yet implemented")
     }
 
     // 뒤로가기 다이얼로그
