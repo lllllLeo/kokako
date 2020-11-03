@@ -24,13 +24,13 @@ class MyViewHolder(itemView: View,
         * */
 // 클릭리스너 설정
 //        itemView.setOnClickListener(this)
+//        removeButton이 onClick된걸 리스너에 등록
         removeButton.setOnClickListener(this)
         // 인터페이스 연결
         this.myRecyclerViewInterface = recyclerViewInterface
     }
 
     //뷰와 데이터 묶기
-
     fun bind(wordDto: ArrayList<WordDTO>, position:Int){
         Log.d("로그","MyViewHolder - bind() called")
         wordEditText.setText(wordDto[position].word.toString())
@@ -38,8 +38,8 @@ class MyViewHolder(itemView: View,
     }
 
 //    뷰홀더에서 아이템이 클릭된걸 암
-    // 리사이클러 인터페이스에 알려줌
-    // 이메소드가 발동이 되는걸 AddWordActivity가 알도록 할거임
+//    리사이클러 인터페이스에 알려줌
+//    이메소드가 발동이 되는걸 AddWordActivity가 알도록 할거임
     /*
     * 이렇게해야 아래 onClick가 발동. 발동되면서
     * this.myRecyclerViewInterface?.onItemClicked()가 발동

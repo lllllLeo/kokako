@@ -54,20 +54,14 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
                     } else {
 //                        btn_add_word.isClickable = true
 //                        btn_add_word.isEnabled = true
-
-                        // adapter 인스턴스 생성
-//                        wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
                         wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
-//                        Toast.makeText(this,"zz"+wordDto[0].word.toString(),Toast.LENGTH_SHORT).show()
                         myRecyclerAdapter = MyRecyclerAdapter(this)
                         myRecyclerAdapter.submitList(this.wordDto)
 
                         // 리사이클러뷰 설정
                         rv_list_item.apply {
-                            //
                             layoutManager = LinearLayoutManager(this@AddWordActivity, LinearLayoutManager.VERTICAL, true)
                             (layoutManager as LinearLayoutManager).stackFromEnd = true
-
                             // 어답터 장착
                             adapter = myRecyclerAdapter
                         }
