@@ -20,9 +20,7 @@ class MyRecyclerAdapter(myRecyclerViewInterface: MyRecyclerViewInterface): Recyc
 
     // 뷰 홀더가 생성 되었을때
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-
         // 연결할 레이아웃 설정
-
         return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false), this.myRecyclerViewInterface!!)
     }
     // 뷰와 뷰홀더가 묶였을때
@@ -38,7 +36,7 @@ class MyRecyclerAdapter(myRecyclerViewInterface: MyRecyclerViewInterface): Recyc
         this.wordDtoData = wordDto
     }
 
-     fun removeWord(wordDto: ArrayList<WordDTO>, position: Int){
+    fun removeWord(wordDto: ArrayList<WordDTO>, position: Int){
         wordDto.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, wordDto.size)

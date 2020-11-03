@@ -1,12 +1,14 @@
 package com.example.kokako
 
 import android.content.Context
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.model.WordDTO
@@ -24,7 +26,7 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
         // Forcing the Soft Keyboard open
         var imm: InputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
         var btnListener = View.OnClickListener { view ->
             when (view.id) {
@@ -32,26 +34,14 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
                     input_word.text.clear()
                     input_mean.text.clear()
                 }
-
                 R.id.btn_move_left -> {
                     input_word.requestFocus()
 //  새로운 카드 없으면 만들고 커서이동
                 }
                 R.id.btn_move_right -> {
                     input_mean.requestFocus()
-
-                    if (rv_word!=null) {
-                        Toast.makeText(this,""+rv_list_item[0],Toast.LENGTH_LONG).show()
-                        input_mean.setNextFocusRightId(0)
-//                        rv_list_item[0].rv_word.requestFocus()
-//                        rv_list_item[0].toString()
-                    } else {
-                        Toast.makeText(this,"또 있다.",Toast.LENGTH_LONG).show()
-                    }
-                    // 오른쪽 없으면 새로운 칸 추가 if문
                 }
-                // data없으면  무시하기
-//                최신순서 맨위로
+// data없으면  무시하기
                 R.id.btn_add_word -> {
                     input_word.text.toString().trim()
                     input_mean.text.toString().trim()
@@ -66,7 +56,9 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
 //                        btn_add_word.isEnabled = true
 
                         // adapter 인스턴스 생성
+//                        wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
                         wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
+//                        Toast.makeText(this,"zz"+wordDto[0].word.toString(),Toast.LENGTH_SHORT).show()
                         myRecyclerAdapter = MyRecyclerAdapter(this)
                         myRecyclerAdapter.submitList(this.wordDto)
 
@@ -79,21 +71,10 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
                             // 어답터 장착
                             adapter = myRecyclerAdapter
                         }
-
-                        /*list.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
-                        adapter = RecyclerAdapterWords(list)
-                        rv_list_item.adapter = adapter
-                        Log.v("","buttonbuttonbuttonbutton")
-                        val llm = LinearLayoutManager(this)
-                        llm.reverseLayout = true  //reverseLayout: 아이템이 보이는 방향. true 지정시 아래에서 위로 올라감
-                        llm.stackFromEnd = true // 이게 false였을때 지우면 안올라갔는데 true하니까 삭제된 자리 빼고 위로 채워짐
-                        rv_list_item.layoutManager = llm
-//                      item이 추가되거나 삭제될 때 RecyclerView의 크기가 변경될 수도 있고, 그렇게 되면 계층 구조의 다른 View 크기가 변경될 가능성이 있기 때문이다. 특히 item이 자주 추가/삭제되면 오류가 날 수도 있기에 setHasFixedSize true를 설정
-                        rv_list_item.setHasFixedSize(true)*/
-
-                        input_word.text.clear()
+                                                input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
+                        Toast.makeText(this,"현재 단어 갯수"+wordDto.size,Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -102,12 +83,26 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
         btn_move_left.setOnClickListener(btnListener)
         btn_move_right.setOnClickListener(btnListener)
         btn_add_word.setOnClickListener(btnListener)
-
     }
 
-    override fun onItemClicked(position: Int) {
-        TODO("Not yet implemented")
+    /*
+    * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
+    * */
+    override fun onRemoveClicked(it: View, position: Int) {
+        Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
+        val mBuilder = AlertDialog.Builder(it.context)
+        mBuilder.setTitle("삭제")
+            .setMessage("단어 : "+wordDto[position].word.toString() + "\n뜻 : "+ wordDto[position].mean.toString() + "\n이 항목을 삭제하시겠습니까?")
+            .setPositiveButton("확인",
+                DialogInterface.OnClickListener { dialog, which ->
+                    myRecyclerAdapter?.removeWord(wordDto,position)
+                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
+                })
+            .setNegativeButton("취소",
+                DialogInterface.OnClickListener { dialog, which ->
+                    dialog.cancel()
+                })
+        mBuilder.show()
     }
-
     // 뒤로가기 다이얼로그
 }

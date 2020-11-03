@@ -1,10 +1,7 @@
 package com.example.kokako
 
-import android.content.DialogInterface
 import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.list_item.view.*
@@ -14,7 +11,6 @@ class MyViewHolder(itemView: View,
                    recyclerViewInterface: MyRecyclerViewInterface)
                     : RecyclerView.ViewHolder(itemView),
                     View.OnClickListener{
-
     private var wordEditText = itemView.rv_word
     private var meanEditText = itemView.rv_mean
     private var removeButton = itemView.rv_remove_word
@@ -24,9 +20,12 @@ class MyViewHolder(itemView: View,
     init {
         Log.d("로그","MyViewHolder - init() called")
         /*
-        * this는 View.OnClickListener.
+        * itemView에 자기 자신 this는 View.OnClickListener.를 걸어줘야 onClick()이 발동이되고
         * */
-        itemView.setOnClickListener(this)
+// 클릭리스너 설정
+//        itemView.setOnClickListener(this)
+        removeButton.setOnClickListener(this)
+        // 인터페이스 연결
         this.myRecyclerViewInterface = recyclerViewInterface
     }
 
@@ -34,27 +33,9 @@ class MyViewHolder(itemView: View,
 
     fun bind(wordDto: ArrayList<WordDTO>, position:Int){
         Log.d("로그","MyViewHolder - bind() called")
-        wordEditText.setText(wordDto[position].toString())
-        meanEditText.setText(wordDto[position].toString())
-        removeButton.setOnClickListener {
-            val mBuilder = AlertDialog.Builder(it.context)
-            mBuilder.setTitle("삭제")
-                .setMessage("단어 : "+wordEditText.text.toString() + "\n뜻 : "+ meanEditText.text.toString() + "\n이 항목을 삭제하시겠습니까?")
-                .setPositiveButton("확인",
-                    DialogInterface.OnClickListener { dialog, which ->
-                        Toast.makeText(App.instance,"또 있다.", Toast.LENGTH_LONG).show()
-//                        removeWord(wordDto,position)
-
-                    })
-                .setNegativeButton("취소",
-                    DialogInterface.OnClickListener { dialog, which ->
-                        dialog.cancel()
-                    })
-            mBuilder.show()
-        }
+        wordEditText.setText(wordDto[position].word.toString())
+        meanEditText.setText(wordDto[position].mean.toString())
     }
-
-
 
 //    뷰홀더에서 아이템이 클릭된걸 암
     // 리사이클러 인터페이스에 알려줌
@@ -67,7 +48,7 @@ class MyViewHolder(itemView: View,
     * */
     override fun onClick(v: View?) {
     // adapterPosition 뷰홀더에서 현재 어답터의 포지션을 알 수 있음
-        this.myRecyclerViewInterface?.onItemClicked(adapterPosition)
+        this.myRecyclerViewInterface?.onRemoveClicked(v!!, adapterPosition)
     }
     /*
     * 아이템 클릭시
