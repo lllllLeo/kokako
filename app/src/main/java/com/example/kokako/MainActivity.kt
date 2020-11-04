@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 DialogInterface.OnClickListener { dialog, which ->
                 when(selectedRadioItem){
                     0 -> {
-                        var intent = Intent(this, Bus::class.java)
+                        var intent = Intent(this, AddWordActivity::class.java)
                         startActivity(intent)
                     }
                     1 -> {

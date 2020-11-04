@@ -11,4 +11,8 @@
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorControlNormal">@color/colorControlNormal</item>
     </style>
+
+    <style name="ButtonStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/colorWhite</item>
+    </style>
 </resources>
