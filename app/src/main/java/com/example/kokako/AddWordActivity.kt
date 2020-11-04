@@ -5,8 +5,11 @@ import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.get
@@ -14,25 +17,40 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.activity_add_word.*
 import kotlinx.android.synthetic.main.list_item.*
+import org.w3c.dom.Text
 import java.text.FieldPosition
 
 class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
     lateinit var myRecyclerAdapter: MyRecyclerAdapter
     var wordDto = ArrayList<WordDTO>()
+    var wordCount : Int = 0
+    var currentCount : Int = 0
+    var countString : String? = null
+    var tv_wordCount : TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_word)
-
+        tv_wordCount = findViewById<TextView>(R.id.word_count)
         // Forcing the Soft Keyboard open
         var imm: InputMethodManager =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        countString = "$currentCount/$wordCount"
+                        Toast.makeText(this,countString,Toast.LENGTH_SHORT).show()
+        tv_wordCount?.text = countString
 
         var btnListener = View.OnClickListener { view ->
             when (view.id) {
-                R.id.btn_remove_text -> {
+                R.id.delete_all -> {
                     input_word.text.clear()
                     input_mean.text.clear()
+                    input_word.requestFocus()
+                }
+                R.id.btn_remove_text -> {
+                    if (input_word.isFocused) {
+                        input_word.text.clear()
+                    } else if (input_mean.isFocused)
+                        input_mean.text.clear()
                 }
                 R.id.btn_move_left -> {
                     input_word.requestFocus()
@@ -61,18 +79,24 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
                         // 리사이클러뷰 설정
                         rv_list_item.apply {
                             layoutManager = LinearLayoutManager(this@AddWordActivity, LinearLayoutManager.VERTICAL, true)
-                            (layoutManager as LinearLayoutManager).stackFromEnd = true
+//                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                             // 어답터 장착
                             adapter = myRecyclerAdapter
                         }
-                                                input_word.text.clear()
+                        input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
-                        Toast.makeText(this,"현재 단어 갯수"+wordDto.size,Toast.LENGTH_SHORT).show()
+//                        Toast.makeText(this,"현재 단어 갯수"+wordDto.size,Toast.LENGTH_SHORT).show()
+                        wordCount++
+                        countString = "$currentCount/$wordCount"
+                        tv_wordCount?.text = countString
+                        Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
+
+        delete_all.setOnClickListener(btnListener)
         btn_remove_text.setOnClickListener(btnListener)
         btn_move_left.setOnClickListener(btnListener)
         btn_move_right.setOnClickListener(btnListener)
@@ -90,7 +114,11 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { dialog, which ->
                     myRecyclerAdapter?.removeWord(wordDto,position)
-                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
+                    wordCount--
+                    countString = "$currentCount/$wordCount"
+                    tv_wordCount?.text = countString
+//                    Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
                 })
             .setNegativeButton("취소",
                 DialogInterface.OnClickListener { dialog, which ->
@@ -99,4 +127,5 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
         mBuilder.show()
     }
     // 뒤로가기 다이얼로그
+
 }

@@ -8,22 +8,26 @@
     tools:context=".AddWordActivity">
 
     <LinearLayout
-        android:id="@+id/words"
+        android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:weightSum="1">
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/word_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="0.6"
-            android:text="3 / 5" />
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.4"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:gravity="center_vertical"
             android:weightSum="1">
 
@@ -39,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:gravity="center_vertical"
-                android:text="중복된 단어 한 쌍"
+                android:text="중복된 단어 ? 쌍"
                 android:textColor="#FF1C26" />
 
             <TextView
@@ -56,7 +60,7 @@
         android:id="@+id/toolbar_division"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_below="@+id/words"
+        android:layout_below="@+id/info"
         android:background="@color/colorDivision"
         android:orientation="horizontal" />
 
@@ -64,8 +68,11 @@
         android:id="@+id/input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/words"
+        android:layout_below="@id/toolbar_division"
+
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="7dp"
+        android:gravity="center"
         android:weightSum="1">
 
         <EditText
@@ -73,11 +80,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
+            android:layout_gravity="center"
             android:hint="  Word"
             android:inputType="text"
             android:privateImeOptions="defaultInputmode=english"
-            android:singleLine="true"
-            android:nextFocusDown="@+id/input_mean">
+            android:singleLine="true">
             <requestFocus/>
         </EditText>
 
@@ -90,13 +97,20 @@
             android:hint="  뜻"
             android:inputType="text"
             android:privateImeOptions="defaultInputmode=korean" />
-        <!-- 동그라미안에있는 x로 모든 텍스트 삭제 -->
         <Button
+            android:id="@+id/delete_all"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/ic_baseline_close_24" />
-        <!-- 삭제하시겠습니까 dialog-->
+            android:background="@drawable/ic_baseline_cancel_24" />
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/input_division"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/input_layout"
+        android:background="@color/colorDivision"
+        android:orientation="horizontal" />
 
     <FrameLayout
         android:id="@+id/list_view"
@@ -129,7 +143,7 @@
         android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:stateListAnimator="@null"
-        android:text="초기화"
+        android:text="지우기"
         android:theme="@style/ButtonStyle" />
 
     <ImageButton
