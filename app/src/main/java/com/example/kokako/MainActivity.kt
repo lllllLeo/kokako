@@ -1,22 +1,18 @@
 package com.example.kokako
 
-import android.content.DialogInterface
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     var drawerLayout: DrawerLayout? = null
@@ -27,40 +23,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-    fab_add_note.setOnClickListener { view ->
-        val select_languge = arrayOf("영어", "일본어", "중국어")
-        val mBuilder = AlertDialog.Builder(this)
-        var selectedRadioItem = 0
-        mBuilder.setTitle("단어장 언어 선택")
-            .setSingleChoiceItems(select_languge, selectedRadioItem,
-                DialogInterface.OnClickListener { dialog, which ->
-                selectedRadioItem = which
-                })
-            .setNegativeButton("취소", null)
-            .setPositiveButton("확인",
-                DialogInterface.OnClickListener { dialog, which ->
-                when(selectedRadioItem){
-                    0 -> {
-                        var intent = Intent(this, AddWordActivity::class.java)
-                        startActivity(intent)
-                    }
-                    1 -> {
-                        Toast.makeText(this,"일어",Toast.LENGTH_LONG).show()
-                    }
-                    2 -> {
-                        Toast.makeText(this,"중국어",Toast.LENGTH_LONG).show()
-                    }
+    val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.main_frame,wordListFragment()).commit()
 
-                }
-                dialog.dismiss()
-            })
-            .setNeutralButton("취소") { dialog, which ->
-                dialog.cancel()
-            }
-        val mDialog = mBuilder.create()
-        mDialog.show()
 
-    }
 
     /*   private fun selectLanguagePopup() {
         }*/
@@ -93,6 +59,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         navigationView?.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음
     }
+
 
 
 
@@ -149,4 +116,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
         return true
     }
+
+
 }

@@ -14,12 +14,12 @@ open class ToolbarActivity : AppCompatActivity() {
     var toolbar: Toolbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_toolbar)
+        setContentView(R.layout.content_main)
 
     }
 
     override fun setContentView(layoutResID: Int) {
-        var fullView : LinearLayout = layoutInflater.inflate(R.layout.activity_toolbar, null) as LinearLayout
+        var fullView : LinearLayout = layoutInflater.inflate(R.layout.content_main, null) as LinearLayout
         super.setContentView(fullView)
         toolbar = findViewById<Toolbar>(R.id.toolbar)
 

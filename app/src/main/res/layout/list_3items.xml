@@ -4,6 +4,11 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardBackgroundColor="#FFFFFF"
+        app:cardUseCompatPadding="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -14,20 +19,30 @@
 
 
                     <EditText
-                        android:id="@+id/rv_word"
+                        android:id="@+id/rv_kanji"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
-                        android:hint="  Word"
+                        android:layout_weight="0.33"
+                        android:hint="  漢字"
                         android:textSize="15sp"
                         android:inputType="text"
-                        android:privateImeOptions="defaultInputmode=english" />
+                        android:privateImeOptions="defaultInputmode=japanese" />
+
+                    <EditText
+                        android:id="@+id/rv_hiragana"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.33"
+                        android:hint="  かんじ"
+                        android:inputType="text"
+                        android:privateImeOptions="defaultInputmode=japanese"
+                        android:textSize="15sp" />
 
                     <EditText
                         android:id="@+id/rv_mean"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="0.5"
+                        android:layout_weight="0.33"
                         android:hint="  뜻"
                         android:textSize="15sp"
                         android:inputType="text"
@@ -35,10 +50,11 @@
 
                     <Button
                         android:id="@+id/rv_remove_word"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
                         android:background="@drawable/ic_baseline_close_24" />
                     <!-- 삭제하시겠습니까 dialog-->
 
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </FrameLayout>

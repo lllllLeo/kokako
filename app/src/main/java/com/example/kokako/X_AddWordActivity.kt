@@ -1,26 +1,19 @@
 package com.example.kokako
 
-import android.content.Context
 import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.activity_add_word.*
-import kotlinx.android.synthetic.main.list_item.*
-import org.w3c.dom.Text
-import java.text.FieldPosition
 
-class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
+class X_AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
     lateinit var myRecyclerAdapter: MyRecyclerAdapter
     var wordDto = ArrayList<WordDTO>()
     var wordCount : Int = 0
@@ -31,9 +24,12 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_word)
         tv_wordCount = findViewById<TextView>(R.id.word_count)
+
+
+
         // Forcing the Soft Keyboard open
         var imm: InputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         countString = "$currentCount/$wordCount"
                         Toast.makeText(this,countString,Toast.LENGTH_SHORT).show()
@@ -78,7 +74,7 @@ class AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
 
                         // 리사이클러뷰 설정
                         rv_list_item.apply {
-                            layoutManager = LinearLayoutManager(this@AddWordActivity, LinearLayoutManager.VERTICAL, true)
+                            layoutManager = LinearLayoutManager(this@X_AddWordActivity, LinearLayoutManager.VERTICAL, true)
 //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                             // 어답터 장착
                             adapter = myRecyclerAdapter
