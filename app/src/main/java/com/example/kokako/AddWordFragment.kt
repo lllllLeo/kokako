@@ -12,13 +12,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordDTO
-import kotlinx.android.synthetic.main.activity_add_word.*
+import kotlinx.android.synthetic.main.fragment_add_word.*
 
 class AddWordFragment : Fragment(), MyRecyclerViewInterface {
+    private lateinit var mainViewModel : MainViewModel
     lateinit var myRecyclerAdapter: MyRecyclerAdapter
     var wordDto = ArrayList<WordDTO>()
     var wordCount: Int = 0
@@ -30,13 +31,27 @@ class AddWordFragment : Fragment(), MyRecyclerViewInterface {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-        val view = inflater.inflate(R.layout.activity_add_word, container, false)
+        val view = inflater.inflate(R.layout.fragment_add_word, container, false)
         return view
 
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        activity?.run {
+            mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
+                .get(MainViewModel::class.java)
+        }
+
+
+
+
+
+
+
+
+
 
         tv_wordCount = view.findViewById<TextView>(R.id.word_count)
 

@@ -1,3 +1,4 @@
+/*
 package com.example.kokako
 
 import android.content.DialogInterface
@@ -11,7 +12,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.model.WordDTO
-import kotlinx.android.synthetic.main.activity_add_word.*
+import kotlinx.android.synthetic.main.fragment_add_word.*
 
 class X_AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
     lateinit var myRecyclerAdapter: MyRecyclerAdapter
@@ -22,7 +23,7 @@ class X_AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
     var tv_wordCount : TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_word)
+        setContentView(R.layout.fra)
         tv_wordCount = findViewById<TextView>(R.id.word_count)
 
 
@@ -99,9 +100,11 @@ class X_AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
         btn_add_word.setOnClickListener(btnListener)
     }
 
-    /*
+    */
+/*
     * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
-    * */
+    * *//*
+
     override fun onRemoveClicked(it: View, position: Int) {
         Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
         val mBuilder = AlertDialog.Builder(it.context)
@@ -124,4 +127,4 @@ class X_AddWordActivity : AppCompatActivity(), MyRecyclerViewInterface {
     }
     // 뒤로가기 다이얼로그
 
-}
+}*/

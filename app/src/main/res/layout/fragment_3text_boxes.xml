@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".X_AddWordActivity">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/info"
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.33"
             android:layout_gravity="center"
-            android:hint="  かんじ"
+            android:hint="  ひらがな"
             android:textSize="15sp"
             android:inputType="text"
             android:privateImeOptions="defaultInputmode=english"

@@ -15,6 +15,7 @@ import com.google.android.material.navigation.NavigationView
 
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+    private lateinit var mainViewModel : MainViewModel
     var drawerLayout: DrawerLayout? = null
     var navigationView: NavigationView? = null
     var toolbar: Toolbar? = null
@@ -23,13 +24,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-    val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.main_frame,wordListFragment()).commit()
+        val ft = supportFragmentManager.beginTransaction()
+        ft.replace(R.id.main_frame,MyWordListFragment()).commit()
 
 
 
-    /*   private fun selectLanguagePopup() {
-        }*/
+
 
         /*---- Hooks ----*/
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -40,13 +40,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-
         /*---- Navigation Drawer Menu ----*/
         /*
         * ActionBarDrawerToggle은 액션 바 아이콘과 네비게이션 드로어 사이의 적절한 상호작용을 가능하게 한다.*/
 
         // Hide or show items
-
         var menu  = navigationView?.menu
         menu?.findItem(R.id.nav_logout)?.isVisible = false
         menu?.findItem(R.id.nav_profile)?.isVisible = false
@@ -56,13 +54,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout?.addDrawerListener(toggle)
         toggle.syncState()  // syncState()는 드로어를 왼쪽 또는 오른쪽으로 돌릴 때 회전하는 드로어 아이콘을 동기화하며, syncState()를 제거하려고 하면 동기화가 실패하여 버그가 회전하거나 작동되지도 않는다.
         navigationView?.setNavigationItemSelectedListener(this)
-
         navigationView?.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음
     }
-
-
-
-
     override fun onBackPressed() {
         /*if (System.currentTimeMillis() - backPressedTime > 2000) {
             Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
@@ -80,7 +73,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             super.onBackPressed()
         }
     }
-
 //    NavigationDrawer Menu
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
@@ -98,13 +90,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         drawerLayout?.closeDrawer(GravityCompat.START) // 네비게이션드로우 닫히고 인텐트전환
         return true // 네이게이션 아이템이 선택되면 true
     }
-
 //    Option Menu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.sub_menu, menu)
         return true
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item?.itemId) {
             R.id.menu_sort -> {

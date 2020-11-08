@@ -8,21 +8,28 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.content_main.*
-import kotlinx.android.synthetic.main.fragment_wordlist.*
+import androidx.lifecycle.ViewModelProvider
+import kotlinx.android.synthetic.main.fragment_my_word_list.*
 
-class wordListFragment : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_wordlist, container, false)
+class MyWordListFragment : Fragment() {
+        private lateinit var mainViewModel : MainViewModel
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?, ): View? {
+        val view = inflater.inflate(R.layout.fragment_my_word_list, container, false)
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        activity?.run {
+            mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
+                .get(MainViewModel::class.java)
+        }
+
+
+
+
+
+
 
         fab_add_note.setOnClickListener { view ->
             val select_languge = arrayOf("영어", "일본어", "중국어")

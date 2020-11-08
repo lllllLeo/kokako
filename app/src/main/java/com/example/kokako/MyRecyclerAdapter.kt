@@ -1,6 +1,5 @@
 package com.example.kokako
 
-import android.text.Layout
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +20,7 @@ class MyRecyclerAdapter(myRecyclerViewInterface: MyRecyclerViewInterface): Recyc
     // 뷰 홀더가 생성 되었을때
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         // 연결할 레이아웃 설정
-        return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false), this.myRecyclerViewInterface!!)
+        return MyViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_add_list_item, parent, false), this.myRecyclerViewInterface!!)
     }
     // 뷰와 뷰홀더가 묶였을때
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {

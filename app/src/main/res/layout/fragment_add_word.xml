@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".X_AddWordActivity">
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:id="@+id/info"
@@ -129,8 +129,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/list_item"
-            />
+            tools:listitem="@layout/rv_add_list_item"/>
     </FrameLayout>
 
     <LinearLayout

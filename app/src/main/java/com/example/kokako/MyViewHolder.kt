@@ -4,7 +4,7 @@ import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordDTO
-import kotlinx.android.synthetic.main.list_item.view.*
+import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
 class MyViewHolder(itemView: View,
