@@ -15,57 +15,45 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.kokako.databinding.FragmentAddWordBinding
 import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.fragment_add_word.*
 
-class AddWordFragment : Fragment(), MyRecyclerViewInterface {
-    private lateinit var mainViewModel : MainViewModel
-    lateinit var myRecyclerAdapter: MyRecyclerAdapter
+class AddWordFragment : Fragment(), AddRecyclerViewInterface {
+    private var _binding : FragmentAddWordBinding? = null
+    private val binding get() = _binding!!
+    lateinit var addRecyclerAdapter: AddRecyclerAdapter
     var wordDto = ArrayList<WordDTO>()
     var wordCount: Int = 0
     var currentCount: Int = 0
     var countString: String? = null
     var tv_wordCount: TextView? = null
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_add_word, container, false)
+        _binding = FragmentAddWordBinding.inflate(inflater,container,false)
+        var view = binding.root
         return view
 
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        activity?.run {
-            mainViewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())
-                .get(MainViewModel::class.java)
-        }
-
-
-
-
-
-
-
-
-
-
-        tv_wordCount = view.findViewById<TextView>(R.id.word_count)
+        tv_wordCount = binding.wordCount
 
         //        add Divider in RecyclerView
         rv_list_item.addItemDecoration(DividerItemDecoration(view.context,LinearLayoutManager.VERTICAL))
-
 
 
         // Forcing the Soft Keyboard open
         var imm: InputMethodManager =
             activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+
         countString = "$currentCount/$wordCount"
-        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
+//        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
         tv_wordCount?.text = countString
 
         var btnListener = View.OnClickListener { view ->
@@ -104,8 +92,8 @@ class AddWordFragment : Fragment(), MyRecyclerViewInterface {
 //                        btn_add_word.isClickable = true
 //                        btn_add_word.isEnabled = true
                         wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
-                        myRecyclerAdapter = MyRecyclerAdapter(this)
-                        myRecyclerAdapter.submitList(this.wordDto)
+                        addRecyclerAdapter = AddRecyclerAdapter(this)
+                        addRecyclerAdapter.submitList(this.wordDto)
 
                         // 리사이클러뷰 설정
                         rv_list_item.apply {
@@ -114,7 +102,7 @@ class AddWordFragment : Fragment(), MyRecyclerViewInterface {
                                 true)
 //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                             // 어답터 장착
-                            adapter = myRecyclerAdapter
+                            adapter = addRecyclerAdapter
                         }
                         input_word.text.clear()
                         input_mean.text.clear()
@@ -147,7 +135,7 @@ class AddWordFragment : Fragment(), MyRecyclerViewInterface {
             .setMessage("단어 : " + wordDto[position].word.toString() + "\n뜻 : " + wordDto[position].mean.toString() + "\n이 항목을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { dialog, which ->
-                    myRecyclerAdapter?.removeWord(wordDto, position)
+                    addRecyclerAdapter.removeWord(wordDto, position)
 //                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
                     wordCount--
                     countString = "$currentCount/$wordCount"
@@ -160,7 +148,13 @@ class AddWordFragment : Fragment(), MyRecyclerViewInterface {
                 })
         mBuilder.show()
     }
-// 뒤로가기 다이얼로그
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // 뒤로가기 다이얼로그
 }
 
 

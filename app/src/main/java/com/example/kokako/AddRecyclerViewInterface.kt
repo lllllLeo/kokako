@@ -6,8 +6,7 @@ import android.view.View
 /*
 * 리사이클러뷰어답터에서 클릭리스너 설정하면 비용이 많이 발생한다더라 그래서 인터페이스로 활용
 * */
-interface MyRecyclerViewInterface {
+interface AddRecyclerViewInterface {
 
     fun onRemoveClicked(v : View, position: Int)
-
 }

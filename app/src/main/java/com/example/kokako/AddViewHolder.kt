@@ -7,14 +7,11 @@ import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
-class MyViewHolder(itemView: View,
-                   recyclerViewInterface: MyRecyclerViewInterface)
-                    : RecyclerView.ViewHolder(itemView),
-                    View.OnClickListener{
+class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
     private var wordEditText = itemView.rv_word
     private var meanEditText = itemView.rv_mean
     private var removeButton = itemView.rv_remove_word
-    private var myRecyclerViewInterface : MyRecyclerViewInterface? = null
+    private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 
     // 기본 생성자
     init {
@@ -27,7 +24,7 @@ class MyViewHolder(itemView: View,
 //        removeButton이 onClick된걸 리스너에 등록
         removeButton.setOnClickListener(this)
         // 인터페이스 연결
-        this.myRecyclerViewInterface = recyclerViewInterface
+        this.addRecyclerViewInterface = recyclerViewInterface
     }
 
     //뷰와 데이터 묶기
@@ -39,7 +36,7 @@ class MyViewHolder(itemView: View,
 
 //    뷰홀더에서 아이템이 클릭된걸 암
 //    리사이클러 인터페이스에 알려줌
-//    이메소드가 발동이 되는걸 AddWordActivity가 알도록 할거임
+//    이메소드가 발동이 되는걸 AddWordFragment 가 알도록 할거임
     /*
     * 이렇게해야 아래 onClick가 발동. 발동되면서
     * this.myRecyclerViewInterface?.onItemClicked()가 발동
@@ -48,7 +45,7 @@ class MyViewHolder(itemView: View,
     * */
     override fun onClick(v: View?) {
     // adapterPosition 뷰홀더에서 현재 어답터의 포지션을 알 수 있음
-        this.myRecyclerViewInterface?.onRemoveClicked(v!!, adapterPosition)
+        this.addRecyclerViewInterface?.onRemoveClicked(v!!, adapterPosition)
     }
     /*
     * 아이템 클릭시

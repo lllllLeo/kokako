@@ -11,7 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 
 open class ToolbarActivity : AppCompatActivity() {
-    var toolbar: Toolbar? = null
+    private var toolbar: Toolbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.content_main)
