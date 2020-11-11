@@ -101,9 +101,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when(item.itemId) {
             R.id.menu_sort -> {
                 Toast.makeText(this,"정렬하기", Toast.LENGTH_SHORT).show()
+                val ft = supportFragmentManager.beginTransaction()
+                ft.replace(R.id.main_frame,MyWordListFragment()).commit()
             }
             R.id.menu_import -> {
-                Toast.makeText(this,"가져오기", Toast.LENGTH_SHORT).show()
+                var ft = supportFragmentManager.beginTransaction()
+                ft.replace(R.id.main_frame,ImportFragment()).commit()
+//                Toast.makeText(this,"가져오기", Toast.LENGTH_SHORT).show()
             }
         }
         return true
