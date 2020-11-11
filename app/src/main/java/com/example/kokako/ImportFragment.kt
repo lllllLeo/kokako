@@ -5,11 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.kokako.databinding.FragmentImportBinding
-import kotlinx.android.synthetic.main.fragment_import.*
 
 class ImportFragment : Fragment() {
     private var _binding : FragmentImportBinding? = null

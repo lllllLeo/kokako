@@ -71,12 +71,11 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
                 }
                 R.id.btn_move_left -> {
                     input_word.requestFocus()
-//  새로운 카드 없으면 만들고 커서이동
                 }
                 R.id.btn_move_right -> {
                     input_mean.requestFocus()
                 }
-// data없으면  무시하기
+// data없으면  무시하기 -> textViewLayout?
                 R.id.btn_add_word -> {
                     input_word.text.toString().trim()
                     input_mean.text.toString().trim()
@@ -117,7 +116,6 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
                 }
             }
         }
-
         delete_all.setOnClickListener(btnListener)
         btn_remove_text.setOnClickListener(btnListener)
         btn_move_left.setOnClickListener(btnListener)
