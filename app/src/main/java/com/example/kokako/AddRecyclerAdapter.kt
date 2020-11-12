@@ -1,7 +1,9 @@
 package com.example.kokako
 
+import android.support.v4.os.IResultReceiver
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordDTO
 
@@ -39,6 +41,7 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Re
         wordDto.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, wordDto.size)
+        DefaultItemAnimator()
     }
 
 

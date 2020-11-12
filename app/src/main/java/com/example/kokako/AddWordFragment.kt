@@ -12,9 +12,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.FragmentAddWordBinding
 import com.example.kokako.model.WordDTO
 import kotlinx.android.synthetic.main.fragment_add_word.*
@@ -22,17 +22,16 @@ import kotlinx.android.synthetic.main.fragment_add_word.*
 class AddWordFragment : Fragment(), AddRecyclerViewInterface {
     private var _binding : FragmentAddWordBinding? = null
     private val binding get() = _binding!!
-    lateinit var addRecyclerAdapter: AddRecyclerAdapter
+    private lateinit var addRecyclerAdapter: AddRecyclerAdapter
     var wordDto = ArrayList<WordDTO>()
     var wordCount: Int = 0
     var currentCount: Int = 0
     var countString: String? = null
-    var tv_wordCount: TextView? = null
+    private var tvWordCount: TextView? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View? {
         _binding = FragmentAddWordBinding.inflate(inflater,container,false)
-        var view = binding.root
-        return view
+        return binding.root
 
     }
 
@@ -41,7 +40,7 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        tv_wordCount = binding.wordCount
+        tvWordCount = binding.wordCount
 
         //        add Divider in RecyclerView
         rv_list_item.addItemDecoration(DividerItemDecoration(view.context,LinearLayoutManager.VERTICAL))
@@ -54,7 +53,7 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
 
         countString = "$currentCount/$wordCount"
 //        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
-        tv_wordCount?.text = countString
+        tvWordCount?.text = countString
 
         var btnListener = View.OnClickListener { view ->
             when (view.id) {
@@ -109,7 +108,7 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
 //                        Toast.makeText(this,"현재 단어 갯수"+wordDto.size,Toast.LENGTH_SHORT).show()
                         wordCount++
                         countString = "$currentCount/$wordCount"
-                        tv_wordCount?.text = countString
+                        tvWordCount?.text = countString
                         Toast.makeText(this.context, "wordCount는 " + wordCount, Toast.LENGTH_SHORT)
                             .show()
                     }
@@ -137,7 +136,8 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
 //                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
                     wordCount--
                     countString = "$currentCount/$wordCount"
-                    tv_wordCount?.text = countString
+                    tvWordCount?.text = countString
+
 //                    Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
                 })
             .setNegativeButton("취소",
