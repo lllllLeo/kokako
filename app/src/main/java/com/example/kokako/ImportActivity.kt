@@ -1,25 +1,18 @@
 package com.example.kokako
 
-import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.fragment.app.Fragment
-import com.example.kokako.databinding.FragmentImportBinding
+import androidx.appcompat.app.AppCompatActivity
+import com.example.kokako.databinding.ActivityImportBinding
 
-class ImportFragment : Fragment() {
-    private var _binding : FragmentImportBinding? = null
+class ImportActivity : AppCompatActivity() {
+    private var _binding : ActivityImportBinding? = null
     private val binding get() = _binding!!
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?, ): View? {
-        _binding = FragmentImportBinding.inflate(inflater,container,false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        _binding = ActivityImportBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(R.layout.activity_import)
 
         var imText : String = "hi,안녕\nbye,잘가\nbeer,맥주"
         var importText = binding.importText.toString()

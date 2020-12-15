@@ -2,24 +2,20 @@ package com.example.kokako
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 
 open class ToolbarActivity : AppCompatActivity() {
     private var toolbar: Toolbar? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.content_main)
+        setContentView(R.layout.activity_toolbar)
 
     }
 
     override fun setContentView(layoutResID: Int) {
-        var fullView : LinearLayout = layoutInflater.inflate(R.layout.content_main, null) as LinearLayout
+        var fullView : LinearLayout = layoutInflater.inflate(R.layout.activity_toolbar, null) as LinearLayout
         super.setContentView(fullView)
         toolbar = findViewById<Toolbar>(R.id.toolbar)
 
@@ -37,7 +33,7 @@ open class ToolbarActivity : AppCompatActivity() {
 
     }
 
-    //    Option Menu
+/*    //    Option Menu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.sub_menu, menu)
         return true
@@ -53,7 +49,7 @@ open class ToolbarActivity : AppCompatActivity() {
             }
         }
         return true
-    }
+    }*/
 
 }
 

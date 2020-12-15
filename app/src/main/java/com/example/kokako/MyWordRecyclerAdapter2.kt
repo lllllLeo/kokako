@@ -29,8 +29,8 @@ class MyWordRecyclerAdapter2: RecyclerView.Adapter<RecyclerView.ViewHolder>{
         var view : View? = null
         var context : Context = parent.context
         var dp  = context.resources.displayMetrics.density
-        var subItemPaddingLeft = (18 * dp).toInt()
-        var subItemPaddingTopAndBottom = (5 * dp).toInt()
+        var subItemPaddingLeft = (24 * dp).toInt()
+        var subItemPaddingTopAndBottom = (6 * dp).toInt()
 
         when (viewType){
             HEADER -> {
@@ -39,6 +39,7 @@ class MyWordRecyclerAdapter2: RecyclerView.Adapter<RecyclerView.ViewHolder>{
                 var header = MyWordViewHolder2(view)
                 return header
             }
+//            단어 개수, 퍼센트 추가해야함
             CHILD -> {
                 var itemTextView = TextView(context)
                 itemTextView.setPadding(subItemPaddingLeft, subItemPaddingTopAndBottom,0,subItemPaddingTopAndBottom)
@@ -91,7 +92,7 @@ class MyWordRecyclerAdapter2: RecyclerView.Adapter<RecyclerView.ViewHolder>{
             } // break
             CHILD -> {
                 var itemTextView = holder.itemView as TextView
-                itemTextView.setText(data[position].text)
+                itemTextView.text = data[position].text
             }
         }
     }

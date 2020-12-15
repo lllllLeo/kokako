@@ -7,10 +7,16 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/activity_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
     <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
         android:weightSum="1">
 
         <TextView

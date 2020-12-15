@@ -41,7 +41,7 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Re
         wordDto.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, wordDto.size)
-        DefaultItemAnimator()
+//        DefaultItemAnimator()
     }
 
 

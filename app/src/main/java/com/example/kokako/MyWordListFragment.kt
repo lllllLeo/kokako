@@ -1,11 +1,11 @@
 package com.example.kokako
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,11 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.FragmentMyWordListBinding
 import com.example.kokako.model.ItemWordDTO
 import com.example.kokako.model.MyWordListDTO
-import kotlinx.android.synthetic.*
 import kotlinx.android.synthetic.main.fragment_my_word_list.*
 
 
 class MyWordListFragment : Fragment() {
+    private lateinit var callback : OnBackPressedCallback
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
     private var _binding: FragmentMyWordListBinding? = null
     private val binding get() = _binding!!
@@ -31,6 +31,13 @@ class MyWordListFragment : Fragment() {
         var view = binding.root
         return view
     }
+
+//    프래그먼트 별 툴바 메뉴 추가
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.sub_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -78,12 +85,11 @@ class MyWordListFragment : Fragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             recyclerview?.layoutManager
             adapter = MyWordRecyclerAdapter2(data)
-        }
+//            var decorator = DividerItemDecoration(view.context,LinearLayoutManager.VERTICAL)
+//            decorator.setDrawable(ContextCompat.getDrawable(context,R.drawable.divider_line)!!)
+//            addItemDecoration(decorator)
 
-      /*  rv_my_item.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            adapter = MyWordRecyclerAdapter2(data)
-        }*/
+        }
 
 
         fab_add_note.setOnClickListener { view ->
@@ -100,7 +106,8 @@ class MyWordListFragment : Fragment() {
                     DialogInterface.OnClickListener { dialog, which ->
                         when (selectedRadioItem) {
                             0 -> {
-                                setFrag(0)
+                                var intent = Intent(this.context, AddWordActivity::class.java)
+                                startActivity(intent)
                             }
                             1 -> {
                                 Toast.makeText(view.context, "일어", Toast.LENGTH_LONG).show()
@@ -112,28 +119,12 @@ class MyWordListFragment : Fragment() {
                         }
                         dialog.dismiss()
                     })
-                .setNeutralButton("취소") { dialog, which ->
-                    dialog.cancel()
-                }
+//                .setNeutralButton("취소") { dialog, which ->
+//                    dialog.cancel()
+//                }
             val mDialog = mBuilder.create()
             mDialog.show()
 
-        }
-    }
-
-    private fun setFrag(fragNum: Int) {
-        val ft = (activity as MainActivity).supportFragmentManager.beginTransaction()
-//        val ft = childFragmentManager.beginTransaction()
-        when(fragNum) {
-            0 -> {
-                ft.replace(R.id.main_frame, AddWordFragment()).commit()
-            }
-            1 -> {
-
-            }
-            2 -> {
-
-            }
         }
     }
 

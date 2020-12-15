@@ -1,26 +1,27 @@
 package com.example.kokako
 
-import android.content.Context.INPUT_METHOD_SERVICE
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.kokako.databinding.FragmentAddWordBinding
+import com.example.kokako.databinding.ActivityAddWordBinding
+import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.WordDTO
-import kotlinx.android.synthetic.main.fragment_add_word.*
+import kotlinx.android.synthetic.main.activity_add_word.*
 
-class AddWordFragment : Fragment(), AddRecyclerViewInterface {
-    private var _binding : FragmentAddWordBinding? = null
+class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
+    private lateinit var toolbarBinding: ActivityToolbarBinding
+    private var _binding : ActivityAddWordBinding? = null
     private val binding get() = _binding!!
     private lateinit var addRecyclerAdapter: AddRecyclerAdapter
     var wordDto = ArrayList<WordDTO>()
@@ -28,27 +29,31 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
     var currentCount: Int = 0
     var countString: String? = null
     private var tvWordCount: TextView? = null
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
-    ): View? {
-        _binding = FragmentAddWordBinding.inflate(inflater,container,false)
-        return binding.root
 
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        _binding = ActivityAddWordBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        toolbarBinding = binding.includeToolbar
         tvWordCount = binding.wordCount
 
         //        add Divider in RecyclerView
-        rv_list_item.addItemDecoration(DividerItemDecoration(view.context,LinearLayoutManager.VERTICAL))
+        rv_list_item.addItemDecoration(DividerItemDecoration(this,LinearLayoutManager.VERTICAL))
+
+        /*---- Tool Bar ----*/
+        setSupportActionBar(toolbarBinding.toolbar)
+        supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
+        supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
+        toolbarBinding.toolbarTitle.setText("단어장 추가")
 
 
         // Forcing the Soft Keyboard open
         var imm: InputMethodManager =
-            activity?.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
         countString = "$currentCount/$wordCount"
@@ -82,7 +87,7 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
                     if (input_mean.text.toString().isEmpty() || input_word.text.toString()
                             .isEmpty()
                     ) {
-                        Toast.makeText(this.context, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
 //                        버튼 활성화 안되게
 //                        btn_add_word.isClickable = false
 //                        btn_add_word.isEnabled = false
@@ -109,7 +114,7 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
                         wordCount++
                         countString = "$currentCount/$wordCount"
                         tvWordCount?.text = countString
-                        Toast.makeText(this.context, "wordCount는 " + wordCount, Toast.LENGTH_SHORT)
+                        Toast.makeText(this, "wordCount는 " + wordCount, Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -120,6 +125,23 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
         btn_move_left.setOnClickListener(btnListener)
         btn_move_right.setOnClickListener(btnListener)
         btn_add_word.setOnClickListener(btnListener)
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_check, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            android.R.id.home -> {
+                finish()
+            }
+            R.id.menu_check -> {
+//                dialog 단어장을 추가하시겠습니까 확인 취소
+                Toast.makeText(this,"호이호이", Toast.LENGTH_SHORT).show()
+            }
+        }
+        return true
     }
 
     /*
@@ -147,12 +169,12 @@ class AddWordFragment : Fragment(), AddRecyclerViewInterface {
         mBuilder.show()
     }
 
-    override fun onDestroyView() {
+/*    override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
+    }*/
+}
 
     // 뒤로가기 다이얼로그
-}
 
 
