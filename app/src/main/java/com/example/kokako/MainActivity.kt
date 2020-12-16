@@ -180,8 +180,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Toast.makeText(this,"정렬하기", Toast.LENGTH_SHORT).show()
             }
             R.id.menu_import -> {
-                val ft = supportFragmentManager.beginTransaction()
-                Toast.makeText(this,"가져오기", Toast.LENGTH_SHORT).show()
+                var intent = Intent(this, ImportActivity::class.java)
+                startActivity(intent)
             }
         }
         return true

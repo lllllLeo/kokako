@@ -12,6 +12,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".ToolbarActivity"/>
         <activity android:name=".AddWordActivity" />
+        <activity android:name=".ImportActivity" />
         <activity android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

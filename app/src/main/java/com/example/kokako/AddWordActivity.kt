@@ -29,6 +29,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     var currentCount: Int = 0
     var countString: String? = null
     private var tvWordCount: TextView? = null
+    private lateinit var imm : InputMethodManager   // 여기 선언한다고 lateinit 함
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +53,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
 
         // Forcing the Soft Keyboard open
-        var imm: InputMethodManager =
+        imm =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
@@ -134,11 +135,24 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                 finish()
             }
             R.id.menu_check -> {
-//                dialog 단어장을 추가하시겠습니까 확인 취소
-                Toast.makeText(this,"호이호이", Toast.LENGTH_SHORT).show()
+                var mBuilder = AlertDialog.Builder(this)
+                mBuilder.setTitle("단어장으로 추가")
+                    .setMessage("입력한 텍스트를 단어장으로 만드시겠습니까?")
+                    .setNegativeButton("취소", null)
+                    .setPositiveButton("확인", DialogInterface.OnClickListener {
+                        dialog, which ->
+//                        DB작업
+                        Toast.makeText(this,"단어장으로 추가완료", Toast.LENGTH_SHORT).show()
+                        dialog.dismiss()
+                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                        finish()
+                    })
+                val mDialog = mBuilder.create()
+                mDialog.show()
             }
         }
         return true
