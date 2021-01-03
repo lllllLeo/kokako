@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.kokako.database.WordDatabase
 import com.example.kokako.databinding.ActivityAddWordBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.WordDTO
@@ -24,6 +25,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private var _binding : ActivityAddWordBinding? = null
     private val binding get() = _binding!!
     private lateinit var addRecyclerAdapter: AddRecyclerAdapter
+    lateinit var db : WordDatabase
+//    var wordList = listOf<WordDTO>()
     var wordDto = ArrayList<WordDTO>()
     var wordCount: Int = 0
     var currentCount: Int = 0
@@ -56,6 +59,28 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         imm =
             getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+
+
+
+        db = WordDatabase.getInstance(this)!!
+
+        fun insertWord(){
+
+        }
+
+        fun getAllWord(){
+
+        }
+
+        fun deleteMemo(){
+
+        }
+
+        fun setRecyclerView(){
+
+        }
+
+
 
         countString = "$currentCount/$wordCount"
 //        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
@@ -98,6 +123,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
                         addRecyclerAdapter = AddRecyclerAdapter(this)
                         addRecyclerAdapter.submitList(this.wordDto)
+                        var word = WordDTO(null, )
+                        insertWord()
 
                         // 리사이클러뷰 설정
                         rv_list_item.apply {
