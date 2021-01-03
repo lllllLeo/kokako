@@ -3,7 +3,7 @@ package com.example.kokako
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kokako.model.WordDTO
+import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
@@ -28,10 +28,10 @@ class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterf
     }
 
     //뷰와 데이터 묶기
-    fun bind(wordDto: ArrayList<WordDTO>, position:Int){
+    fun bind(word: ArrayList<Word>, position:Int){
         Log.d("로그","MyViewHolder - bind() called")
-        wordEditText.setText(wordDto[position].word.toString())
-        meanEditText.setText(wordDto[position].mean.toString())
+        wordEditText.setText(word[position].word.toString())
+        meanEditText.setText(word[position].mean.toString())
     }
 
 //    뷰홀더에서 아이템이 클릭된걸 암

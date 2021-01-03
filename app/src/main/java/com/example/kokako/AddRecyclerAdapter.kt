@@ -1,15 +1,13 @@
 package com.example.kokako
 
-import android.support.v4.os.IResultReceiver
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kokako.model.WordDTO
+import com.example.kokako.model.Word
 
 class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): RecyclerView.Adapter<AddViewHolder>() {
 
-    private var wordDtoData = ArrayList<WordDTO>()
+    private var wordDtoData = ArrayList<Word>()
 
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 
@@ -33,14 +31,14 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Re
     override fun getItemCount(): Int { return wordDtoData.size }
 
     // 외부에서 데이터 넘기기, 단어, 뜻 추가시킴
-    fun submitList(wordDto: ArrayList<WordDTO>){
-        this.wordDtoData = wordDto
+    fun submitList(word: ArrayList<Word>){
+        this.wordDtoData = word
     }
 
-    fun removeWord(wordDto: ArrayList<WordDTO>, position: Int){
-        wordDto.removeAt(position)
+    fun removeWord(word: ArrayList<Word>, position: Int){
+        word.removeAt(position)
         notifyItemRemoved(position)
-        notifyItemRangeChanged(position, wordDto.size)
+        notifyItemRangeChanged(position, word.size)
 //        DefaultItemAnimator()
     }
 

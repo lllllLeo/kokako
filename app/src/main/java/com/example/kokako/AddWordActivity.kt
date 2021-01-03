@@ -12,12 +12,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.kokako.database.WordDatabase
+import com.example.kokako.viewModel.WordViewModel
 import com.example.kokako.databinding.ActivityAddWordBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
-import com.example.kokako.model.WordDTO
+import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.activity_add_word.*
 
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
@@ -25,9 +26,10 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private var _binding : ActivityAddWordBinding? = null
     private val binding get() = _binding!!
     private lateinit var addRecyclerAdapter: AddRecyclerAdapter
-    lateinit var db : WordDatabase
+    private var model : WordViewModel? = null // 바로 WordDatabase안부르고 뷰모델 통해서 부름
+    //    lateinit var db : WordDatabase  뷰모델할려고 일단지움
 //    var wordList = listOf<WordDTO>()
-    var wordDto = ArrayList<WordDTO>()
+//    var word = ArrayList<Word>()  // 밑에 var word 새로 만들거라서 잠시 지움 맨밑에도 오류 뜸 이거떄문에
     var wordCount: Int = 0
     var currentCount: Int = 0
     var countString: String? = null
@@ -56,29 +58,19 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
 
         // Forcing the Soft Keyboard open
-        imm =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
 
 
-        db = WordDatabase.getInstance(this)!!
+//        db = WordDatabase.getInstance(this)!!
 
-        fun insertWord(){
+//        데이터핸들링은 뷰모델을 통해서만 한다.
+        model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(WordViewModel::class.java)
+        model?.wordList?.observe(this, {    // 단어 추가 버튼 누르면 이게 옵저버로 보고잇으니까 여기 안에는 리사이클러뷰에 넣는거해야겟지
+            updateWordList(it)
+        })
 
-        }
-
-        fun getAllWord(){
-
-        }
-
-        fun deleteMemo(){
-
-        }
-
-        fun setRecyclerView(){
-
-        }
 
 
 
@@ -118,23 +110,26 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 //                        btn_add_word.isClickable = false
 //                        btn_add_word.isEnabled = false
                     } else {
-//                        btn_add_word.isClickable = true
-//                        btn_add_word.isEnabled = true
-                        wordDto.add(WordDTO(input_word.text.toString(), input_mean.text.toString()))
-                        addRecyclerAdapter = AddRecyclerAdapter(this)
-                        addRecyclerAdapter.submitList(this.wordDto)
-                        var word = WordDTO(null, )
-                        insertWord()
+                        addWord(view)
+//                        var word  = Word()
+//                        word.word = binding.inputWord.text.toString()
+//                        word.mean = binding.inputMean.text.toString()
+//                        model?.insert(word)
 
-                        // 리사이클러뷰 설정
-                        rv_list_item.apply {
-                            layoutManager = LinearLayoutManager(context,
-                                LinearLayoutManager.VERTICAL,
-                                true)
-//                            (layoutManager as LinearLayoutManager).stackFromEnd = true
-                            // 어답터 장착
-                            adapter = addRecyclerAdapter
-                        }
+
+//                        word.add(Word(input_word.text.toString(), input_mean.text.toString()))
+//                        addRecyclerAdapter = AddRecyclerAdapter(this)
+//                        addRecyclerAdapter.submitList(this.word)
+
+//                        // 리사이클러뷰 설정
+//                        rv_list_item.apply {
+//                            layoutManager = LinearLayoutManager(context,
+//                                LinearLayoutManager.VERTICAL,
+//                                true)
+////                            (layoutManager as LinearLayoutManager).stackFromEnd = true
+//                            // 어답터 장착
+//                            adapter = addRecyclerAdapter
+//                        }
                         input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
@@ -154,6 +149,32 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         btn_move_right.setOnClickListener(btnListener)
         btn_add_word.setOnClickListener(btnListener)
     }
+    fun addWord(view: View){
+        var word = Word()
+        word.word = binding.inputWord.text.toString()
+        word.mean = binding.inputMean.text.toString()
+        model?.insert(word)
+    }
+    private fun updateWordList(words: List<Word>?) {
+        addRecyclerAdapter = AddRecyclerAdapter(this)
+        addRecyclerAdapter.submitList(words as ArrayList<Word>)
+        // 리사이클러뷰 설정
+        rv_list_item.apply {
+            layoutManager = LinearLayoutManager(context,
+                LinearLayoutManager.VERTICAL,
+                true)
+//                            (layoutManager as LinearLayoutManager).stackFromEnd = true
+            // 어답터 장착
+            adapter = addRecyclerAdapter
+        }
+    }
+
+    fun deleteWord() {
+
+//        model?.delete(word)
+    }
+
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_check, menu)
         return true
@@ -188,27 +209,39 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     /*
     * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
     * */
-    override fun onRemoveClicked(it: View, position: Int) {
-        Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
-        val mBuilder = AlertDialog.Builder(it.context)
-        mBuilder.setTitle("삭제")
-            .setMessage("단어 : " + wordDto[position].word.toString() + "\n뜻 : " + wordDto[position].mean.toString() + "\n이 항목을 삭제하시겠습니까?")
-            .setPositiveButton("확인",
-                DialogInterface.OnClickListener { dialog, which ->
-                    addRecyclerAdapter.removeWord(wordDto, position)
-//                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
-                    wordCount--
-                    countString = "$currentCount/$wordCount"
-                    tvWordCount?.text = countString
 
-//                    Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
-                })
-            .setNegativeButton("취소",
-                DialogInterface.OnClickListener { dialog, which ->
-                    dialog.cancel()
-                })
-        mBuilder.show()
+//    delete메서드 만들기
+
+
+    override fun onRemoveClicked(view: View, position: Int) {
+//        Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
+//        val mBuilder = AlertDialog.Builder(view.context)
+//        mBuilder.setTitle("삭제")
+//            .setMessage("단어 : " + word[position].word.toString() + "\n뜻 : " + word[position].mean.toString() + "\n이 항목을 삭제하시겠습니까?")
+//            .setPositiveButton("확인",
+//                DialogInterface.OnClickListener { dialog, which ->
+//                    addRecyclerAdapter.removeWord(word, position)
+////                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
+//                    wordCount--
+//                    countString = "$currentCount/$wordCount"
+//                    tvWordCount?.text = countString
+//
+////                    Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
+//                })
+//            .setNegativeButton("취소",
+//                DialogInterface.OnClickListener { dialog, which ->
+//                    dialog.cancel()
+//                })
+//        mBuilder.show()
     }
+
+
+
+
+
+
+
+
 
 /*    override fun onDestroyView() {
         super.onDestroyView()

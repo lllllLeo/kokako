@@ -1,20 +1,28 @@
 package com.example.kokako.dao
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import com.example.kokako.model.WordDTO
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.room.*
+import com.example.kokako.model.Word
 
+ /*
+ WordDTO 데이터를 데이터베이스에 넣고 빼고 조회하는 Data Access Object
+ UI를 위한 데이터를 준비하는 역할
+
+ * */
 
 @Dao
 interface WordDAO {
-    @Query("SELECT * FROM tb_wordBook")
-    fun getAll(): List<WordDTO>
 
     @Insert
-    fun insertAll(vararg wordDAO: WordDAO)
+    fun insert(word: Word)
+
+    @Update
+    fun update(word: Word)
 
     @Delete
-    fun delete(wordDTO: WordDTO)
+    fun delete(word: Word)
+
+    @Query("SELECT * FROM tb_wordBook")
+    fun getAll(): LiveData<List<Word>>
 }
