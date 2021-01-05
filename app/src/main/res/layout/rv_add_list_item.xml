@@ -4,13 +4,32 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#D3FD0000"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp">
 
+            <TextView
+                android:id="@+id/rv_remove_word"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="삭제"
+                android:textColor="#ffffff"
+                android:layout_marginRight="15dp"
+                android:layout_gravity="end|center_vertical"
+                />
+        </FrameLayout>
         <LinearLayout
+            android:id="@+id/swipe_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="1dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp"
             android:orientation="horizontal"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:background="@color/colorBackground">
 
 
                     <EditText
@@ -33,12 +52,12 @@
                         android:inputType="text"
                         android:privateImeOptions="defaultInputmode=korean" />
 
-                    <Button
-                        android:id="@+id/rv_remove_word"
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/ic_baseline_close_24" />
-                    <!-- 삭제하시겠습니까 dialog-->
+<!--                    <Button-->
+<!--                        android:id="@+id/rv_remove_word"-->
+<!--                        android:layout_width="28dp"-->
+<!--                        android:layout_height="28dp"-->
+<!--                        android:background="@drawable/ic_baseline_close_24" />-->
+<!--                    &lt;!&ndash; 삭제하시겠습니까 dialog&ndash;&gt;-->
 
         </LinearLayout>
 </FrameLayout>

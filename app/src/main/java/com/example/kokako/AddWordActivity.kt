@@ -1,5 +1,6 @@
 package com.example.kokako
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
@@ -14,7 +15,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.viewModel.WordViewModel
 import com.example.kokako.databinding.ActivityAddWordBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
@@ -29,7 +32,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private var model : WordViewModel? = null // 바로 WordDatabase안부르고 뷰모델 통해서 부름
     //    lateinit var db : WordDatabase  뷰모델할려고 일단지움
 //    var wordList = listOf<WordDTO>()
-//    var word = ArrayList<Word>()  // 밑에 var word 새로 만들거라서 잠시 지움 맨밑에도 오류 뜸 이거떄문에
+    var wordList = ArrayList<Word>()  // 밑에 var word 새로 만들거라서 잠시 지움 맨밑에도 오류 뜸 이거떄문에
     var wordCount: Int = 0
     var currentCount: Int = 0
     var countString: String? = null
@@ -71,9 +74,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             updateWordList(it)
         })
 
-
-
-
         countString = "$currentCount/$wordCount"
 //        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
         tvWordCount?.text = countString
@@ -111,25 +111,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 //                        btn_add_word.isEnabled = false
                     } else {
                         addWord(view)
-//                        var word  = Word()
-//                        word.word = binding.inputWord.text.toString()
-//                        word.mean = binding.inputMean.text.toString()
-//                        model?.insert(word)
-
-
-//                        word.add(Word(input_word.text.toString(), input_mean.text.toString()))
-//                        addRecyclerAdapter = AddRecyclerAdapter(this)
-//                        addRecyclerAdapter.submitList(this.word)
-
-//                        // 리사이클러뷰 설정
-//                        rv_list_item.apply {
-//                            layoutManager = LinearLayoutManager(context,
-//                                LinearLayoutManager.VERTICAL,
-//                                true)
-////                            (layoutManager as LinearLayoutManager).stackFromEnd = true
-//                            // 어답터 장착
-//                            adapter = addRecyclerAdapter
-//                        }
                         input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
@@ -155,25 +136,69 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         word.mean = binding.inputMean.text.toString()
         model?.insert(word)
     }
+    @SuppressLint("ClickableViewAccessibility")
     private fun updateWordList(words: List<Word>?) {
         addRecyclerAdapter = AddRecyclerAdapter(this)
         addRecyclerAdapter.submitList(words as ArrayList<Word>)
+        val swipeHelperCallback = SwipeHelperCallback().apply {
+            setClamp(200f)
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
+        itemTouchHelper.attachToRecyclerView(rv_list_item)
         // 리사이클러뷰 설정
         rv_list_item.apply {
-            layoutManager = LinearLayoutManager(context,
-                LinearLayoutManager.VERTICAL,
-                true)
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
 //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
             // 어답터 장착
             adapter = addRecyclerAdapter
+//            addItemDecoration(ItemDecoration())
+
+            setOnTouchListener { _, _ ->
+                swipeHelperCallback.removePreviousClamp(this)
+                false
+            }
+
         }
     }
 
-    fun deleteWord() {
-
-//        model?.delete(word)
+    fun deleteWord(position: Int) {
+//        model?.delete(addRecyclerAdapter.getItem()[position])
+//        들어있는 데이터(Word) 를빼와야함 위에처럼 선언한거 하면 INdexOutOFBoundException나옴
+        model?.delete(wordList[position])
     }
 
+    /*
+* 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
+* */
+
+//    delete메서드 만들기
+
+
+    override fun onRemoveClicked(view: View, position: Int) {
+        Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
+        val mBuilder = AlertDialog.Builder(view.context)
+        mBuilder.setTitle("삭제")
+//            .setMessage("단어 : " + wordList[position].word.toString() + "\n뜻 : " + wordList[position].mean.toString() + "\n이 항목을 삭제하시겠습니까?")
+            .setMessage("삭제 ㄱㄱ?")
+            .setPositiveButton("확인",
+                DialogInterface.OnClickListener { dialog, which ->
+
+                    deleteWord(position)
+
+//                    addRecyclerAdapter.removeWord(word, position)
+//                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
+                    wordCount--
+                    countString = "$currentCount/$wordCount"
+                    tvWordCount?.text = countString
+
+//                    Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
+                })
+            .setNegativeButton("취소",
+                DialogInterface.OnClickListener { dialog, which ->
+                    dialog.cancel()
+                })
+        mBuilder.show()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_check, menu)
@@ -206,34 +231,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         return true
     }
 
-    /*
-    * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
-    * */
 
-//    delete메서드 만들기
-
-
-    override fun onRemoveClicked(view: View, position: Int) {
-//        Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
-//        val mBuilder = AlertDialog.Builder(view.context)
-//        mBuilder.setTitle("삭제")
-//            .setMessage("단어 : " + word[position].word.toString() + "\n뜻 : " + word[position].mean.toString() + "\n이 항목을 삭제하시겠습니까?")
-//            .setPositiveButton("확인",
-//                DialogInterface.OnClickListener { dialog, which ->
-//                    addRecyclerAdapter.removeWord(word, position)
-////                    Toast.makeText(this,"삭제된 후 단어 개수"+wordDto.size,Toast.LENGTH_SHORT).show()
-//                    wordCount--
-//                    countString = "$currentCount/$wordCount"
-//                    tvWordCount?.text = countString
-//
-////                    Toast.makeText(this,"wordCount는 "+wordCount,Toast.LENGTH_SHORT).show()
-//                })
-//            .setNegativeButton("취소",
-//                DialogInterface.OnClickListener { dialog, which ->
-//                    dialog.cancel()
-//                })
-//        mBuilder.show()
-    }
 
 
 

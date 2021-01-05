@@ -25,4 +25,7 @@ interface WordDAO {
 
     @Query("SELECT * FROM tb_wordBook")
     fun getAll(): LiveData<List<Word>>
+
+//    @Query("SELECT position FROM tb_wordBook")
+//    fun getItem(word: Word, position: Int): LiveData<List<Word>>
 }

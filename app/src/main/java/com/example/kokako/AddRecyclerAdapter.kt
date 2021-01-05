@@ -7,7 +7,7 @@ import com.example.kokako.model.Word
 
 class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): RecyclerView.Adapter<AddViewHolder>() {
 
-    private var wordDtoData = ArrayList<Word>()
+    private var wordData = ArrayList<Word>()
 
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 
@@ -24,23 +24,27 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Re
     }
     // 뷰와 뷰홀더가 묶였을때
     override fun onBindViewHolder(holder: AddViewHolder, position: Int) {
-        holder.bind(this.wordDtoData,position)
+        holder.bind(this.wordData,position)
         // 여기서 클릭리스너안함. MyViewHolder에 View.OnClickListener가 있으니까 발동된다
     }
+//    fun getItem(): ArrayList<Word>{
+//       return this.wordData
+//    }
     // 목록의 수
-    override fun getItemCount(): Int { return wordDtoData.size }
+    override fun getItemCount(): Int { return wordData.size }
 
-    // 외부에서 데이터 넘기기, 단어, 뜻 추가시킴
+    // 외부에서 데이터 넘기기, 단어, 뜻 추가시킴          이걸로 갱신만하면 될듯 그래서 삭제도 이걸로 갱신만하면될듯
     fun submitList(word: ArrayList<Word>){
-        this.wordDtoData = word
+        this.wordData = word
     }
 
-    fun removeWord(word: ArrayList<Word>, position: Int){
+
+/*    fun removeWord(word: ArrayList<Word>, position: Int){
         word.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, word.size)
 //        DefaultItemAnimator()
-    }
+    }*/
 
 
 }

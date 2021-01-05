@@ -10,7 +10,7 @@ import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
     private var wordEditText = itemView.rv_word
     private var meanEditText = itemView.rv_mean
-    private var removeButton = itemView.rv_remove_word
+    private var removeButton = itemView.rv_remove_word   //     X버튼 없앴으니 지우기
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 
     // 기본 생성자
@@ -22,7 +22,9 @@ class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterf
 // 클릭리스너 설정
 //        itemView.setOnClickListener(this)
 //        removeButton이 onClick된걸 리스너에 등록
-        removeButton.setOnClickListener(this)
+
+
+        removeButton.setOnClickListener(this)       // X버튼 없앴으니 지우기
         // 인터페이스 연결
         this.addRecyclerViewInterface = recyclerViewInterface
     }
