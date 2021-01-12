@@ -5,6 +5,7 @@
     android:orientation="horizontal">
 
         <FrameLayout
+            android:id="@+id/rv_remove_word"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#D3FD0000"
@@ -12,12 +13,11 @@
             android:layout_marginRight="1dp">
 
             <TextView
-                android:id="@+id/rv_remove_word"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="삭제"
                 android:textColor="#ffffff"
-                android:layout_marginRight="15dp"
+                android:layout_marginRight="13dp"
                 android:layout_gravity="end|center_vertical"
                 />
         </FrameLayout>
@@ -34,23 +34,29 @@
 
                     <EditText
                         android:id="@+id/rv_word"
+                        android:nextFocusDown="@+id/rv_mean"
+                        android:nextFocusUp="@+id/rv_mean"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
                         android:hint="  Word"
                         android:textSize="15sp"
                         android:inputType="text"
-                        android:privateImeOptions="defaultInputmode=english" />
+                        android:singleLine="true"
+                        android:privateImeOptions="defaultInputMode=english" />
 
                     <EditText
                         android:id="@+id/rv_mean"
+                        android:nextFocusDown="@+id/rv_word"
+                        android:nextFocusUp="@+id/rv_word"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.5"
                         android:hint="  뜻"
                         android:textSize="15sp"
                         android:inputType="text"
-                        android:privateImeOptions="defaultInputmode=korean" />
+                        android:singleLine="true"
+                        android:privateImeOptions="defaultInputMode=korean" />
 
 <!--                    <Button-->
 <!--                        android:id="@+id/rv_remove_word"-->

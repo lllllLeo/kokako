@@ -8,6 +8,9 @@ import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
 class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
+    companion object {
+        private const val TAG = "TAG"
+    }
     private var wordEditText = itemView.rv_word
     private var meanEditText = itemView.rv_mean
     private var removeButton = itemView.rv_remove_word   //     X버튼 없앴으니 지우기
@@ -15,7 +18,7 @@ class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterf
 
     // 기본 생성자
     init {
-        Log.d("로그","MyViewHolder - init() called")
+        Log.d(TAG,"MyViewHolder - init() called")
         /*
         * itemView에 자기 자신 this는 View.OnClickListener.를 걸어줘야 onClick()이 발동이되고
         * */
@@ -24,16 +27,19 @@ class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterf
 //        removeButton이 onClick된걸 리스너에 등록
 
 
-        removeButton.setOnClickListener(this)       // X버튼 없앴으니 지우기
+        removeButton.setOnClickListener(this)
         // 인터페이스 연결
         this.addRecyclerViewInterface = recyclerViewInterface
     }
 
     //뷰와 데이터 묶기
     fun bind(word: ArrayList<Word>, position:Int){
-        Log.d("로그","MyViewHolder - bind() called")
+        Log.d(" TAG ","MyViewHolder - bind() called")
+
         wordEditText.setText(word[position].word.toString())
         meanEditText.setText(word[position].mean.toString())
+        wordEditText.id = (position * 2) + 1
+        meanEditText.id = position * 2
     }
 
 //    뷰홀더에서 아이템이 클릭된걸 암

@@ -92,6 +92,8 @@
             android:textSize="15sp"
             android:inputType="text"
             android:privateImeOptions="defaultInputmode=english"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@id/input_mean"
             android:singleLine="true">
             <requestFocus/>
         </EditText>
@@ -105,7 +107,11 @@
             android:hint="  뜻"
             android:textSize="15sp"
             android:inputType="text"
-            android:privateImeOptions="defaultInputmode=korean" />
+            android:nextFocusDown="@id/input_word"
+            android:singleLine="true"
+            android:privateImeOptions="defaultInputmode=korean"
+            android:imeOptions="actionNext"
+            />
         <Button
             android:id="@+id/delete_all"
             android:layout_width="23dp"
@@ -135,6 +141,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="beforeDescendants"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/rv_add_list_item"/>
     </FrameLayout>
@@ -162,6 +170,8 @@
         android:layout_weight="0.5"
         android:theme="@style/ButtonStyle"
         android:stateListAnimator="@null"
+        android:imeOptions="actionPrevious"
+
         android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
 
     <ImageButton
@@ -171,6 +181,7 @@
         android:layout_weight="0.5"
         android:theme="@style/ButtonStyle"
         android:stateListAnimator="@null"
+        android:imeOptions="actionNext"
         android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
 
     <Button

@@ -1,7 +1,9 @@
 package com.example.kokako.viewModel
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.os.AsyncTask
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,6 +13,9 @@ import com.example.kokako.database.WordDatabase
 import com.example.kokako.model.Word
 
 class WordViewModel(application: Application) : AndroidViewModel(application) {
+    companion object {
+        private const val TAG = "TAG"
+    }
     var wordList : LiveData<List<Word>>
     private var wordDao : WordDAO
 
@@ -27,6 +32,7 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
         DeleteWordAsyncTask().execute(word)
     }
 
+    @SuppressLint("StaticFieldLeak")
     private inner class DeleteWordAsyncTask : AsyncTask<Word, Void, Void>() {
         override fun doInBackground(vararg word: Word?): Void? {
             wordDao.delete(word[0]!!)
@@ -35,6 +41,7 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
+    @SuppressLint("StaticFieldLeak")
     private inner class InsertWordAsyncTask : AsyncTask<Word, Void, Void>() {
         override fun doInBackground(vararg words: Word?): Void? {
             wordDao.insert(words[0]!!)
