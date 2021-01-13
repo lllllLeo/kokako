@@ -23,9 +23,9 @@ interface WordDAO {
     @Delete
     fun delete(word: Word)
 
-    @Query("SELECT * FROM tb_wordBook")
+    @Query("DELETE FROM tb_word")
+    fun deleteAll()
+    @Query("SELECT * FROM tb_word")
     fun getAll(): LiveData<List<Word>>
 
-//    @Query("SELECT position FROM tb_wordBook")
-//    fun getItem(word: Word, position: Int): LiveData<List<Word>>
 }

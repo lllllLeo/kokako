@@ -3,11 +3,11 @@ package com.example.kokako
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.kokako.model.MyWordListDTO
+import com.example.kokako.model.WordBook
 
 // Adapter 캐리어 ViewHolder는 인터셉터
 class MyWordRecyclerAdapter() : RecyclerView.Adapter<MyWordViewHolder>(){
-    private var myWordListDTO = ArrayList<MyWordListDTO>()
+    private var myWordListDTO = ArrayList<WordBook>()
     private var myWordListRecyclerViewInterface : MyWordListRecyclerViewInterface? = null
 
     override fun getItemCount(): Int { return myWordListDTO.size }
@@ -26,8 +26,8 @@ class MyWordRecyclerAdapter() : RecyclerView.Adapter<MyWordViewHolder>(){
     }
 
 //    내 단어장들 불러오는 메소드
-    fun getMyList(wordListDTO: ArrayList<MyWordListDTO>) {
-        this.myWordListDTO = wordListDTO
+    fun getMyList(wordBook: ArrayList<WordBook>) {
+        this.myWordListDTO = wordBook
     }
 
 

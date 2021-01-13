@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.FragmentMyWordListBinding
 import com.example.kokako.model.ItemWordDTO
-import com.example.kokako.model.MyWordListDTO
+import com.example.kokako.model.WordBook
 import kotlinx.android.synthetic.main.fragment_my_word_list.*
 
 
@@ -21,9 +21,9 @@ class MyWordListFragment : Fragment() {
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
     private var _binding: FragmentMyWordListBinding? = null
     private val binding get() = _binding!!
-    var myWordList = ArrayList<MyWordListDTO>()
+    var myWordList = ArrayList<WordBook>()
 
-    var itemWordDTO = ArrayList<MyWordListDTO>()
+    var itemWordDTO = ArrayList<WordBook>()
     private var recyclerview: RecyclerView? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,): View? {
@@ -41,25 +41,7 @@ class MyWordListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-/*
-
-        for (i in 1..20) {
-            var myWordListDTO = MyWordListDTO(title = "유준 단어장 $i", wordCount = i)
-            this.myWordList.add(myWordListDTO)
-        }
-
-
-        myWordRecyclerAdapter = MyWordRecyclerAdapter()
-        myWordRecyclerAdapter.getMyList(this.myWordList)
-
-        rv_my_item.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-//          위 인스턴스만들걸 넣어줌/ 커스텀햇기떄문에 장착됨
-            adapter = myWordRecyclerAdapter
-        }
-*/
-        recyclerview = binding.rvMyItem
-
+        recyclerview = binding.rvWordBook
 
         var data = ArrayList<ItemWordDTO>()
         data.add(ItemWordDTO(MyWordRecyclerAdapter2.HEADER, "N1"))
@@ -81,7 +63,7 @@ class MyWordListFragment : Fragment() {
 
         data.add(places)
 
-        rv_my_item.apply {
+        rv_word_book.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             recyclerview?.layoutManager
             adapter = MyWordRecyclerAdapter2(data)

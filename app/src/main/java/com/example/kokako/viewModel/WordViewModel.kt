@@ -32,6 +32,19 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
         DeleteWordAsyncTask().execute(word)
     }
 
+    fun deleteAll() {
+        DeleteAllWordAsyncTask().execute()
+    }
+
+
+    private inner class DeleteAllWordAsyncTask(): AsyncTask<Word, Void, Void>() {
+        override fun doInBackground(vararg params: Word?): Void? {
+            wordDao.deleteAll()
+            return null
+        }
+
+    }
+
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteWordAsyncTask : AsyncTask<Word, Void, Void>() {
         override fun doInBackground(vararg word: Word?): Void? {

@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-        recyclerview = binding.rvMyItem
+        recyclerview = binding.rvWordBook
 
         var data = ArrayList<ItemWordDTO>()
         data.add(ItemWordDTO(MyWordRecyclerAdapter2.HEADER, "N1"))
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         data.add(places)
 
-        rv_my_item.apply {
+        rv_word_book.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             recyclerview?.layoutManager
             adapter = MyWordRecyclerAdapter2(data)
@@ -136,11 +136,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             mBuilder.setOnShowListener {
                 val b: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
                 b.setOnClickListener(View.OnClickListener {
-                    if (dialogEditText.text!!.isEmpty()) {
-                        Toast.makeText(this, "단어장 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    if (dialogEditText.text!!.trim().isEmpty()) {
+                        Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
                     } else {
                         val wordBookName = dialogEditText.text.toString()
-                        Log.d("TAG", "단어장이름 $wordBookName")
+                        Log.d("TAG ===== ", "단어장이름은 $wordBookName")
                         val intent = Intent(this, AddWordActivity::class.java)
 //                        다음 intent로 wordBookName 넘기기
                         startActivity(intent)
@@ -150,37 +150,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             mBuilder.show()
         }
-        /*DialogInterface.OnClickListener { dialog, which ->
-            var wordBookName = dialogEditText.text.toString()
-            if (dialogEditText.text!!.isEmpty()) {
-                Toast.makeText(this, "단어장 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
-            } else {
-                Log.d(TAG, wordBookName)
-                var intent = Intent(this, AddWordActivity::class.java)
-                startActivity(intent)
-                dialog.dismiss()
-            }
-        })
-val mDialog = mBuilder.create()
-mDialog.show()*/
-/*        val d: AlertDialog = AlertDialog.Builder(context)
-            .setView(v)
-            .setTitle(R.string.my_title)
-            .setPositiveButton(R.string.ok, null) //onClick오버라이딩할거니까 null로해줘요.
-            .setNegativeButton(R.string.cancel, null)
-            .create()
-
-        d.setOnShowListener {
-            val b: Button = d.getButton(AlertDialog.BUTTON_POSITIVE)
-            b.setOnClickListener(object : OnClickListener() {
-                fun onClick(view: View?) {
-                    // 어떤 조건을 줌
-
-                    // 인풋 값이 잘들어와있으면 dialog를 끔
-                    d.dismiss()
-                }
-            })
-        }*/
     }
     override fun onBackPressed() {
         /*if (System.currentTimeMillis() - backPressedTime > 2000) {

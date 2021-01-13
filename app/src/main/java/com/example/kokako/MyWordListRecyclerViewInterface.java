@@ -1,5 +1,5 @@
 package com.example.kokako;
 
-public interface MyWordListRecyclerViewInterface {
+interface MyWordListRecyclerViewInterface {
 
 }

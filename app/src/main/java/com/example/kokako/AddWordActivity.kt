@@ -17,6 +17,7 @@ import android.widget.TextView.OnEditorActionListener
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -75,6 +76,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         model = ViewModelProvider(this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(
             WordViewModel::class.java)
+//        mutable해야하나
         model?.wordList?.observe(this, {    // 단어 추가 버튼 누르면 이게 옵저버로 보고잇으니까 여기 안에는 리사이클러뷰에 넣는거해야겟지
             updateWordList(it)
         })
@@ -108,70 +110,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     else {
                         input_mean.requestFocus()
                     }
-
-//                    Toast.makeText(this, "$currentFocus",Toast.LENGTH_SHORT).show()
-//                    if(currentFocus == rv_word)
-//
-//                        Toast.makeText(this,"ㅎㅇ",Toast.LENGTH_SHORT).show()
-//                    input_word.requestFocus()
-//                    Toast.makeText(this, "" + addRecyclerAdapter.getItem()[1].word,Toast.LENGTH_SHORT).show()
-//                    var a : String =  addRecyclerAdapter.getItem()[1].word
-
-//                    Toast.makeText(this, ""+currentFocus!!.id,Toast.LENGTH_SHORT).show()
-//                    Toast.makeText(this, ""+currentFocus!!.nextFocusDownId,Toast.LENGTH_SHORT).show()
-
-//                    val id = currentFocus!!.findFocus()
-//                    id.requestFocus()
-//                    val id2 = currentFocus!!.nextFocusForwardId
-
-//                    val id = currentFocus!!.nextFocusForwardId
-//                    findViewById<EditText>(rv_mean.nextFocusDownId).requestFocus()
-
-//                    Toast.makeText(this, "$id",Toast.LENGTH_SHORT).show()
-//                    Toast.makeText(this, "$id2",Toast.LENGTH_SHORT).show()
-//                    findViewById<View>(id).requestFocus()
-//                    rv_word.requestFocus()
-//                    rv_word.isCursorVisible = true
-
-                    /*    if 리스트뷰 getCurrentFocus word이면
-                            if 지금현재 word(position).edittext
-                                word(position).edit mean 이동
-                            else
-                                word(position+1).edit word로 이동
-                    else if 리스트뷰 getCurrentFocus mean이면*/
-
-/*                    input_mean.setOnEditorActionListener(
-                        OnEditorActionListener { v, actionId, event ->
-                            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                                input_word.post(Runnable {
-                                    input_word.requestFocus()
-                                })
-                            }
-                            false
-                        })
-                    input_word.setOnEditorActionListener(
-                        OnEditorActionListener { v, actionId, event ->
-                            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                                input_mean.post(Runnable {
-                                    input_mean.requestFocus()
-                                })
-                            }
-                            false
-                        })*/
-
-
-//                    val id = currentFocus!!.nextFocusForwardId
-//                    Toast.makeText(this,"$id",Toast.LENGTH_SHORT).show()
-
-//                    if (id != null){
-//                        findViewById<View>(id).requestFocus()
-//                    }
-//                    if (id != View.NO_ID) {
-//                        findViewById<View>(id).requestFocus()
-//                        println("Next")
-//                    }
-
-//                    Toast.makeText(this, "$currentFocus",Toast.LENGTH_SHORT).show()
                 }
                 R.id.btn_move_right -> {
                     if (currentFocus!!.id == 2131230923 && addRecyclerAdapter.itemCount != null) {
@@ -181,25 +119,13 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     } else if (findViewById<EditText>(currentFocusId - 1) != null) {
                         findViewById<EditText>(currentFocusId - 1).requestFocus()
                     }
-//                    if (currentFocus == input_word)
-
-
-                    /*val id = currentFocus!!.nextFocusUpId
-                    Toast.makeText(this, "$id", Toast.LENGTH_SHORT).show()
-                    Toast.makeText(this, "${View.NO_ID}", Toast.LENGTH_SHORT).show()
-                    if (id != View.NO_ID) {
-                        findViewById<View>(id).requestFocus(0x00000005)
-                        println("Next")
-                    }
-//                    input_mean.requestFocus()*/
-
                 }
 // data없으면  무시하기 -> textViewLayout?
                 R.id.btn_add_word -> {
                     input_word.text.toString().trim()
                     input_mean.text.toString().trim()
 //                    if (input_word.text.equals("") || input_mean.text.equals("")) {
-                    if (input_mean.text.toString().isEmpty() || input_word.text.toString()
+                    if (input_mean.text.toString().trim().isEmpty() || input_word.text.toString().trim()
                             .isEmpty()
                     ) {
                         Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
@@ -217,36 +143,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 }
             }
         }
-/*        View.OnClickListener { view ->
-            when(view.rv_list_item){
-                R.id.btn_move_left -> {
-                    rv_word.imeOptions = EditorInfo.IME_ACTION_PREVIOUS
-                }
-                R.id.btn_move_right -> {
-                    rv_word.imeOptions = EditorInfo.IME_ACTION_NEXT
-                }
-            }
-        }
-        R.id.rv_list_item.rv_word.setOnClickListener{view
-            when(view.id) {
-                R.id.btn_move_left -> {
-                    rv_word.imeOptions = EditorInfo.IME_ACTION_PREVIOUS
-                }
-                R.id.btn_move_right -> {
-                    rv_word.imeOptions = EditorInfo.IME_ACTION_NEXT
-                }
-            }
-        }
-        binding.rvListItem.rv_mean.setOnClickListener{view
-            when(view.id) {
-                R.id.btn_move_left -> {
-                    rv_word.imeOptions = EditorInfo.IME_ACTION_PREVIOUS
-                }
-                R.id.btn_move_right -> {
-                    rv_word.imeOptions = EditorInfo.IME_ACTION_NEXT
-                }
-            }
-        }*/
 
         delete_all.setOnClickListener(btnListener)
         btn_remove_text.setOnClickListener(btnListener)
@@ -267,6 +163,9 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     }
     private fun updateWord(){
 
+    }
+    private fun deleteAllWord(){
+        model?.deleteAll()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -329,16 +228,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
             android.R.id.home -> {
-                mBuilder.setTitle("단어장 취소")
-                    .setMessage("입력한 단어를 취소하고 이동하시겠습니까?")
-                    .setNegativeButton("취소", null)
-                    .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-//                        DB작업
-                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-                        dialog.dismiss()
-                        finish()
-                    })
-                mBuilder.create().show()
+                cancelDialog(mBuilder)
             }
             R.id.menu_check -> {
                 mBuilder.setTitle("단어장으로 추가")
@@ -356,6 +246,32 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         }
         return true
     }
+    override fun onBackPressed() {
+        cancelDialog(mBuilder = AlertDialog.Builder(this))
+    }
+    private fun cancelDialog(mBuilder: AlertDialog.Builder) {
+        mBuilder.setTitle("단어장 취소")
+            .setMessage("입력한 단어를 취소하고 이동하시겠습니까?")
+            .setNegativeButton("취소", null)
+            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
+                deleteAllWord()
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                dialog.dismiss()
+                finish()
+            })
+        mBuilder.create().show()
+    }
+
+
+        /*if (System.currentTimeMillis() - backPressedTime > 2000) {
+            Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
+            return
+        }else if(System.currentTimeMillis() - backPressedTime <2000){
+            finish()
+        }
+        backPressedTime = System.currentTimeMillis()*/
+
+        /*---- When ESC is pressed in a NavigationDrawer ----*/
 
     override fun onDestroy() {
         super.onDestroy()
