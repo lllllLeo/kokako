@@ -4,8 +4,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.kokako.dao.WordDAO
 import com.example.kokako.model.Word
+import com.example.kokako.model.WordBook
 
-@Database(entities = [Word::class], version = 1)
+@Database(entities = [Word::class,WordBook::class], version = 1)
 abstract class WordDatabase : RoomDatabase() {
     abstract fun getWordDAO(): WordDAO
 

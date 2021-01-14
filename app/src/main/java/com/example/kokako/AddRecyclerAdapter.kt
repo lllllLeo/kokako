@@ -7,12 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.Word
 
 class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): RecyclerView.Adapter<AddViewHolder>() {
-
     private var wordDatas = ArrayList<Word>()
-
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
-
-
     // 생성자
     // 외부에서 들어온걸 여기에 장착
     init {
@@ -39,14 +35,5 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Re
     fun submitList(word: ArrayList<Word>){
         this.wordDatas = word
     }
-
-
-/*    fun removeWord(word: ArrayList<Word>, position: Int){
-        word.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, word.size)
-//        DefaultItemAnimator()
-    }*/
-
 
 }

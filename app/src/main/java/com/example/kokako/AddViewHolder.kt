@@ -7,13 +7,13 @@ import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
-class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
+class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
     companion object {
         private const val TAG = "TAG"
     }
     private var wordEditText = itemView.rv_word
     private var meanEditText = itemView.rv_mean
-    private var removeButton = itemView.rv_remove_word   //     X버튼 없앴으니 지우기
+    private var removeButton = itemView.rv_remove_word
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 
     // 기본 생성자
@@ -29,7 +29,7 @@ class AddViewHolder(itemView: View, recyclerViewInterface: AddRecyclerViewInterf
 
         removeButton.setOnClickListener(this)
         // 인터페이스 연결
-        this.addRecyclerViewInterface = recyclerViewInterface
+        this.addRecyclerViewInterface = addRecyclerViewInterface
     }
 
     //뷰와 데이터 묶기

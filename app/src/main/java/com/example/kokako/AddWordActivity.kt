@@ -1,8 +1,10 @@
 package com.example.kokako
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -43,13 +45,14 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     var countString: String? = null
     private var tvWordCount: TextView? = null
     private lateinit var imm : InputMethodManager   // 여기 선언한다고 lateinit 함
+    private var wordBookId : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAddWordBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
+        wordBookId = intent.getIntExtra("wordBookId",0)
         toolbarBinding = binding.includeToolbar
         tvWordCount = binding.wordCount
 
@@ -152,11 +155,13 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
     }
     private fun addWord(view: View){
-        val word = Word()
-        word.word = binding.inputWord.text.toString()
-        word.mean = binding.inputMean.text.toString()
+        val word = Word(0,
+            binding.inputWord.text.toString(),
+            binding.inputMean.text.toString(),
+        wordBookId) // TODO 여기서 받고 있음
+        Log.d(" ############## TAG ",""+word.toString())
         model?.insert(word)
-        Log.d(" TAG ", "############################## AddWordActivity addWord")
+        Log.d(" ############## TAG ", "############################## AddWordActivity addWord")
     }
     private fun deleteWord(position: Int) {
         model?.delete(addRecyclerAdapter.getItem()[position])
@@ -164,6 +169,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private fun updateWord(){
 
     }
+
     private fun deleteAllWord(){
         model?.deleteAll()
     }
@@ -197,9 +203,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
 * */
 
-//    delete메서드 만들기
-
-
     override fun onRemoveClicked(view: View, position: Int) {
         Log.d(" TAG ", "AddWordActivity -- onItemClicked() called")
         val mBuilder = AlertDialog.Builder(view.context)
@@ -218,12 +221,10 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 })
         mBuilder.show()
     }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_check, menu)
         return true
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
@@ -235,10 +236,12 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     .setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-//                        DB작업
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
-                        dialog.dismiss()
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+//                        DB작업
+                        val intent = Intent()
+                        setResult(Activity.RESULT_OK, intent)
+                        dialog.dismiss()
                         finish()
                     })
                 mBuilder.create().show()
@@ -261,18 +264,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             })
         mBuilder.create().show()
     }
-
-
-        /*if (System.currentTimeMillis() - backPressedTime > 2000) {
-            Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
-            return
-        }else if(System.currentTimeMillis() - backPressedTime <2000){
-            finish()
-        }
-        backPressedTime = System.currentTimeMillis()*/
-
-        /*---- When ESC is pressed in a NavigationDrawer ----*/
-
     override fun onDestroy() {
         super.onDestroy()
         try

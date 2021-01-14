@@ -16,6 +16,9 @@ interface WordBookDAO {
     @Delete
     fun delete(wordBook: WordBook)
 
+    @Query("DELETE FROM tb_word_book WHERE word_book_id = :wordBookId")
+    fun deleteWordBookById(wordBookId: Int)
+
     @Query("SELECT * FROM tb_word_book")
     fun getAll(): LiveData<List<WordBook>>
 }

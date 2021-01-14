@@ -1,6 +1,7 @@
 package com.example.kokako
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -17,17 +18,20 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.core.view.marginLeft
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityMainBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
-import com.example.kokako.model.ItemWordDTO
+import com.example.kokako.model.WordBook
+import com.example.kokako.viewModel.WordBookViewModel
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.fragment_my_word_list.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
     companion object {
         private const val TAG = "TAG"
     }
@@ -37,6 +41,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var recyclerview: RecyclerView? = null
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
     private lateinit var imm : InputMethodManager
+    private var model : WordBookViewModel? = null
+    private var viewData = ArrayList<WordBook>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -44,13 +50,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(view)
 
         toolbarBinding = binding.includeToolbar
-    /*
-        *//*---- Hooks ----*//*
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navigationView = findViewById(R.id.nav_view)
-        toolbar = findViewById<Toolbar>(R.id.toolbar)
-    */
-
         /*---- Tool Bar ----*/
         setSupportActionBar(toolbarBinding.toolbar)
         supportActionBar?.setDisplayShowCustomEnabled(true)   //커스터마이징 하기 위해 필요
@@ -67,7 +66,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        menu.findItem(R.id.nav_profile)?.isVisible = false
 
         binding.navView.bringToFront()  // Bring view in front of everything
-        var toggle = ActionBarDrawerToggle(this,
+        val toggle = ActionBarDrawerToggle(this,
             binding.drawerLayout,
             toolbarBinding.toolbar,
             R.string.navigation_drawer_open,
@@ -80,40 +79,17 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-        recyclerview = binding.rvWordBook
+        model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(WordBookViewModel::class.java)
+        model?.wordBookList?.observe(this, {
+            updateWordBookList(it)
+        })
 
-        var data = ArrayList<ItemWordDTO>()
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.HEADER, "N1"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "단어"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "문법"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "회화표현"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.HEADER, "영어"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "토익 단어"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "숙어"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "헷갈리는 단어"))
-        data.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "회화표현"))
 
-        var places : ItemWordDTO = ItemWordDTO(MyWordRecyclerAdapter2.HEADER, "일본어")
-        places.invisibleChildren = ArrayList<ItemWordDTO>() // 원래 <> 안에 없엇는데 내가 추가함
-        places.invisibleChildren?.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "1~100"))
-        places.invisibleChildren?.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "101~200"))
-        places.invisibleChildren?.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "201~300"))
-        places.invisibleChildren?.add(ItemWordDTO(MyWordRecyclerAdapter2.CHILD, "301~400"))
 
-        data.add(places)
-
-        rv_word_book.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            recyclerview?.layoutManager
-            adapter = MyWordRecyclerAdapter2(data)
-//            var decorator = DividerItemDecoration(view.context,LinearLayoutManager.VERTICAL)
-//            decorator.setDrawable(ContextCompat.getDrawable(context,R.drawable.divider_line)!!)
-//            addItemDecoration(decorator)
-
-        }
-
+// TODO  플로팅버튼 -> 단어장으로 감 -> 단어, 뜻입력하고 추가버튼 누르면 튕김. 체크표시가 아님 -> FOREIGN KEY 저 문제임
 
         fab_add_note.setOnClickListener { view ->
+
             imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 
@@ -128,7 +104,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             container.addView(dialogEditText, lp)
             val mBuilder = AlertDialog.Builder(view.context)
 //                .setTitle("단어장 이름 추가")
-                .setMessage("새로운 단어장 이름을 입력해주세요.")
+                .setMessage("작성할 단어장 이름을 입력해주세요.")
                 .setView(container)
                 .setNegativeButton("취소", null)
                 .setPositiveButton("확인", null)
@@ -138,10 +114,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 b.setOnClickListener(View.OnClickListener {
                     if (dialogEditText.text!!.trim().isEmpty()) {
                         Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
+//                        특문제외
                     } else {
                         val wordBookName = dialogEditText.text.toString()
-                        Log.d("TAG ===== ", "단어장이름은 $wordBookName")
+                        Log.d("############## TAG ", "단어장이름은 $wordBookName")
                         val intent = Intent(this, AddWordActivity::class.java)
+                        intent.putExtra("wordBookId", 0)    // TODO  5 이거는 내가 WordBook에 있는거랑 직접 일단 맞출려고 하드코딩했는데 안맞네 0 해도 안되네 / 껏다켜지면 0됨
+                        addWordBook(view, dialogEditText)
 //                        다음 intent로 wordBookName 넘기기
                         startActivity(intent)
                         mBuilder.dismiss()
@@ -150,6 +129,47 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             mBuilder.show()
         }
+    }
+
+    /*    val intent = Intent(this, AddWordActivity::class.java)
+    intent.putExtra("wordBookId", 0)
+    startActivityForResult(intent, REQUEST_CODE)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                100 -> {
+                    Toast.makeText(this, "과연", Toast.LENGTH_SHORT).show()
+//                    addWordBook()
+                }
+            }
+        }
+    }*/
+    private fun addWordBook(view: View, dialogEditText: EditText) {
+        val wordBook = WordBook(0,
+            dialogEditText.text.toString(),
+        0,
+            0)
+//        for (i in 1..10) {
+//            WordBook(0,"ㅅㅂ$i",100+i, 1)
+//        }
+        Log.d("############## TAG",""+wordBook.toString())
+        model?.insert(wordBook)
+    }
+    private fun deleteWordBook(position: Int) {
+        model?.delete(myWordRecyclerAdapter.getItem()[position])
+    }
+
+    private fun updateWordBookList(wordBook: List<WordBook>?) {
+        myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
+        myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
+//        Log.d("TAG", ""+ myWordRecyclerAdapter.getItem()[]) // TODO 여기 마지막 요소 뽑기
+        rv_word_book.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+//            recyclerview?.layoutManager
+            adapter = myWordRecyclerAdapter
+        }
+
     }
     override fun onBackPressed() {
         /*if (System.currentTimeMillis() - backPressedTime > 2000) {
@@ -173,7 +193,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         when (menuItem.itemId) {
             R.id.nav_view -> return true
             R.id.nav_bus -> {
-                var intent = Intent(this, Bus::class.java)
+                val intent = Intent(this, Bus::class.java)
                 startActivity(intent)
             }
             R.id.nav_share -> {
@@ -196,12 +216,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
             }
             R.id.menu_import -> {
-                var intent = Intent(this, ImportActivity::class.java)
+                val intent = Intent(this, ImportActivity::class.java)
                 startActivity(intent)
             }
         }
         return true
     }
+
+//    단어장 삭제
+    override fun onRemoveClicked(view: View, position: Int) {
+        val mBuilder = AlertDialog.Builder(view.context)
+        mBuilder.setTitle("삭제")
+            .setMessage(myWordRecyclerAdapter.getItem()[position].title.toString() + " 단어장을 삭제하시겠습니까?")
+            .setPositiveButton("확인",
+                DialogInterface.OnClickListener { _, _ ->
+                    deleteWordBook(position)
+                })
+            .setNegativeButton("취소",
+                DialogInterface.OnClickListener { dialog, _ ->
+                    dialog.cancel()
+                })
+        mBuilder.show()
+    }
+
+
 
     override fun onDestroy() {
     super.onDestroy()
@@ -219,6 +257,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         catch (e: IllegalAccessException) {}
 //ignored }}
     }
+
+
 
 
 //    fab_add_note.setOnClickListener { view ->

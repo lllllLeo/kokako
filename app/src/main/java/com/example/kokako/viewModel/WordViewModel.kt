@@ -6,7 +6,6 @@ import android.os.AsyncTask
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import com.example.kokako.dao.WordDAO
 import com.example.kokako.database.WordDatabase
@@ -20,7 +19,7 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
     private var wordDao : WordDAO
 
     init {
-        val db : WordDatabase = Room.databaseBuilder(application, WordDatabase::class.java, "tb_wordBook").build()
+        val db : WordDatabase = Room.databaseBuilder(application, WordDatabase::class.java, "tb_word").build()
         wordDao = db.getWordDAO()
         wordList = wordDao.getAll()
     }
@@ -31,19 +30,10 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
     fun delete(word: Word) {
         DeleteWordAsyncTask().execute(word)
     }
-
     fun deleteAll() {
         DeleteAllWordAsyncTask().execute()
     }
 
-
-    private inner class DeleteAllWordAsyncTask(): AsyncTask<Word, Void, Void>() {
-        override fun doInBackground(vararg params: Word?): Void? {
-            wordDao.deleteAll()
-            return null
-        }
-
-    }
 
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteWordAsyncTask : AsyncTask<Word, Void, Void>() {
@@ -51,13 +41,23 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
             wordDao.delete(word[0]!!)
             return null
         }
-
     }
+
 
     @SuppressLint("StaticFieldLeak")
     private inner class InsertWordAsyncTask : AsyncTask<Word, Void, Void>() {
-        override fun doInBackground(vararg words: Word?): Void? {
-            wordDao.insert(words[0]!!)
+        override fun doInBackground(vararg word: Word?): Void? {
+            Log.d(" TAG ", ""+word[0].toString())
+            wordDao.insert(word[0]!!)       // TODO  여기가 계속 터짐 / WordBookDB가 생성이 안돼서 FOREIGN KEY 에러뜸
+            return null
+        }
+    }
+
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class DeleteAllWordAsyncTask(): AsyncTask<Word, Void, Void>() {
+        override fun doInBackground(vararg params: Word?): Void? {
+            wordDao.deleteAll()
             return null
         }
 
