@@ -9,17 +9,17 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tb_word",
     foreignKeys = [
         ForeignKey(entity = WordBook::class,
-            parentColumns = arrayOf("word_book_id"),
-            childColumns = arrayOf("word_book_id_fk"),
-            onDelete = CASCADE)])
+            parentColumns = ["id"],
+            childColumns = ["wordBookId"],
+            onDelete = CASCADE)
+    ]
+)
 data class Word(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "word_id")
-    var id: Int,
+    var id: Long,
     var word: String,
     var mean: String,
-    @ColumnInfo(name = "word_book_id_fk")
-    var wordBookIdFK: Int
+    var wordBookId: Long
 )
 
 /*{

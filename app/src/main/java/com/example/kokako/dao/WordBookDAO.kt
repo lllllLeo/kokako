@@ -8,7 +8,7 @@ import com.example.kokako.model.WordBook
 interface WordBookDAO {
 
     @Insert
-    fun insert(wordBook: WordBook)
+    fun insert(wordBook: WordBook):Long
 
     @Update
     fun update(wordBook: WordBook)
@@ -16,7 +16,7 @@ interface WordBookDAO {
     @Delete
     fun delete(wordBook: WordBook)
 
-    @Query("DELETE FROM tb_word_book WHERE word_book_id = :wordBookId")
+    @Query("DELETE FROM tb_word_book WHERE id = :wordBookId")
     fun deleteWordBookById(wordBookId: Int)
 
     @Query("SELECT * FROM tb_word_book")

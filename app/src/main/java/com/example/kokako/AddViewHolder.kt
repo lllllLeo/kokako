@@ -34,7 +34,7 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
 
     //뷰와 데이터 묶기
     fun bind(word: ArrayList<Word>, position:Int){
-        Log.d(" TAG ","MyViewHolder - bind() called")
+        Log.d("TAG ","MyViewHolder - bind() called")
 
         wordEditText.setText(word[position].word.toString())
         meanEditText.setText(word[position].mean.toString())

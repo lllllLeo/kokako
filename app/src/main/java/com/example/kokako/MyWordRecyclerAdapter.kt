@@ -9,7 +9,7 @@ import com.example.kokako.model.WordBook
 class MyWordRecyclerAdapter(myWordListRecyclerViewInterface: MyWordListRecyclerViewInterface) : RecyclerView.Adapter<MyWordViewHolder>(){
     private var wordBookDatas = ArrayList<WordBook>()
     private var myWordListRecyclerViewInterface : MyWordListRecyclerViewInterface? = null
-
+    private var myWordViewHolder : MyWordViewHolder? = null
     override fun getItemCount(): Int { return wordBookDatas.size }
 
     init {
@@ -32,6 +32,11 @@ class MyWordRecyclerAdapter(myWordListRecyclerViewInterface: MyWordListRecyclerV
 
     fun submitList(wordBook: ArrayList<WordBook>) {
         this.wordBookDatas = wordBook
+    }
+
+//    안쓰는듯
+    fun getAdapterPosition():Int? {
+        return myWordViewHolder?.adapterPosition
     }
 
 

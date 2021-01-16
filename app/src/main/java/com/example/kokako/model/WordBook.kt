@@ -8,8 +8,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tb_word_book")
 data class WordBook(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name="word_book_id")
-    val id: Int,
+    val id: Long,
     var title : String?,
     var count : Int,
     var addTime : Long  // 안드로이드에서는 Date로 변환

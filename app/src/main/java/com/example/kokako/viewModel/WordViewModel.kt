@@ -19,13 +19,16 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
     private var wordDao : WordDAO
 
     init {
-        val db : WordDatabase = Room.databaseBuilder(application, WordDatabase::class.java, "tb_word").build()
+        val db : WordDatabase = Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
         wordDao = db.getWordDAO()
         wordList = wordDao.getAll()
     }
 
     fun insert(word: Word) {
+        Log.d("TAG","WordViewModel insert() IN")
+        Log.d("TAG", "WordViewModel insert() word.wordBookId 값 : $word")
         InsertWordAsyncTask().execute(word)
+        Log.d("TAG","WordViewModel insert() OUT")
     }
     fun delete(word: Word) {
         DeleteWordAsyncTask().execute(word)
@@ -43,12 +46,16 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
+//  TODO 설마 비동기라서?
     @SuppressLint("StaticFieldLeak")
     private inner class InsertWordAsyncTask : AsyncTask<Word, Void, Void>() {
         override fun doInBackground(vararg word: Word?): Void? {
-            Log.d(" TAG ", ""+word[0].toString())
-            wordDao.insert(word[0]!!)       // TODO  여기가 계속 터짐 / WordBookDB가 생성이 안돼서 FOREIGN KEY 에러뜸
+            Log.d("TAG","WordViewModel InsertWordAsyncTask - doInBackground() IN")
+//            word[0]!!.id = 1
+            Log.d("TAG ", "WordViewModel InsertWordAsyncTask - doInBackground() "+word[0].toString())
+//            wordDao.insert2(word[0]!!.id, word[0]!!.word, word[0]!!.mean, word[0]!!.wordBookId)       // TODO  여기가 계속 터짐 FOREIGN KEY 에러뜸
+            wordDao.insert(word[0]!!)       // TODO  여기가 계속 터짐 FOREIGN KEY 에러뜸
+            Log.d("TAG","WordViewModel InsertWordAsyncTask - doInBackground() OUT")
             return null
         }
     }
