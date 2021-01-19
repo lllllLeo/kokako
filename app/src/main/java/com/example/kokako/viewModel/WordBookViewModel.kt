@@ -11,14 +11,11 @@ import com.example.kokako.dao.WordBookDAO
 import com.example.kokako.database.WordDatabase
 import com.example.kokako.model.WordBook
 
+//  Log.d("     TAG", "===== WordBookViewModel")
 class WordBookViewModel(application: Application) : AndroidViewModel(application) {
     var wordBookList: LiveData<List<WordBook>>
     private var wordBookDao: WordBookDAO
     var recentInsertedWordBookId : Long = 0
-    get() = field
-    private set(value) {
-        field = value
-    }
 
     init {
         val db: WordDatabase =
@@ -41,13 +38,8 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
 
     @SuppressLint("StaticFieldLeak")
     private inner class InsertWordBookAsyncTask() : AsyncTask<WordBook, Long, Long>() {
-        override fun doInBackground(vararg wordBook: WordBook?): Long {
-            Log.d("TAG","WordBookViewModel InsertWordBookAsyncTask - doInBackground() IN")
-            Log.d("TAG","WordBookViewModel InsertWordBookAsyncTask - doInBackground() : "+wordBook[0].toString())
+        override fun doInBackground(vararg wordBook: WordBook?): Long? {
             recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!)
-            Log.d("TAG",
-                "WordBookViewModel InsertWordBookAsyncTask - doInBackground() recentInsertedWordBookId 값 : $recentInsertedWordBookId")
-            Log.d("TAG","WordBookViewModel InsertWordBookAsyncTask - doInBackground() OUT")
             return recentInsertedWordBookId
         }
     }

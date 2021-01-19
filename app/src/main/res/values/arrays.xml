@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort_array">
+        <item>최신순</item>
+        <item>별표순</item>
+        <item>단어 ▲/▼</item>
+        <item>단어 ▼</item>
+        <item>뜻 ▲/▼</item>
+        <item>뜻 ▼</item>
+        <item>랜덤</item>
+    </string-array>
+    <string-array name="hide_array">
+        <item>단어 가리기</item>
+        <item>뜻 가리기</item>
+        <item>랜덤</item>
+    </string-array>
+</resources>

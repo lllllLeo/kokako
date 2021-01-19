@@ -75,16 +75,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
         binding.navView.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음
 
-        Log.d("TAG","MainActivity 전부 뽑기"+model?.wordBookList.toString())
-
 
         model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(WordBookViewModel::class.java)
-        Log.d("TAG","MainActivity observe() 값 : "+model?.recentInsertedWordBookId+" IN")
         model?.wordBookList?.observe(this, {
-            Log.d("TAG","MainActivity observe() IN")
             updateWordBookList(it)
-            Log.d("TAG","MainActivity observe() OUT")
-            Log.d("TAG","MainActivity 전부 뽑기222"+model?.wordBookList?.value)
         })
 
 
@@ -113,7 +107,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 .create()
             mBuilder.setOnShowListener {
                 val b: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
-                var adapterPosition = myWordRecyclerAdapter.getAdapterPosition()
                 b.setOnClickListener(View.OnClickListener {
                     if (dialogEditText.text!!.trim().isEmpty()) {
                         Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
@@ -121,16 +114,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     } else {
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                         val wordBookName = dialogEditText.text.toString()
-                        Log.d("TAG","MainActivity floating Button 단어장이름은 $wordBookName")
                         val intent = Intent(this, AddWordActivity::class.java)
-//                        intent.putExtra("wordBookId", adapterPosition)
-                        val wordBookId = addWordBook(view, wordBookName) // 여기서 만들고 다음 엑티비티로 넘어가야함
-                        Log.d("TAG","MainActivity floating Button addWordBook()후 ")
-                        Log.d("TAG",
-                            "MainActivity floating Button putExtra() 전 wordBookId : $wordBookId")
-                        intent.putExtra("wordBookId", wordBookId)
+                        val wordBookIdForAdd = addWordBook(wordBookName)
+                        Log.d("     TAG", "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
+                        intent.putExtra("wordBookIdForAdd", wordBookIdForAdd)
                         startActivity(intent)
-                        Log.d("TAG","MainActivity floating Button startActivity() 후")
                         mBuilder.dismiss()
                     }
                 })
@@ -139,16 +127,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
-    private fun addWordBook(view: View, wordBookName: String): Long {
-        Log.d("TAG","MainActivity addWordBook() IN")
+    private fun addWordBook(wordBookName: String): Long {
         val wordBook = WordBook(0, wordBookName, 0, 0)
-        Log.d("TAG", "MainActivity addWordBook() $wordBook")
         val recentInsertedWordBookId : Long = model?.insert(wordBook)!!
-        Log.d("TAG",
-            "MainActivity addWordBook() recentInsertedWordBookId값 : ${recentInsertedWordBookId.toString()}")
-        Log.d("TAG", "MainActivity addWordBook() putExtra함 " )
-//        Log.d("TAG", "MainActivity addWordBook() recentInsertedWordBookId값 : " + model?.recentInsertedWordBookId)
-        Log.d("TAG","MainActivity addWordBook() OUT")
+        Log.d("     TAG", "===== MainActivity - addWordBook - recentInsertedWordBookId 값은 : $recentInsertedWordBookId")
         return recentInsertedWordBookId
     }
     private fun deleteWordBook(position: Int) {
@@ -156,7 +138,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun updateWordBookList(wordBook: List<WordBook>?) {
-        Log.d("TAG","MainActivity updateWordBookList() IN")
         myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
         myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
         rv_word_book.apply {
@@ -164,9 +145,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //            recyclerview?.layoutManager
             adapter = myWordRecyclerAdapter
         }
-        Log.d("TAG","MainActivity updateWordBookList() OUT")
-
     }
+
+    override fun onViewClicked(v: View, adapterPosition: Int) {
+        Log.d("     TAG", "===== MainActivity - onViewClicked 값은 : "+ myWordRecyclerAdapter.getItem()[adapterPosition].id)
+        val intent = Intent(this, ViewWordActivity::class.java)
+        intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
+        startActivity(intent)
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     override fun onBackPressed() {
         /*if (System.currentTimeMillis() - backPressedTime > 2000) {
             Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
@@ -184,7 +202,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             super.onBackPressed()
         }
     }
-//    NavigationDrawer Menu
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.nav_view -> return true
@@ -201,29 +218,30 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.drawerLayout.closeDrawer(GravityCompat.START) // 네비게이션드로우 닫히고 인텐트전환
         return true // 네이게이션 아이템이 선택되면 true
     }
-//    Option Menu
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.sub_menu, menu)
         return true
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
+            R.id.menu_import -> {
+                val intent = Intent(this, ImportActivity::class.java)
+                startActivity(intent)
+            }
             R.id.menu_sort -> {
                 Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
             }
-            R.id.menu_import -> {
-                val intent = Intent(this, ImportActivity::class.java)
+            R.id.menu_view -> {
+                val intent = Intent(this, ViewWordActivity::class.java)
                 startActivity(intent)
             }
         }
         return true
     }
-
-//    단어장 삭제
     override fun onRemoveClicked(view: View, position: Int) {
-    Log.d("TAG","MainActivity onRemoveClicked() IN "+myWordRecyclerAdapter.getItem()[position].toString())
-    val mBuilder = AlertDialog.Builder(view.context)
-    mBuilder.setTitle("삭제")
+        Log.d("     TAG", "===== MainActivity - onRemoveClicked() IN "+myWordRecyclerAdapter.getItem()[position].toString())
+        val mBuilder = AlertDialog.Builder(view.context)
+        mBuilder.setTitle("삭제")
             .setMessage(myWordRecyclerAdapter.getItem()[position].title.toString() + " 단어장을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
@@ -237,9 +255,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 })
         mBuilder.show()
     }
-
-
-
     override fun onDestroy() {
     super.onDestroy()
         try

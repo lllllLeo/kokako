@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/include_toolbar"
+        layout="@layout/activity_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        <Spinner
+            android:id="@+id/sort_spinner"
+            android:dropDownWidth="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            />
+<!--        android:overlapAnchor="false"   -->
+        <Spinner
+            android:id="@+id/hide_spinner"
+            android:dropDownWidth="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            />
+<!--        정렬, 가리기 -->
+    </LinearLayout>
+    <FrameLayout
+        android:id="@+id/list_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/spinner"
+        >
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_list_word_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="beforeDescendants"
+            tools:listitem="@layout/rv_view_list_item"/>
+    </FrameLayout>
+</LinearLayout>

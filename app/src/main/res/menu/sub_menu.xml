@@ -8,5 +8,8 @@
     <item
         android:id="@+id/menu_sort"
         android:title="정렬"/>
+    <item
+        android:id="@+id/menu_view"
+        android:title="뷰"/>
 
 </menu>
