@@ -7,6 +7,7 @@ import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
+//  Log.d("     TAG", "===== AddViewHolder")
 class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
     private var wordEditText = itemView.rv_word
     private var meanEditText = itemView.rv_mean
@@ -30,8 +31,9 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
 
     //뷰와 데이터 묶기
     fun bind(word: ArrayList<Word>, position:Int){
-        wordEditText.setText(word[position].word.toString())
-        meanEditText.setText(word[position].mean.toString())
+        wordEditText.setText(word[position].word)
+        meanEditText.setText(word[position].mean)
+//        Log.d("     TAG", "===== AddViewHolder - bind 단어, 뜻 : ${word[position].word}, ${word[position].mean}")
         wordEditText.id = (position * 2) + 1
         meanEditText.id = position * 2
     }

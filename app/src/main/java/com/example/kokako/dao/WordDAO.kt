@@ -16,6 +16,9 @@ interface WordDAO {
     @Insert
     fun insert(word: Word)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertAllDatas(word: ArrayList<Word>)
+
     @Update
     fun update(word: Word)
 
@@ -30,5 +33,8 @@ interface WordDAO {
 
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView")
     fun getWordFromWordBook(wordBookIdForView: Array<out Long?>): LiveData<List<Word>>
+
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView")
+    fun getWordFromWordBook222(wordBookIdForView: Array<out Long?>): List<Word>
 
 }

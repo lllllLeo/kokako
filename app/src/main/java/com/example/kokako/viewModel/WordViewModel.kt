@@ -10,9 +10,11 @@ import androidx.room.Room
 import com.example.kokako.dao.WordDAO
 import com.example.kokako.database.WordDatabase
 import com.example.kokako.model.Word
+
 //  Log.d("     TAG", "===== WordViewModel")
 class WordViewModel(application: Application, wordBookId: Long) : AndroidViewModel(application) {
     var wordList : LiveData<List<Word>>
+    var wordArrayList : List<Word>? = null
     private var wordDao : WordDAO
 
     init {
@@ -25,6 +27,12 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         }else{
             wordList = wordDao.getAll()
         }
+//        var d = wordDao.getWordFromWordBook222(arrayOf(wordBookId)) as ArrayList<Word>
+//        Log.d("     TAG", "===== WordViewModel - init d : $d")
+//        wordArrayList = d
+    }
+    fun insertAllDatas(word : ArrayList<Word>) {
+        InsertAllWordAsyncTask().execute(word)
     }
 
     fun insert(word: Word) {
@@ -37,12 +45,36 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         DeleteAllWordAsyncTask().execute()
     }
     fun getWordFromWordBook(wordBookIdForView: Long): LiveData<List<Word>> {
-        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordBookIdForView 값은 : $wordBookIdForView")
         wordList = GetWordFromWordBookAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList 값은 : ${wordList.value}")
         return wordList
     }
+    fun getWordFromWordBook222(wordBookIdForView: Long): ArrayList<Word> {
+        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordBookIdForView 값은 : $wordBookIdForView")
+        wordArrayList = GetWordFromWordBookAsyncTask222().execute(wordBookIdForView).get()
+        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordList 값은 : ${wordArrayList}")
+        return wordArrayList as ArrayList<Word>
+    }
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetWordFromWordBookAsyncTask222 : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
+            Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground called")
+            Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground 값은 : ${wordBookIdForView[0]}")
+            return wordDao.getWordFromWordBook222(wordBookIdForView)
+        }
 
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class InsertAllWordAsyncTask : AsyncTask<ArrayList<Word>, Void, Void>(){
+        override fun doInBackground(vararg words: ArrayList<Word>): Void? {
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask word 값은 : $words")
+            var word : ArrayList<Word> = words[0]
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask word 값은 : ${word.toString()}")
+            wordDao.insertAllDatas(word)
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask")
+            return null
+        }
+    }
     @SuppressLint("StaticFieldLeak")
     private inner class GetWordFromWordBookAsyncTask : AsyncTask<Long, Void, LiveData<List<Word>>>(){
         override fun doInBackground(vararg wordBookIdForView: Long?): LiveData<List<Word>> {
@@ -82,3 +114,4 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     }
 
 }
+

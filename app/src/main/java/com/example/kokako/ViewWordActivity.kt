@@ -31,12 +31,13 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     private val binding get() = _binding!!
     private lateinit var viewRecyclerAdapter : ViewWordRecyclerAdapter
     private var model : WordViewModel? = null
+    var wordBookIdForView : Long = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityViewWordBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        val wordBookIdForView = intent.getLongExtra("wordBookIdForView",0)
+        wordBookIdForView = intent.getLongExtra("wordBookIdForView",0)
         val sortItems = resources.getStringArray(R.array.sort_array)
         val hideItems = resources.getStringArray(R.array.hide_array) // 발음 가리기 (3 items)
         toolbarBinding = binding.includeToolbar
@@ -161,6 +162,20 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         menuInflater.inflate(R.menu.view_word_menu, menu)
         return true
     }
+/*    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Log.d("     TAG", "===== ViewWordActivity - onActivityResult called")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                100 -> {
+                    Log.d("     TAG", "===== ViewWordActivity - onActivityResult when called")
+//                    wordBookIdForView = intent.getLongExtra("wordBookIdForView", 0)
+                    super.onResume()
+                    Log.d("     TAG", "===== ViewWordActivity - onActivityResult when wordBookIdForView : $wordBookIdForView")
+                }
+            }
+        }
+    }*/
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
@@ -168,23 +183,19 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 finish()
             }
             R.id.menu_edit -> {
-//                누르면 바로 페이지 이동?
-                mBuilder.setTitle("단어장 편집")
-                    .setMessage("단어장을 편집하시겠습니까?")
-                    .setNegativeButton("취소", null)
-                    .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-//                        DB작업
-                        dialog.dismiss()
-                        finish()
-                    })
-                mBuilder.create().show()
+                val intent = Intent(this, AddWordActivity::class.java)
+        // FIXME: 2021-01-20  고치기
+                intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForView)
+                intent.putExtra("checkActivity", true)
+                startActivityForResult(intent, 100)
+//                startActivity(intent)
             }
             R.id.menu_delete -> {
                 mBuilder.setTitle("단어장 삭제")
                     .setMessage("단어장을 삭제하시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-//                        DB작업, MainActivity로
+//                      FIXME  DB작업, MainActivity로
 //                        val intent = Intent()
 //                        setResult(Activity.RESULT_OK, intent)
                         dialog.dismiss()

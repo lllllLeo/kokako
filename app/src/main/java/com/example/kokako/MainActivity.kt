@@ -117,7 +117,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val intent = Intent(this, AddWordActivity::class.java)
                         val wordBookIdForAdd = addWordBook(wordBookName)
                         Log.d("     TAG", "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
-                        intent.putExtra("wordBookIdForAdd", wordBookIdForAdd)
+                        intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAdd)
                         startActivity(intent)
                         mBuilder.dismiss()
                     }
@@ -230,10 +230,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             R.id.menu_sort -> {
                 Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
-            }
-            R.id.menu_view -> {
-                val intent = Intent(this, ViewWordActivity::class.java)
-                startActivity(intent)
             }
         }
         return true
