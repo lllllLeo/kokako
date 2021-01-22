@@ -27,9 +27,6 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         }else{
             wordList = wordDao.getAll()
         }
-//        var d = wordDao.getWordFromWordBook222(arrayOf(wordBookId)) as ArrayList<Word>
-//        Log.d("     TAG", "===== WordViewModel - init d : $d")
-//        wordArrayList = d
     }
     fun insertAllDatas(word : ArrayList<Word>) {
         InsertAllWordAsyncTask().execute(word)
@@ -110,7 +107,7 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         }
     }
 
-
+    // FIXME: 2021-01-22 CASCADE라서 WordBook에서만 지우면 되는 것 같음
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteAllWordAsyncTask(): AsyncTask<Long, Void, Void>() {
         override fun doInBackground(vararg wordBookIdForView: Long?): Void? {

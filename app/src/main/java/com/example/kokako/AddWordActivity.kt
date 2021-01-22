@@ -32,7 +32,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private val binding get() = _binding!!
     private lateinit var addRecyclerAdapter: AddRecyclerAdapter
     private var model : WordViewModel? = null // 바로 WordDatabase안부르고 뷰모델 통해서 부름
-    //    lateinit var db : WordDatabase  뷰모델할려고 일단지움
     var wordCount: Int = 0
     var currentCount: Int = 0
     var countString: String? = null
@@ -59,6 +58,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         tvWordCount = binding.wordCount
         input_word.id = INPUT_WORD_ID
         input_mean.id = INPUT_MEAN_ID
+        Log.d("     TAG", "===== AddWordActivity input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
 
         //        add Divider in RecyclerView
         rv_list_item.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
@@ -96,6 +96,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
                 //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                 setHasFixedSize(true)
+                smoothScrollToPosition(word.size - 1)
                 adapter = addRecyclerAdapter
                 addRecyclerAdapter.submitDataList(word)
             }
@@ -136,12 +137,23 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         input_mean.requestFocus()
                     }
                 }
+                // FIXME: 2021-01-22 LongTouch하면 쭉쭉쭉쭉가게? 오바
                 R.id.btn_move_right -> {
+                    Log.d("     TAG",
+                        "===== AddWordActivity btn_move_right input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
+                    Log.d("     TAG",
+                        "===== AddWordActivity btn_move_right currentFocus!!.id ${currentFocus!!.id} 와 INPUT_MEAN_ID ${INPUT_MEAN_ID} ")
                     if (currentFocus!!.id == INPUT_WORD_ID) { // 현재 포커스가 input_word이면
                         input_mean.requestFocus()
+                        Log.d("     TAG", "===== AddWordActivity btn_move_right if문 ")
                     } else if (currentFocus!!.id == INPUT_MEAN_ID && addRecyclerAdapter.itemCount != 0) {
+                        Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 1")
+                        // FIXME: 2021-01-22 리사이클러뷰의 최신값이 맨위에서 보일떄는 뜻에서 바로 밑 최신값의 에딧텍스트로 가는데
+                        // FIXME: 2021-01-22 스크롤 쪼금이라도 내리고 하면 에러뜸
+                        // FIXME: 2021-01-22 밑에 값이 없으면 안움직이게해야겠다 이유는 뷰를 재사용하니까 없어짐
                         findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).requestFocus()
                     } else if (findViewById<EditText>(currentFocusId - 1) != null) {
+                        Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 2")
                         findViewById<EditText>(currentFocusId - 1).requestFocus()
                     }
                 }
@@ -171,6 +183,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
                             //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                             setHasFixedSize(true)
+                            smoothScrollToPosition(word.size - 1)
                             adapter = addRecyclerAdapter
                             addRecyclerAdapter.submitDataList(word)
                         }

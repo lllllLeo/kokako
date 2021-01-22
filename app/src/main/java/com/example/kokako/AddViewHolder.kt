@@ -33,10 +33,10 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
 
     //뷰와 데이터 묶기
     fun bind(word: ArrayList<Word>, position:Int){
-        wordEditText.setText(word[position].word)
-        meanEditText.setText(word[position].mean)
         wordEditText.tag = position
         meanEditText.tag = position
+        wordEditText.setText(word[position].word)
+        meanEditText.setText(word[position].mean)
         wordEditText.id = (position * 2) + 1
         meanEditText.id = position * 2
 //        Log.d("     TAG", "===== AddViewHolder - bind 단어, 뜻 : ${word[position].word}, ${word[position].mean}")

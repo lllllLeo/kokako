@@ -3,7 +3,6 @@ package com.example.kokako.viewModel
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.AsyncTask
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.room.Room
@@ -32,6 +31,10 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
         DeleteWordBookAsyncTask().execute(wordBook)
     }
 
+    fun deleteWordBookById(wordBookIdForView: Long) {
+        DeleteWordBookByIdAsyncTask().execute(wordBookIdForView)
+    }
+
     fun update(wordBook: WordBook) {
         UpdateWordBookAsyncTask().execute(wordBook)
     }
@@ -43,11 +46,19 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
             return recentInsertedWordBookId
         }
     }
-
+//    또 타입에러? 같은거 떴을때 그냥 deleteWordBookById안 쓰고 Delete다시 만드니까 됨
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteWordBookAsyncTask(): AsyncTask<WordBook, Void, Void>() {
         override fun doInBackground(vararg wordBook: WordBook?): Void? {
             wordBookDao.delete(wordBook[0]!!)
+            return null
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class DeleteWordBookByIdAsyncTask(): AsyncTask<Long, Void, Void>() {
+        override fun doInBackground(vararg wordBookIdForView: Long?): Void? {
+            wordBookDao.deleteWordBookById(wordBookIdForView[0]!!)
             return null
         }
     }

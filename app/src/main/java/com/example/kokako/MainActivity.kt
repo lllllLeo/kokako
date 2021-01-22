@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.d("     TAG", "===== MainActivity - onViewClicked 값은 : "+ myWordRecyclerAdapter.getItem()[adapterPosition].id)
         val intent = Intent(this, ViewWordActivity::class.java)
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
+        intent.putExtra("wordBookNameForView", myWordRecyclerAdapter.getItem()[adapterPosition].title)
         startActivity(intent)
     }
 
@@ -241,9 +242,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setMessage(myWordRecyclerAdapter.getItem()[position].title.toString() + " 단어장을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
-
+// TODO: 2021-01-22 여기서 지우면 바로 LIveData 적용됨
                     deleteWordBook(position)
-                    Log.d("TAG","MainActivity onRemoveClicked() IN "+myWordRecyclerAdapter.getItem()[position].toString() + " 삭제완료")
+                    Log.d("TAG",
+                        "MainActivity onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[position].toString() + " 삭제완료")
                 })
             .setNegativeButton("취소",
                 DialogInterface.OnClickListener { dialog, _ ->

@@ -22,22 +22,32 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.databinding.ActivityViewWordBinding
 import com.example.kokako.model.Word
+import com.example.kokako.model.WordBook
+import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_view_word.*
+import kotlinx.android.synthetic.main.fragment_my_word_list.*
+
 //  Log.d("     TAG", "===== AddWordActivity")
+// TODO: 2021-01-22 정렬, 가리기 구현
+// TODO: 2021-01-22 편집 하나씩 Dialog로 구현
+// TODO: 2021-01-22 뷰모델하나로 합치기?
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private var _binding : ActivityViewWordBinding? = null
     private val binding get() = _binding!!
     private lateinit var viewRecyclerAdapter : ViewWordRecyclerAdapter
     private var model : WordViewModel? = null
+    private var wordBookModel : WordBookViewModel? = null
     var wordBookIdForView : Long = 0
+    var wordBookNameForView : String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityViewWordBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
         wordBookIdForView = intent.getLongExtra("wordBookIdForView",0)
+        wordBookNameForView = intent.getStringExtra("wordBookNameForView")
         val sortItems = resources.getStringArray(R.array.sort_array)
         val hideItems = resources.getStringArray(R.array.hide_array) // 발음 가리기 (3 items)
         toolbarBinding = binding.includeToolbar
@@ -47,7 +57,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
-        toolbarBinding.toolbarTitle.text = "단어장 제목" // TODO 단어장 제목 추가
+        toolbarBinding.toolbarTitle.text = wordBookNameForView
 
         Log.d("     TAG", "===== ViewWordActivity getExtra wordBookIdForView 값은 : $wordBookIdForView")
 
@@ -56,11 +66,13 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 return WordViewModel(application,wordBookIdForView) as T
             }
         }).get(WordViewModel::class.java)
+
         model?.wordList?.observe(this, {
             Log.d("     TAG", "===== ViewWordActivity observe IN")
             updateWordList(it)
             Log.d("     TAG", "===== ViewWordActivity observe OUT")
         })
+        wordBookModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(WordBookViewModel::class.java)
 
 
 
@@ -71,8 +83,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 val v = super.getView(position, convertView, parent)
                 if (position == count) {
                     (v.findViewById<View>(R.id.sort_item_spinner) as TextView).text = getItem(count)
-//                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).text = ""
-//                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).hint = getItem(count)
                 }
                 return v
             }
@@ -145,6 +155,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         rv_list_word_view.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
             setHasFixedSize(true)
+            if (word.isNotEmpty()) { scrollToPosition(word.size - 1) }
             adapter = viewRecyclerAdapter
         }
         Log.d("     TAG", "===== ViewWordActivity updateWordList OUT")
@@ -195,9 +206,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                     .setMessage("단어장을 삭제하시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-//                      FIXME  DB작업, MainActivity로
-//                        val intent = Intent()
-//                        setResult(Activity.RESULT_OK, intent)
+// FIXME: 2021-01-22 삭제하고 MainActivity로 돌아오면 LiveData반영 안되어있음
+                        wordBookModel?.deleteWordBookById(wordBookIdForView)
                         dialog.dismiss()
                         finish()
                     })
