@@ -19,14 +19,14 @@ interface WordDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAllDatas(word: ArrayList<Word>)
 
-    @Update
+    @Update // 한 개씩 Dialog로 바꿀 때
     fun update(word: Word)
 
     @Delete
     fun delete(word: Word)
 
-    @Query("DELETE FROM tb_word")
-    fun deleteAll()
+    @Query("DELETE FROM tb_word WHERE wordBookId = :wordBookIdForView")
+    fun deleteWordById(wordBookIdForView: Array<out Long?>)
 
     @Query("SELECT * FROM tb_word")
     fun getAll(): LiveData<List<Word>>

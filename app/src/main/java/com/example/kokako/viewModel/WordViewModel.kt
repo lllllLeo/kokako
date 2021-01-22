@@ -41,8 +41,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     fun delete(word: Word) {
         DeleteWordAsyncTask().execute(word)
     }
-    fun deleteAll() {
-        DeleteAllWordAsyncTask().execute()
+    fun deleteWordById(wordBookIdForView : Long) {
+        Log.d("     TAG", "===== WordViewModel - deleteWordById called")
+        DeleteAllWordAsyncTask().execute(wordBookIdForView)
     }
     fun getWordFromWordBook(wordBookIdForView: Long): LiveData<List<Word>> {
         wordList = GetWordFromWordBookAsyncTask().execute(wordBookIdForView).get()
@@ -59,6 +60,7 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground called")
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground 값은 : ${wordBookIdForView[0]}")
+            Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground out")
             return wordDao.getWordFromWordBook222(wordBookIdForView)
         }
 
@@ -67,11 +69,12 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     @SuppressLint("StaticFieldLeak")
     private inner class InsertAllWordAsyncTask : AsyncTask<ArrayList<Word>, Void, Void>(){
         override fun doInBackground(vararg words: ArrayList<Word>): Void? {
-            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask word 값은 : $words")
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground - called")
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground -  word 값은 : ${words[0]}")
             var word : ArrayList<Word> = words[0]
-            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask word 값은 : ${word.toString()}")
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground -  word 값은 : ${word.toString()}")
             wordDao.insertAllDatas(word)
-            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask")
+            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground - out")
             return null
         }
     }
@@ -80,6 +83,7 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         override fun doInBackground(vararg wordBookIdForView: Long?): LiveData<List<Word>> {
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground called")
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground 값은 : ${wordBookIdForView[0]}")
+            Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground out")
             return wordDao.getWordFromWordBook(wordBookIdForView)
         }
 
@@ -88,7 +92,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteWordAsyncTask : AsyncTask<Word, Void, Void>() {
         override fun doInBackground(vararg word: Word?): Void? {
+            Log.d("     TAG", "===== WordViewModel - DeleteWordAsyncTask - doInBackground called")
             wordDao.delete(word[0]!!)
+            Log.d("     TAG", "===== WordViewModel - DeleteWordAsyncTask - doInBackground out")
             return null
         }
     }
@@ -99,15 +105,18 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
             Log.d("     TAG", "===== WordViewModel - InsertWordAsyncTask - doInBackground called")
             Log.d("     TAG", "===== WordViewModel - InsertWordAsyncTask - doInBackground word[0] : ${word[0]}")
             wordDao.insert(word[0]!!)
+            Log.d("     TAG", "===== WordViewModel - InsertWordAsyncTask - doInBackground out")
             return null
         }
     }
 
 
     @SuppressLint("StaticFieldLeak")
-    private inner class DeleteAllWordAsyncTask(): AsyncTask<Word, Void, Void>() {
-        override fun doInBackground(vararg params: Word?): Void? {
-            wordDao.deleteAll()
+    private inner class DeleteAllWordAsyncTask(): AsyncTask<Long, Void, Void>() {
+        override fun doInBackground(vararg wordBookIdForView: Long?): Void? {
+            Log.d("     TAG", "===== WordViewModel - DeleteAllWordAsyncTask - doInBackground - called")
+            wordDao.deleteWordById(wordBookIdForView)
+            Log.d("     TAG", "===== WordViewModel - DeleteAllWordAsyncTask - doInBackground - out")
             return null
         }
 

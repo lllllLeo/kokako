@@ -1,7 +1,10 @@
 package com.example.kokako
 
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_add_list_item.view.*
@@ -9,9 +12,10 @@ import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
 //  Log.d("     TAG", "===== AddViewHolder")
 class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
-    private var wordEditText = itemView.rv_word
-    private var meanEditText = itemView.rv_mean
-    private var removeButton = itemView.rv_remove_word
+    var wordEditText: EditText = itemView.rv_word
+    var meanEditText: EditText = itemView.rv_mean
+    var removeButton: FrameLayout = itemView.rv_remove_word
+
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 
     // 기본 생성자
@@ -22,8 +26,6 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
 // 클릭리스너 설정
 //        itemView.setOnClickListener(this)
 //        removeButton이 onClick된걸 리스너에 등록
-
-
         removeButton.setOnClickListener(this)
         // 인터페이스 연결
         this.addRecyclerViewInterface = addRecyclerViewInterface
@@ -33,9 +35,11 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
     fun bind(word: ArrayList<Word>, position:Int){
         wordEditText.setText(word[position].word)
         meanEditText.setText(word[position].mean)
-//        Log.d("     TAG", "===== AddViewHolder - bind 단어, 뜻 : ${word[position].word}, ${word[position].mean}")
+        wordEditText.tag = position
+        meanEditText.tag = position
         wordEditText.id = (position * 2) + 1
         meanEditText.id = position * 2
+//        Log.d("     TAG", "===== AddViewHolder - bind 단어, 뜻 : ${word[position].word}, ${word[position].mean}")
     }
 
 //    뷰홀더에서 아이템이 클릭된걸 암
