@@ -25,8 +25,10 @@ import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_view_word.*
 import kotlinx.android.synthetic.main.fragment_my_word_list.*
+import kotlinx.android.synthetic.main.fragment_my_word_list.fab_add_note
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-22 정렬, 가리기 구현
@@ -128,7 +130,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             override fun getCount(): Int { return super.getCount() - 1 }
         }
         hideArrayAdapter.addAll(hideItems.toMutableList())
-        hideArrayAdapter.add("가리기")
+        hideArrayAdapter.add("보기/가리기")
         hide_spinner.adapter = hideArrayAdapter
         hide_spinner.setSelection(hideArrayAdapter.count)
         hide_spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
@@ -147,7 +149,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+// TODO: 2021-01-23  putExtra(wordBookIdForView) -> 순서 정하는 Activity
+//        fab_add_note.setOnClickListener { view -> }
     }
+
+
+
     private fun updateWordList(word: List<Word>?) {
         Log.d("     TAG", "===== ViewWordActivity updateWordList IN")
         viewRecyclerAdapter = ViewWordRecyclerAdapter(this)
@@ -173,21 +180,22 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         menuInflater.inflate(R.menu.view_word_menu, menu)
         return true
     }
-/*    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("     TAG", "===== ViewWordActivity - onActivityResult called")
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 100 -> {
                     Log.d("     TAG", "===== ViewWordActivity - onActivityResult when called")
-//                    wordBookIdForView = intent.getLongExtra("wordBookIdForView", 0)
-                    super.onResume()
+                    wordBookIdForView = intent.getLongExtra("wordBookIdForView", 0)
+                    updateWordList(viewRecyclerAdapter.getItems())
                     Log.d("     TAG", "===== ViewWordActivity - onActivityResult when wordBookIdForView : $wordBookIdForView")
                 }
             }
         }
-    }*/
+    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
             android.R.id.home -> {
@@ -195,7 +203,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             }
             R.id.menu_edit -> {
                 val intent = Intent(this, AddWordActivity::class.java)
-        // FIXME: 2021-01-20  고치기
+        // FIXME: 2021-01-20  startActivityForResult 고치기
                 intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForView)
                 intent.putExtra("checkActivity", true)
                 startActivityForResult(intent, 100)
@@ -206,7 +214,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                     .setMessage("단어장을 삭제하시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-// FIXME: 2021-01-22 삭제하고 MainActivity로 돌아오면 LiveData반영 안되어있음
+        // FIXME: 2021-01-22 삭제하고 MainActivity로 돌아오면 LiveData반영 안되어있음
                         wordBookModel?.deleteWordBookById(wordBookIdForView)
                         dialog.dismiss()
                         finish()

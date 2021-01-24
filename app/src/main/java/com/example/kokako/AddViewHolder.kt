@@ -3,6 +3,7 @@ package com.example.kokako
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +15,8 @@ import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
     var wordEditText: EditText = itemView.rv_word
     var meanEditText: EditText = itemView.rv_mean
-    var removeButton: FrameLayout = itemView.rv_remove_word
+//    var removeButton: FrameLayout = itemView.rv_remove_word
+    var removeButton: Button = itemView.rv_remove_word
 
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 

@@ -2,6 +2,7 @@ package com.example.kokako
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

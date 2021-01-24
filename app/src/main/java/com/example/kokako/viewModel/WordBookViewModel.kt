@@ -3,6 +3,7 @@ package com.example.kokako.viewModel
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.AsyncTask
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.room.Room
@@ -21,6 +22,7 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
             Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
         wordBookDao = db.getWordBookDAO()
         wordBookList = wordBookDao.getAll()
+        Log.d("     TAG", "===== WordBookViewModel wordBookList.value : ${wordBookList.value}")
     }
 
     fun insert(wordBook: WordBook):Long? {

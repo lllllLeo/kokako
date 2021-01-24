@@ -25,11 +25,14 @@ import com.example.kokako.databinding.ActivityMainBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
+import com.example.kokako.viewModel.WordViewModel
 import com.google.android.material.navigation.NavigationView
-import kotlinx.android.synthetic.main.fragment_my_word_list.*
-import kotlin.collections.ArrayList
+import kotlinx.android.synthetic.main.activity_main.*
 
-
+// TODO: 2021-01-23 스크롤하면 네이게이션에서 스크롤바 숨기기
+// TODO: 2021-01-23 스크롤하면 툴바 숨기기?
+// TODO: 2021-01-23 툴바 클래스로
+// TODO: 2021-01-23 종료할 떄 키보드 넣기 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
     companion object {
         private const val TAG = "TAG"
@@ -40,7 +43,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var recyclerview: RecyclerView? = null
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
     private lateinit var imm : InputMethodManager
-    private var model : WordBookViewModel? = null
+    private var wordBookModel : WordBookViewModel? = null
+    private var wordModel : WordViewModel? = null
     private var wordBookDatas : ArrayList<WordBook>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,24 +79,37 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
         binding.navView.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음
 
+        rv_word_book.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0 || dy < 0 && fab_add_note.isShown) fab_add_note.hide()
+            }
 
-        model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(WordBookViewModel::class.java)
-        model?.wordBookList?.observe(this, {
-            updateWordBookList(it)
+            // FIXME: 2021-01-23 스크롤을 올리면 뜨게? 그러면
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) fab_add_note.show()
+                super.onScrollStateChanged(recyclerView, newState)
+            }
         })
 
-
+        wordBookModel = ViewModelProvider(this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(
+                this.application)).get(WordBookViewModel::class.java)
+        wordBookModel?.wordBookList?.observe(this, {
+            updateWordBookList(it)
+        })
 
 
         fab_add_note.setOnClickListener { view ->
 
             imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+                InputMethodManager.HIDE_IMPLICIT_ONLY)
 
             val container = LinearLayout(this)
             container.orientation = LinearLayout.VERTICAL
-            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
-            lp.setMargins(50,0,50,0)
+            val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
+            lp.setMargins(50, 0, 50, 0)
 
             val dialogEditText = EditText(this)
             dialogEditText.maxLines = 1
@@ -116,7 +133,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val wordBookName = dialogEditText.text.toString()
                         val intent = Intent(this, AddWordActivity::class.java)
                         val wordBookIdForAdd = addWordBook(wordBookName)
-                        Log.d("     TAG", "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
+                        Log.d("     TAG",
+                            "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAdd)
                         startActivity(intent)
                         mBuilder.dismiss()
@@ -128,16 +146,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun addWordBook(wordBookName: String): Long {
+//        TODO wordBook에 Date 형식으로 추가하기
         val wordBook = WordBook(0, wordBookName, 0, 0)
-        val recentInsertedWordBookId : Long = model?.insert(wordBook)!!
-        Log.d("     TAG", "===== MainActivity - addWordBook - recentInsertedWordBookId 값은 : $recentInsertedWordBookId")
+        val recentInsertedWordBookId : Long = wordBookModel?.insert(wordBook)!!
+        Log.d("     TAG",
+            "===== MainActivity - addWordBook - recentInsertedWordBookId 값은 : $recentInsertedWordBookId")
         return recentInsertedWordBookId
     }
     private fun deleteWordBook(position: Int) {
-        model?.delete(myWordRecyclerAdapter.getItem()[position])
+        wordBookModel?.delete(myWordRecyclerAdapter.getItem()[position])
     }
 
     private fun updateWordBookList(wordBook: List<WordBook>?) {
+        Log.d("     TAG", "===== MainActivity - updateWordBookList called")
+        Log.d("     TAG", "===== MainActivity - updateWordBookList wordBook : $wordBook")
         myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
         myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
         rv_word_book.apply {
@@ -148,10 +170,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onViewClicked(v: View, adapterPosition: Int) {
-        Log.d("     TAG", "===== MainActivity - onViewClicked 값은 : "+ myWordRecyclerAdapter.getItem()[adapterPosition].id)
+        Log.d("     TAG",
+            "===== MainActivity - onViewClicked 값은 : " + myWordRecyclerAdapter.getItem()[adapterPosition].id)
         val intent = Intent(this, ViewWordActivity::class.java)
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
-        intent.putExtra("wordBookNameForView", myWordRecyclerAdapter.getItem()[adapterPosition].title)
+        intent.putExtra("wordBookNameForView",
+            myWordRecyclerAdapter.getItem()[adapterPosition].title)
         startActivity(intent)
     }
 
@@ -223,6 +247,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuInflater.inflate(R.menu.sub_menu, menu)
         return true
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.menu_import -> {
@@ -236,7 +261,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
     override fun onRemoveClicked(view: View, position: Int) {
-        Log.d("     TAG", "===== MainActivity - onRemoveClicked() IN "+myWordRecyclerAdapter.getItem()[position].toString())
+        Log.d("     TAG",
+            "===== MainActivity - onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[position].toString())
         val mBuilder = AlertDialog.Builder(view.context)
         mBuilder.setTitle("삭제")
             .setMessage(myWordRecyclerAdapter.getItem()[position].title.toString() + " 단어장을 삭제하시겠습니까?")

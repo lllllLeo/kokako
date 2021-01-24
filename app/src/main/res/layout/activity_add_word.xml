@@ -120,13 +120,13 @@
             android:background="@drawable/ic_baseline_cancel_24" />
     </LinearLayout>
 
-    <LinearLayout
+<!--    <LinearLayout
         android:id="@+id/input_division"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_below="@+id/input_layout"
         android:background="@color/colorDivision"
-        android:orientation="horizontal" />
+        android:orientation="horizontal" />-->
 
     <FrameLayout
         android:id="@+id/list_view"
@@ -138,9 +138,9 @@
             android:id="@+id/rv_list_item"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"

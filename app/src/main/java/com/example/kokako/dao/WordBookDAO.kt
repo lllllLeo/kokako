@@ -19,6 +19,8 @@ interface WordBookDAO {
     @Query("DELETE FROM tb_word_book WHERE id = :wordBookIdForView")
     fun deleteWordBookById(wordBookIdForView: Long)
 
-    @Query("SELECT * FROM tb_word_book")
+//    @Query("SELECT * FROM tb_word_book")
+    @Query("SELECT id, title, (SELECT count(word) FROM tb_word WHERE wordBookId = tb_word_book.id) AS count, addTime FROM tb_word_book")
     fun getAll(): LiveData<List<WordBook>>
+
 }

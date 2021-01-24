@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <include
@@ -51,5 +51,22 @@
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
             tools:listitem="@layout/rv_view_list_item"/>
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fab_test_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom|center"
+            android:layout_centerHorizontal="true"
+            android:theme="@style/MaterialTheme"
+            android:layout_margin="30dp"
+            android:backgroundTint="@color/colorPrimary"
+            android:text="단어테스트"
+            android:textColor="@color/colorWhite"
+            android:textStyle="bold"
+            app:iconTint="@color/colorWhite"
+            app:iconPadding="0dp"
+            app:icon="@drawable/ic_baseline_check_24"
+            />
     </FrameLayout>
 </LinearLayout>

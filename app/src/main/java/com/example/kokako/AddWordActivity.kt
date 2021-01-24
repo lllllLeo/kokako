@@ -1,8 +1,10 @@
-            package com.example.kokako
+package com.example.kokako
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,7 +19,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityAddWordBinding
@@ -25,14 +26,19 @@ import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_add_word.*
+import java.lang.NullPointerException
+
 //  Log.d("     TAG", "===== AddWordActivity")
+// TODO: 2021-01-23 Upsert
+// FIXME: 2021-01-23 단어장 편집하기로 불러온 상태에서 맨위값 삭제하면 스크롤이 맨위로 안올라감
+// FIXME: 2021-01-23 wordCount 고치기
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private var _binding : ActivityAddWordBinding? = null
     private val binding get() = _binding!!
     private lateinit var addRecyclerAdapter: AddRecyclerAdapter
     private var model : WordViewModel? = null // 바로 WordDatabase안부르고 뷰모델 통해서 부름
-    var wordCount: Int = 0
+    var currentWordCount: Int = 0
     var currentCount: Int = 0
     var countString: String? = null
     private var tvWordCount: TextView? = null
@@ -58,10 +64,11 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         tvWordCount = binding.wordCount
         input_word.id = INPUT_WORD_ID
         input_mean.id = INPUT_MEAN_ID
-        Log.d("     TAG", "===== AddWordActivity input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
+
+        Log.d("     TAG", "===== AddWordActivity input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 $INPUT_WORD_ID \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
 
         //        add Divider in RecyclerView
-        rv_list_item.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+//        rv_list_item.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         rv_list_item.isFocusable = false
 
 
@@ -72,7 +79,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
-        toolbarBinding.toolbarTitle.text = "단어장 추가"
+        toolbarBinding.toolbarTitle.text = if(checkActivity) {"단어장 편집"} else {"단어장 추가"}
 
         // Forcing the Soft Keyboard open
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -84,32 +91,27 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         model = ViewModelProvider(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return WordViewModel(application, wordBookIdForAddOrEdit) as T
-            }
-        }).get(WordViewModel::class.java)
-
+            }}).get(WordViewModel::class.java)
         addRecyclerAdapter = AddRecyclerAdapter(this)
         if (checkActivity){
-//            word = model?.wordList
             word  = model?.getWordFromWordBook222(wordBookIdForAddOrEdit)!!
+            currentCount = word.size
 //            recyclerViewApply(addRecyclerAdapter)
             rv_list_item.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
                 //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                 setHasFixedSize(true)
-                smoothScrollToPosition(word.size - 1)
+                if(word.size != 0) smoothScrollToPosition(word.size - 1)    // 데이터가 없으면 에러
                 adapter = addRecyclerAdapter
                 addRecyclerAdapter.submitDataList(word)
             }
         }
 
+        // FIXME: 2021-01-23 count
 
-/*        model?.wordList?.observe(this, {    // 단어 추가 버튼 누르면 이게 옵저버로 보고잇으니까 여기 안에는 리사이클러뷰에 넣는거해야겟지
-            updateWordList(it)
-        })*/
-
-        countString = "$currentCount/$wordCount"
+//        countString = "${findViewById<EditText>(currentFocusId)}/$currentWordCount"
 //        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
-        tvWordCount?.text = countString
+//        tvWordCount?.text = countString
 
         val btnListener = View.OnClickListener { view ->
             val currentFocusId = currentFocus!!.id
@@ -128,30 +130,32 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 R.id.btn_move_left -> {
                     if (findViewById<EditText>(currentFocusId + 1) != null) {
                         findViewById<EditText>(currentFocusId + 1).requestFocus()
-                    } else if (currentFocus!!.id == INPUT_MEAN_ID){ // 현재 포커스가 input_mean이면
+                    } else if (currentFocus!!.id == INPUT_MEAN_ID){
                         input_word.requestFocus()
-                    } else if (currentFocus!!.id == INPUT_WORD_ID){ // 현재 포커스가 input_word이면
+                    } else if (currentFocus!!.id == INPUT_WORD_ID){
                         "do nothing"
                     }
                     else {
                         input_mean.requestFocus()
                     }
                 }
-                // FIXME: 2021-01-22 LongTouch하면 쭉쭉쭉쭉가게? 오바
+                // TODO 2021-01-22 LongTouch하면 쭉쭉쭉쭉가게? 오바
                 R.id.btn_move_right -> {
                     Log.d("     TAG",
                         "===== AddWordActivity btn_move_right input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
                     Log.d("     TAG",
                         "===== AddWordActivity btn_move_right currentFocus!!.id ${currentFocus!!.id} 와 INPUT_MEAN_ID ${INPUT_MEAN_ID} ")
-                    if (currentFocus!!.id == INPUT_WORD_ID) { // 현재 포커스가 input_word이면
+                    if (currentFocus!!.id == INPUT_WORD_ID) {
                         input_mean.requestFocus()
                         Log.d("     TAG", "===== AddWordActivity btn_move_right if문 ")
                     } else if (currentFocus!!.id == INPUT_MEAN_ID && addRecyclerAdapter.itemCount != 0) {
-                        Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 1")
-                        // FIXME: 2021-01-22 리사이클러뷰의 최신값이 맨위에서 보일떄는 뜻에서 바로 밑 최신값의 에딧텍스트로 가는데
-                        // FIXME: 2021-01-22 스크롤 쪼금이라도 내리고 하면 에러뜸
-                        // FIXME: 2021-01-22 밑에 값이 없으면 안움직이게해야겠다 이유는 뷰를 재사용하니까 없어짐
-                        findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).requestFocus()
+                        try {
+                            findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).requestFocus()
+                        } catch(e : NullPointerException) {
+                            return@OnClickListener
+                        }
+//                        Log.d("     TAG", "===== AddWordActivity ㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎㅎ if문 ${((addRecyclerAdapter.itemCount - 1) * 2) + 1} 는 ${(addRecyclerAdapter.itemCount * 2 - 1)}")
+//                        if (((addRecyclerAdapter.itemCount - 1) * 2) + 1 != (addRecyclerAdapter.itemCount * 2 - 1))
                     } else if (findViewById<EditText>(currentFocusId - 1) != null) {
                         Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 2")
                         findViewById<EditText>(currentFocusId - 1).requestFocus()
@@ -168,19 +172,18 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     ) {
                         Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
                     } else {
-                        // FIXME: 2021-01-20   addWord(wordBookIdForAddOrEdit)
-                        word.add(Word(0,input_word.text.toString(), input_mean.text.toString(), wordBookIdForAddOrEdit))
-                        Log.d("     TAG", "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
+                        // FIXME: 2021-01-23 입력한 값들에서 빈값 예외처리 / 추후
+                        word.add(Word(0,
+                            input_word.text.toString(),
+                            input_mean.text.toString(),
+                            wordBookIdForAddOrEdit))
+                        Log.d("     TAG",
+                            "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
                         Log.d("     TAG", "===== AddWordActivity word 값은 : $word")
                         addRecyclerAdapter = AddRecyclerAdapter(this)
-//                        word2 = addRecyclerAdapter.getItem()
-//                        word2.add(Word(0,input_word.text.toString(), input_mean.text.toString(), wordBookIdForAddOrEdit))
-//                        Log.d("     TAG", "===== AddWordActivity word2 값은 : $word2")
-//                        word2 = word.clone() as ArrayList<Word>
-//                        addRecyclerAdapter.notifyItemChanged(addRecyclerAdapter.itemCount -1)
-//                        recyclerViewApply(addRecyclerAdapter)
                         rv_list_item.apply {
-                            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
+                            layoutManager =
+                                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
                             //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
                             setHasFixedSize(true)
                             smoothScrollToPosition(word.size - 1)
@@ -190,6 +193,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
+                        // TODO: 2021-01-23 wordCount
 //                        wordCount++
 //                        countString = "$currentCount/$wordCount"
 //                        tvWordCount?.text = countString
@@ -206,15 +210,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         btn_add_word.setOnClickListener(btnListener)
     }
 
-//    private fun recyclerViewApply(addRecyclerAdapter: AddRecyclerAdapter) {
-//        rv_list_item.apply {
-//            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-//    //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
-//            setHasFixedSize(true)
-//            adapter = addRecyclerAdapter
-//        }
-//    }
-
     private fun addWord(wordBookId: Long){
 //        val word = Word(0,
 //            binding.inputWord.text.toString(),
@@ -229,12 +224,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private fun updateWord(){
 
     }
-//    TODO 여기서 추가한 단어 id(pk)까지 가져와서 그 뒤부터 추가하게 하기 일단 계속 0으로 넣어지는걸 고쳐야할듯
-//    TODO 아 id가 pk니까 중복으로 안되서 그렇구나.
-//    private fun getWordList(wordBookIdForView: Long) {
-//        model?.getWordFromWordBook(wordBookIdForView)
-//    }
-
     private fun deleteAllWord(wordBookIdForView : Long){
         model?.deleteWordById(wordBookIdForView)
     }
@@ -268,15 +257,24 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
 * */
 
+    //    fun removeWord(wordDto: ArrayList<WordDTO>, position: Int){
+//        wordDto.removeAt(position)
+//        notifyItemRemoved(position)
+//        notifyItemRangeChanged(position, wordDto.size)
+//    }
     override fun onRemoveClicked(view: View, position: Int) {
+                    Log.d("     TAG","===== AddWordActivity onRemoveClicked position $position")
         val mBuilder = AlertDialog.Builder(view.context)
         mBuilder.setTitle("삭제")
             .setMessage("단어 : " + addRecyclerAdapter.getItem()[position].word.toString() + "\n뜻 : " + addRecyclerAdapter.getItem()[position].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
-                    deleteWord(position)
-                    wordCount--
-                    countString = "$currentCount/$wordCount"
+                    word.removeAt(position)
+                    addRecyclerAdapter.notifyItemRemoved(position)
+                    addRecyclerAdapter.notifyItemRangeChanged(position, addRecyclerAdapter.itemCount)
+//                    addRecyclerAdapter.notifyDataSetChanged() // 이거 추가하니까 아예 갱신도 안되노
+                    currentWordCount--
+                    countString = "$currentCount/$currentWordCount"
                     tvWordCount?.text = countString
                 })
             .setNegativeButton("취소",
@@ -301,14 +299,22 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     .setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
+                        // FIXME: 2021-01-23 Toast? snackBar?
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
 //                        DB작업
-                        Log.d("     TAG", "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인1")
+                        Log.d("     TAG",
+                            "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인1")
                         model?.deleteWordById(wordBookIdForAddOrEdit)
                         model?.insertAllDatas(word)
                         Log.d("     TAG", "===== AddWordActivity onOptionsItemSelected word $word")
-                        Log.d("     TAG", "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인2")
+                        Log.d("     TAG",
+                            "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인2")
+
+                        // FIXME: 2021-01-24  이렇게 해도 안되네
+                        val intent = Intent()
+                        setResult(Activity.RESULT_OK, intent)
+
                         dialog.dismiss()
                         finish()
                     })

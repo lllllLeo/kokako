@@ -25,4 +25,8 @@ class ViewWordRecyclerAdapter(viewWordRecyclerViewInterface: ViewWordRecyclerVie
         this.wordDatas = words
     }
 
+    fun getItems() : ArrayList<Word> {
+        return this.wordDatas
+    }
+
 }

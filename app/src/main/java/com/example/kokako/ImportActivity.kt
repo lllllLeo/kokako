@@ -65,6 +65,7 @@ class ImportActivity : AppCompatActivity() {
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, which ->
 //                        DB작업
+                        // FIXME: 2021-01-23 Toast?  snackBar?
                         Toast.makeText(this, "추가 완료", Toast.LENGTH_SHORT).show()
                         dialog.dismiss()
                         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
