@@ -1,5 +1,6 @@
 package com.example.kokako
 
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -32,11 +33,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 // TODO: 2021-01-23 스크롤하면 네이게이션에서 스크롤바 숨기기
 // TODO: 2021-01-23 스크롤하면 툴바 숨기기?
 // TODO: 2021-01-23 툴바 클래스로
-// TODO: 2021-01-23 종료할 떄 키보드 넣기 
+// TODO: 2021-01-23 종료할 떄 키보드 넣기
+// FIXME: 2021-01-24 wordBook에 count 업데이트해야함 지금은 select로 뽑기만하고있는데
+// TODO: 2021-01-24 메인에서 편집 삭제, 다이얼로그or롱터치
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
-    companion object {
-        private const val TAG = "TAG"
-    }
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private lateinit var binding : ActivityMainBinding
     //    var backPressedTime: Long = 0
@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             container.orientation = LinearLayout.VERTICAL
             val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
-            lp.setMargins(50, 0, 50, 0)
+            lp.setMargins(50, 0, 50, 0) // editText Margin
 
             val dialogEditText = EditText(this)
             dialogEditText.maxLines = 1
@@ -136,7 +136,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         Log.d("     TAG",
                             "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAdd)
-                        startActivity(intent)
+                        startActivityForResult(intent, 100)
+//                        startActivity(intent)
                         mBuilder.dismiss()
                     }
                 })
@@ -175,40 +176,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val intent = Intent(this, ViewWordActivity::class.java)
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
         intent.putExtra("wordBookNameForView",
-            myWordRecyclerAdapter.getItem()[adapterPosition].title)
+        myWordRecyclerAdapter.getItem()[adapterPosition].title)
         startActivity(intent)
     }
 
+// FIXME: 2021-01-24 count는 startActivityForResult이렇게하니까 안되네 in MainActivity
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                100 -> {
+                    Log.d("     TAG", "===== MainActivity - onActivityResult when called")
+                    updateWordBookList(myWordRecyclerAdapter.getItem())
+                }
+            }
+        }
+    }
 
     override fun onBackPressed() {
         /*if (System.currentTimeMillis() - backPressedTime > 2000) {
@@ -230,15 +214,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.nav_view -> return true
-            R.id.nav_bus -> {
-                val intent = Intent(this, Bus::class.java)
-                startActivity(intent)
-            }
             R.id.nav_share -> {
                 Toast.makeText(this, "Share", Toast.LENGTH_SHORT).show()
                 return true
             }
-
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START) // 네비게이션드로우 닫히고 인텐트전환
         return true // 네이게이션 아이템이 선택되면 true

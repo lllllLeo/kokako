@@ -6,9 +6,6 @@
             android:id="@+id/nav_home"
             android:title="Home" />
         <item
-            android:id="@+id/nav_bus"
-            android:title="Bus" />
-        <item
             android:id="@+id/nav_setting"
             android:title="Setting" />
         <item

@@ -19,6 +19,7 @@ data class Word(
     var id: Long,
     var word: String,
     var mean: String,
+    var bookMarkCheck : Boolean,
     var wordBookId: Long
 )
 

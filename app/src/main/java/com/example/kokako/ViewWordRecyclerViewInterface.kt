@@ -1,5 +1,7 @@
 package com.example.kokako
 
-interface ViewWordRecyclerViewInterface {
+import android.view.View
 
+interface ViewWordRecyclerViewInterface {
+    fun onStarClicked(v: View, adapterPosition: Int)
 }

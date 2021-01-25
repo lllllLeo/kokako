@@ -176,6 +176,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         word.add(Word(0,
                             input_word.text.toString(),
                             input_mean.text.toString(),
+                            false,
                             wordBookIdForAddOrEdit))
                         Log.d("     TAG",
                             "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
@@ -216,7 +217,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 //            binding.inputMean.text.toString(),
 //            wordBookId)
 //        model?.insert(word)
-        model?.insert(Word(0, binding.inputWord.text.toString(),binding.inputMean.text.toString(), wordBookId))
+//        model?.insert(Word(0, binding.inputWord.text.toString(),binding.inputMean.text.toString(), wordBookId))
     }
     private fun deleteWord(position: Int) {
         model?.delete(addRecyclerAdapter.getItem()[position])
@@ -259,11 +260,13 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
     //    fun removeWord(wordDto: ArrayList<WordDTO>, position: Int){
 //        wordDto.removeAt(position)
-//        notifyItemRemoved(position)
+//        notifyItemRemoved(position){ // 뜻 ▲
+//
+//                }
 //        notifyItemRangeChanged(position, wordDto.size)
 //    }
     override fun onRemoveClicked(view: View, position: Int) {
-                    Log.d("     TAG","===== AddWordActivity onRemoveClicked position $position")
+        Log.d("     TAG","===== AddWordActivity onRemoveClicked position $position")
         val mBuilder = AlertDialog.Builder(view.context)
         mBuilder.setTitle("삭제")
             .setMessage("단어 : " + addRecyclerAdapter.getItem()[position].word.toString() + "\n뜻 : " + addRecyclerAdapter.getItem()[position].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
@@ -290,9 +293,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
-            android.R.id.home -> {
-                cancelDialog(mBuilder)
-            }
+            android.R.id.home -> { cancelDialog(mBuilder) }
             R.id.menu_check -> {
                 // FIXME: 2021-01-20 아무값 입력없이 추가 예외처리
                 mBuilder.setTitle("단어장으로 추가")
@@ -302,7 +303,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         // FIXME: 2021-01-23 Toast? snackBar?
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-//                        DB작업
                         Log.d("     TAG",
                             "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인1")
                         model?.deleteWordById(wordBookIdForAddOrEdit)
@@ -310,11 +310,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         Log.d("     TAG", "===== AddWordActivity onOptionsItemSelected word $word")
                         Log.d("     TAG",
                             "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인2")
-
-                        // FIXME: 2021-01-24  이렇게 해도 안되네
                         val intent = Intent()
                         setResult(Activity.RESULT_OK, intent)
-
                         dialog.dismiss()
                         finish()
                     })
@@ -327,14 +324,11 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         cancelDialog(mBuilder = AlertDialog.Builder(this))
     }
 
-    // FIXME: 2021-01-19  이전 액티비티의 값에 따라 전체 취소(제일 처음 단어장 추가할 때),/ 편집할때 (방금입력한거 다시 지우고 뒤로가기)
     private fun cancelDialog(mBuilder: AlertDialog.Builder) {
         mBuilder.setTitle("단어장 취소")
             .setMessage("입력한 단어를 취소하고 이동하시겠습니까?")
             .setNegativeButton("취소", null)
             .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-                // FIXME: 2021-01-20 clear()
-//                deleteAllWord()
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                 dialog.dismiss()
                 finish()

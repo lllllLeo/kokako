@@ -13,4 +13,6 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorBackground">#F5F5F5</color>
     <color name="transparent">#00F5F5F5</color>
+    <color name="colorDarkBackground">#4A4A4A</color>
+    <color name="colorDarkText">#BDBDBD</color>
 </resources>

@@ -38,4 +38,12 @@ interface WordDAO {
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView")
     fun getWordFromWordBook222(wordBookIdForView: Array<out Long?>): List<Word>
 
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY word ASC")
+    fun getWordAscendingOrder(wordBookIdForView: Array<out Long?>): LiveData<List<Word>>
+
 }
+
+/*
+*     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY word ASC")
+    fun getWordAscendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
+* */

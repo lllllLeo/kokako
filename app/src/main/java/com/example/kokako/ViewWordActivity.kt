@@ -8,27 +8,20 @@ import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.databinding.ActivityViewWordBinding
 import com.example.kokako.model.Word
-import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_view_word.*
-import kotlinx.android.synthetic.main.fragment_my_word_list.*
-import kotlinx.android.synthetic.main.fragment_my_word_list.fab_add_note
+import kotlinx.android.synthetic.main.rv_view_list_item.*
+import kotlinx.android.synthetic.main.rv_view_list_item.view.*
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-22 정렬, 가리기 구현
@@ -36,19 +29,22 @@ import kotlinx.android.synthetic.main.fragment_my_word_list.fab_add_note
 // TODO: 2021-01-22 뷰모델하나로 합치기?
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
-    private var _binding : ActivityViewWordBinding? = null
+    private var _binding: ActivityViewWordBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewRecyclerAdapter : ViewWordRecyclerAdapter
-    private var model : WordViewModel? = null
-    private var wordBookModel : WordBookViewModel? = null
-    var wordBookIdForView : Long = 0
-    var wordBookNameForView : String? = null
+    private lateinit var viewRecyclerAdapter: ViewWordRecyclerAdapter
+    private var model: WordViewModel? = null
+    private var wordBookModel: WordBookViewModel? = null
+    var wordBookIdForView: Long = 0
+
+    var wordBookNameForView: String? = null
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityViewWordBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-        wordBookIdForView = intent.getLongExtra("wordBookIdForView",0)
+        wordBookIdForView = intent.getLongExtra("wordBookIdForView", 0)
         wordBookNameForView = intent.getStringExtra("wordBookNameForView")
         val sortItems = resources.getStringArray(R.array.sort_array)
         val hideItems = resources.getStringArray(R.array.hide_array) // 발음 가리기 (3 items)
@@ -61,11 +57,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
         toolbarBinding.toolbarTitle.text = wordBookNameForView
 
-        Log.d("     TAG", "===== ViewWordActivity getExtra wordBookIdForView 값은 : $wordBookIdForView")
+        Log.d("     TAG",
+            "===== ViewWordActivity getExtra wordBookIdForView 값은 : $wordBookIdForView")
 
-        model = ViewModelProvider(this, object :ViewModelProvider.Factory{
+        model = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return WordViewModel(application,wordBookIdForView) as T
+                return WordViewModel(application, wordBookIdForView) as T
             }
         }).get(WordViewModel::class.java)
 
@@ -74,9 +71,9 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             updateWordList(it)
             Log.d("     TAG", "===== ViewWordActivity observe OUT")
         })
-        wordBookModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(WordBookViewModel::class.java)
-
-
+        wordBookModel = ViewModelProvider(this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(
+            WordBookViewModel::class.java)
 
 
         val sortArrayAdapter = object : ArrayAdapter<String>(this, R.layout.sort_spinner) {
@@ -88,32 +85,50 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 }
                 return v
             }
-            override fun getCount(): Int { return super.getCount() - 1 }
+
+            override fun getCount(): Int {
+                return super.getCount() - 1
+            }
         }
         sortArrayAdapter.addAll(sortItems.toMutableList())
         sortArrayAdapter.add("정렬")
+        /* TODO 정렬 :생성일순 처럼 처음 default는 정렬 만나오게하고 밑에 클릭하면 정렬 : ~~하게 나오면 좋겠다
+        * */
         sort_spinner.adapter = sortArrayAdapter
         sort_spinner.setSelection(sortArrayAdapter.count)
-        sort_spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
+        sort_spinner.dropDownVerticalOffset = dipToPixels(35f).toInt()
         sort_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?,view: View?,position: Int,id: Long) {
-            when(position) {
-                0 -> { // 단어 오름차순
-                }
-                1 -> { // 단어 내림차순
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                when (position) {
+                    0 -> { // 최신순
 
-                }
-                2 -> { // 뜻 오름차순
+                    }
+                    1 -> { // 별표순
 
-                }
-                3 -> { // 뜻 내림차순
+                    }
+                    2 -> { // 단어 ▲
+                        model?.getWordAscendingOrder(wordBookIdForView)
+                    }
+                    3 -> { // 단어 ▼
 
-                }
-                4 -> { // 랜덤
+                    }
+                    4 -> {
 
+                    }
+                    5 -> { // 뜻 ▼
+
+                    }
+                    6 -> { // 랜덤
+
+                    }
                 }
             }
-        }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
@@ -127,16 +142,24 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 }
                 return v
             }
-            override fun getCount(): Int { return super.getCount() - 1 }
+
+            override fun getCount(): Int {
+                return super.getCount() - 1
+            }
         }
         hideArrayAdapter.addAll(hideItems.toMutableList())
         hideArrayAdapter.add("보기/가리기")
         hide_spinner.adapter = hideArrayAdapter
         hide_spinner.setSelection(hideArrayAdapter.count)
-        hide_spinner.dropDownVerticalOffset = dipToPixels(45f).toInt()
+        hide_spinner.dropDownVerticalOffset = dipToPixels(35f).toInt()
         hide_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?,view: View?,position: Int,id: Long) {
-                when(position) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                when (position) {
                     0 -> { // 단어 가리기
                     }
                     1 -> { // 뜻 가리기
@@ -147,13 +170,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                     }
                 }
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 // TODO: 2021-01-23  putExtra(wordBookIdForView) -> 순서 정하는 Activity
 //        fab_add_note.setOnClickListener { view -> }
     }
-
-
 
     private fun updateWordList(word: List<Word>?) {
         Log.d("     TAG", "===== ViewWordActivity updateWordList IN")
@@ -162,7 +184,9 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         rv_list_word_view.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
             setHasFixedSize(true)
-            if (word.isNotEmpty()) { scrollToPosition(word.size - 1) }
+            if (word.isNotEmpty()) {
+                scrollToPosition(word.size - 1)
+            }
             adapter = viewRecyclerAdapter
         }
         Log.d("     TAG", "===== ViewWordActivity updateWordList OUT")
@@ -180,6 +204,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         menuInflater.inflate(R.menu.view_word_menu, menu)
         return true
     }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("     TAG", "===== ViewWordActivity - onActivityResult called")
         super.onActivityResult(requestCode, resultCode, data)
@@ -188,33 +213,39 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 100 -> {
                     Log.d("     TAG", "===== ViewWordActivity - onActivityResult when called")
                     wordBookIdForView = intent.getLongExtra("wordBookIdForView", 0)
-                    updateWordList(viewRecyclerAdapter.getItems())
-                    Log.d("     TAG", "===== ViewWordActivity - onActivityResult when wordBookIdForView : $wordBookIdForView")
+                    val wordList = model?.getWordFromWordBook222(wordBookIdForView)
+                    updateWordList(wordList)
+                    Log.d("     TAG",
+                        "===== ViewWordActivity - onActivityResult when wordBookIdForView : $wordBookIdForView")
                 }
             }
         }
     }
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         val mBuilder = AlertDialog.Builder(this)
-        when(item.itemId) {
+        when (item.itemId) {
             android.R.id.home -> {
+                // FIXME: 2021-01-24 count는 startActivityForResult이렇게하니까 안되네 in ViewWordActivity
+
+/*                val intent = Intent()
+                setResult(Activity.RESULT_OK, intent)*/
                 finish()
             }
             R.id.menu_edit -> {
                 val intent = Intent(this, AddWordActivity::class.java)
-        // FIXME: 2021-01-20  startActivityForResult 고치기
                 intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForView)
                 intent.putExtra("checkActivity", true)
                 startActivityForResult(intent, 100)
-//                startActivity(intent)
             }
             R.id.menu_delete -> {
                 mBuilder.setTitle("단어장 삭제")
                     .setMessage("단어장을 삭제하시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-        // FIXME: 2021-01-22 삭제하고 MainActivity로 돌아오면 LiveData반영 안되어있음
+                        // FIXME: 2021-01-22 삭제하고 MainActivity로 돌아오면 LiveData반영 안되어있음 / 이거랑 위에꺼 해결
                         wordBookModel?.deleteWordBookById(wordBookIdForView)
                         dialog.dismiss()
                         finish()
@@ -223,5 +254,15 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             }
         }
         return true
+    }
+
+    private fun udpateStar(word: Word) {
+        model?.updateStarChecked(word)
+    }
+
+    override fun onStarClicked(view: View, adapterPosition: Int) {
+        val word: Word = viewRecyclerAdapter.getItems()[adapterPosition]
+        word.bookMarkCheck = !word.bookMarkCheck
+        udpateStar(word)
     }
 }

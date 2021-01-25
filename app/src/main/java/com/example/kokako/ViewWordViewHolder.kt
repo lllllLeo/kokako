@@ -13,15 +13,22 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     private var viewWordRecyclerViewInterface : ViewWordRecyclerViewInterface? = null
 
     init {
+        starButton.setOnClickListener(this)
         this.viewWordRecyclerViewInterface = viewWordRecyclerViewInterface
     }
 
     fun bind(wordDatas: ArrayList<Word>, position: Int) {
         wordTextView.text = wordDatas[position].word
         meanTextView.text = wordDatas[position].mean
+        if (wordDatas[position].bookMarkCheck) {
+            starButton.setBackgroundResource(R.drawable.star_visible)
+        } else {
+            starButton.setBackgroundResource(R.drawable.star_invisible)
+        }
     }
 
     override fun onClick(v: View?) {
-        TODO("Not yet implemented")
+        this.viewWordRecyclerViewInterface?.onStarClicked(v!!, adapterPosition)
     }
+
 }

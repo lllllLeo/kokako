@@ -11,8 +11,9 @@ data class WordBook(
     val id: Long,
     var title : String?,
     var count : Int,
-    var addTime : Long  // 안드로이드에서는 Date로 변환
+    var addTime : Long
 )
+// FIXME: 2021-01-24 Date 
 /*
 {
 //    만약 DB로 해당 컬럼 값에 null이 insert 될 경우 기본값
