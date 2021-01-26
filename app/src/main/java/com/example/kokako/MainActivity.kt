@@ -11,10 +11,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -36,6 +33,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
 // FIXME: 2021-01-24 wordBook에 count 업데이트해야함 지금은 select로 뽑기만하고있는데
 // TODO: 2021-01-24 메인에서 편집 삭제, 다이얼로그or롱터치
+// TODO: 2021-01-26 dimens 만들기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private lateinit var binding : ActivityMainBinding
@@ -46,12 +44,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var wordBookModel : WordBookViewModel? = null
     private var wordModel : WordViewModel? = null
     private var wordBookDatas : ArrayList<WordBook>? = null
-
+    private var wordBookIdForAdd : Long? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         toolbarBinding = binding.includeToolbar
         /*---- Tool Bar ----*/
         setSupportActionBar(toolbarBinding.toolbar)
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         fab_add_note.setOnClickListener { view ->
 
-            imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
                 InputMethodManager.HIDE_IMPLICIT_ONLY)
 
@@ -132,7 +131,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                         val wordBookName = dialogEditText.text.toString()
                         val intent = Intent(this, AddWordActivity::class.java)
-                        val wordBookIdForAdd = addWordBook(wordBookName)
+                        wordBookIdForAdd = addWordBook(wordBookName)
                         Log.d("     TAG",
                             "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAdd)
@@ -180,6 +179,84 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(intent)
     }
 
+    override fun onPopupMenuClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
+        Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
+        val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
+        popup.inflate(R.menu.view_word_menu)
+        popup.setOnMenuItemClickListener(
+            PopupMenu.OnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_edit -> {
+                        val container = LinearLayout(this)
+                        container.orientation = LinearLayout.VERTICAL
+                        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT)
+                        lp.setMargins(50, 0, 50, 0) // editText Margin
+
+                        val dialogEditText = EditText(this)
+                        dialogEditText.maxLines = 1
+                        dialogEditText.setLines(1)
+                        container.addView(dialogEditText, lp)
+                        val mBuilder = AlertDialog.Builder(this)
+//                .setTitle("단어장 이름 변경")
+                            .setMessage("변경할 단어장 이름을 입력해주세요.")
+                            .setView(container)
+                            .setNegativeButton("취소", null)
+                            .setPositiveButton("확인", null)
+                            .create()
+                        mBuilder.setOnShowListener {
+                            val b: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
+                            b.setOnClickListener(View.OnClickListener {
+                                if (dialogEditText.text!!.trim().isEmpty()) {
+                                    Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT)
+                                        .show()
+//                        TODO 특문제외
+                                } else {
+                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                                    myWordRecyclerAdapter.getItem()[adapterPosition].title =
+                                        dialogEditText.text.toString()
+                                    Log.d("     TAG", "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
+                                    updateWordBookTitle(myWordRecyclerAdapter.getItem()[adapterPosition])
+//                                안되면 update갱신코드에 넣기
+                                    mBuilder.dismiss()
+                                }
+                            })
+                        }
+                        mBuilder.show()
+                    }
+                    R.id.menu_delete -> {
+                        Log.d("     TAG",
+                            "===== MainActivity - onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
+                        val mBuilder = AlertDialog.Builder(this)
+                        mBuilder.setTitle("삭제")
+                            .setMessage(myWordRecyclerAdapter.getItem()[adapterPosition].title.toString() + " 단어장을 삭제하시겠습니까?")
+                            .setPositiveButton("확인",
+                                DialogInterface.OnClickListener { _, _ ->
+// TODO: 2021-01-22 여기서 지우면 바로 LIveData 적용됨
+                                    deleteWordBook(adapterPosition)
+                                    Log.d("TAG",
+                                        "MainActivity onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[adapterPosition].toString() + " 삭제완료")
+                                })
+                            .setNegativeButton("취소",
+                                DialogInterface.OnClickListener { dialog, _ ->
+                                    dialog.cancel()
+                                })
+                        mBuilder.show()
+                    }
+                }
+                true
+            })
+            popup.show()
+        }
+
+    private fun updateWordBookTitle(wordBook: WordBook) {
+        wordBookModel?.update(wordBook)
+    }
+
+    private fun updateWordBookCount(updateWordBookMain: Long) {
+        wordBookModel?.updateWordBookCount(updateWordBookMain)
+    }
+
 // FIXME: 2021-01-24 count는 startActivityForResult이렇게하니까 안되네 in MainActivity
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -188,7 +265,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (requestCode) {
                 100 -> {
                     Log.d("     TAG", "===== MainActivity - onActivityResult when called")
-                    updateWordBookList(myWordRecyclerAdapter.getItem())
+                    // TODO: 2021-01-26 여기서  업데이트 워드북
+
+//                    var updateWordBookMain  = intent.getLongExtra("updateWordBookMain",0)
+//                    Log.d("     TAGG", "===== MainActivity - onActivityResult updateWordBookMain $updateWordBookMain")
+                    updateWordBookCount(wordBookIdForAdd!!) // putExtra로 보낸 값
                 }
             }
         }

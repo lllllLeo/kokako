@@ -20,13 +20,10 @@ import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_view_word.*
-import kotlinx.android.synthetic.main.rv_view_list_item.*
-import kotlinx.android.synthetic.main.rv_view_list_item.view.*
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-22 정렬, 가리기 구현
 // TODO: 2021-01-22 편집 하나씩 Dialog로 구현
-// TODO: 2021-01-22 뷰모델하나로 합치기?
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private var _binding: ActivityViewWordBinding? = null
@@ -58,7 +55,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         toolbarBinding.toolbarTitle.text = wordBookNameForView
 
         Log.d("     TAG",
-            "===== ViewWordActivity getExtra wordBookIdForView 값은 : $wordBookIdForView")
+            "===== ViewWordActivity getExtra wordBookIdForView 값은 1111 : $wordBookIdForView")
 
         model = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -211,8 +208,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 100 -> {
-                    Log.d("     TAG", "===== ViewWordActivity - onActivityResult when called")
-                    wordBookIdForView = intent.getLongExtra("wordBookIdForView", 0)
+                    Log.d("     TAG", "===== ViewWordActivity - onActivityResult when called 2222 $wordBookIdForView")
                     val wordList = model?.getWordFromWordBook222(wordBookIdForView)
                     updateWordList(wordList)
                     Log.d("     TAG",
@@ -229,7 +225,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         when (item.itemId) {
             android.R.id.home -> {
                 // FIXME: 2021-01-24 count는 startActivityForResult이렇게하니까 안되네 in ViewWordActivity
-
 /*                val intent = Intent()
                 setResult(Activity.RESULT_OK, intent)*/
                 finish()
@@ -256,13 +251,13 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         return true
     }
 
-    private fun udpateStar(word: Word) {
+    private fun updateStar(word: Word) {
         model?.updateStarChecked(word)
     }
 
-    override fun onStarClicked(view: View, adapterPosition: Int) {
+    override fun onStarClicked(v: View, adapterPosition: Int) {
         val word: Word = viewRecyclerAdapter.getItems()[adapterPosition]
         word.bookMarkCheck = !word.bookMarkCheck
-        udpateStar(word)
+        updateStar(word)
     }
 }

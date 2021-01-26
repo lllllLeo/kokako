@@ -53,13 +53,13 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     fun getWordFromWordBook222(wordBookIdForView: Long): ArrayList<Word> {
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordBookIdForView 값은 : $wordBookIdForView")
         wordArrayList = GetWordFromWordBookAsyncTask222().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordArrayList 값은 : ${wordArrayList}")
+        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordArrayList 값은 : $wordArrayList")
         return wordArrayList as ArrayList<Word>
     }
 
     fun getWordAscendingOrder(wordBookIdForView: Long): LiveData<List<Word>>{
         wordList = GetWordAscendingOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : ${wordList}")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
         return wordList
     }
 
@@ -105,7 +105,6 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     private inner class InsertAllWordAsyncTask : AsyncTask<ArrayList<Word>, Void, Void>(){
         override fun doInBackground(vararg words: ArrayList<Word>): Void? {
             Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground - called")
-            Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground -  word 값은 : ${words[0]}")
             var word : ArrayList<Word> = words[0]
             Log.d("     TAG", "===== WordViewModel - InsertAllWordAsyncTask - doInBackground -  word 값은 : ${word.toString()}")
             wordDao.insertAllDatas(word)
@@ -144,8 +143,6 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
             return null
         }
     }
-
-    // FIXME: 2021-01-22 CASCADE라서 WordBook에서만 지우면 되는 것 같음
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteAllWordAsyncTask(): AsyncTask<Long, Void, Void>() {
         override fun doInBackground(vararg wordBookIdForView: Long?): Void? {
@@ -154,8 +151,6 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
             Log.d("     TAG", "===== WordViewModel - DeleteAllWordAsyncTask - doInBackground - out")
             return null
         }
-
     }
-
 }
 

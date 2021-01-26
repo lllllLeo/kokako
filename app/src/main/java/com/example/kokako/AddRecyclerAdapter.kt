@@ -20,53 +20,6 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
 
     // 뷰와 뷰홀더가 묶였을때
     override fun onBindViewHolder(holder: AddViewHolder, position: Int) {
-//        Log.d("     TAG","===== AddViewHolder position $position")
-/*
-
-        holder.wordEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
-            override fun afterTextChanged(s: Editable?) {
-                Log.d("     TAG","===== AddRecyclerAdapter afterTextChanged wordEditText called")
-
-                if (holder.wordEditText.tag != null) {
-                    val position : Int = holder.wordEditText.id / 2
-                    Log.d("     TAG",
-                        "===== AddRecyclerAdapter wordEditText position : $position 값 : ${s.toString()}")
-                    wordDatas[position].word = s.toString()
-                }
-                *//*if (holder.wordEditText.tag != null) {
-//                    val position: Int = v.wordEditText.tag as Int
-                    val position : Int = holder.wordEditText.id / 2
-                    Log.d("     TAG",
-                        "===== AddViewHolder wordEditText position : $position 값 : ${s.toString()}")
-                    wordDatas[position].word = s.toString()
-                }*//*
-            }
-        })
-        holder.meanEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
-            override fun afterTextChanged(s: Editable?) {
-                Log.d("     TAG","===== AddRecyclerAdapter afterTextChanged meanEditText called")
-
-                if (holder.meanEditText.tag != null) {
-                    val position : Int = holder.wordEditText.id / 2
-                    Log.d("     TAG",
-                        "===== AddRecyclerAdapter meanEditText position : $position 값 : ${s.toString()}")
-                    wordDatas[position].mean = s.toString()
-                }
-                *//*if (holder.meanEditText.tag != null) {
-//                    val position: Int = v.meanEditText.tag as Int
-                    val position : Int = holder.wordEditText.id / 2
-                    Log.d("     TAG",
-                        "===== AddViewHolder meanEditText position : $position 값 : ${s.toString()}")
-                    wordDatas[position].mean = s.toString()
-                }*//*
-            }
-        })
-
-        */
         holder.bind(this.wordDatas,position)
         // 여기서 클릭리스너안함. MyViewHolder에 View.OnClickListener가 있으니까 발동된다
     }
@@ -75,36 +28,36 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
         // 연결할 레이아웃 설정
 //        return AddViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_add_list_item, parent, false), this.addRecyclerViewInterface!!)
 
-        val v = AddViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_add_list_item, parent, false), this.addRecyclerViewInterface!!)
+        val addViewHolder = AddViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_add_list_item, parent, false), this.addRecyclerViewInterface!!)
 //        Log.d("     TAG","===== AddViewHolder position $position")
-        v.wordEditText.addTextChangedListener(object : TextWatcher {
+        addViewHolder.wordEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
             override fun afterTextChanged(s: Editable?) {
                 Log.d("     TAG","===== AddViewHolder afterTextChanged wordEditText called")
 
-                if (v.wordEditText.tag != null) {
-                    val position: Int = v.wordEditText.tag as Int
+                if (addViewHolder.wordEditText.tag != null) {
+                    val position: Int = addViewHolder.wordEditText.tag as Int
                     Log.d("     TAG",
                         "===== AddViewHolder wordEditText position : $position 값 : ${s.toString()}")
                     wordDatas[position].word = s.toString()
                 }
             }
         })
-        v.meanEditText.addTextChangedListener(object : TextWatcher {
+        addViewHolder.meanEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
             override fun afterTextChanged(s: Editable?) {
                 Log.d("     TAG","===== AddViewHolder afterTextChanged meanEditText called")
-                if (v.meanEditText.tag != null) {
-                    val position: Int = v.meanEditText.tag as Int
+                if (addViewHolder.meanEditText.tag != null) {
+                    val position: Int = addViewHolder.meanEditText.tag as Int
                     Log.d("     TAG",
                         "===== AddViewHolder meanEditText position : $position 값 : ${s.toString()}")
                     wordDatas[position].mean = s.toString()
                 }
             }
         })
-        return v
+        return addViewHolder
     }
     fun getItem(): ArrayList<Word>{
        return this.wordDatas

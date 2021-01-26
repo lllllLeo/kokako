@@ -3,9 +3,9 @@
 
     <item
         android:id="@+id/menu_edit"
-        android:title="단어장 편집"
+        android:title="편집하기"
         />
     <item
         android:id="@+id/menu_delete"
-        android:title="단어장 삭제"/>
+        android:title="삭제하기"/>
 </menu>

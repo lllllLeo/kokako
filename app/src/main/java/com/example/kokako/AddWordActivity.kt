@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityAddWordBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
+import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_add_word.*
 import java.lang.NullPointerException
@@ -290,6 +291,12 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         menuInflater.inflate(R.menu.menu_check, menu)
         return true
     }
+
+
+
+
+
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
@@ -300,17 +307,23 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     .setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-                        // FIXME: 2021-01-23 Toast? snackBar?
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                         Log.d("     TAG",
                             "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인1")
                         model?.deleteWordById(wordBookIdForAddOrEdit)
                         model?.insertAllDatas(word)
+                        // TODO: 2021-01-26 여기서 단어장 count업데이트 여기말고 메인에서 activityResult에서하면되겟다
                         Log.d("     TAG", "===== AddWordActivity onOptionsItemSelected word $word")
                         Log.d("     TAG",
                             "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인2")
                         val intent = Intent()
+
+//                        Main에 업데이트용
+//                        intent.putExtra("updateWordBookMain", model?.wordArrayList as ArrayList<*>)
+                        Log.d("     TAGG",
+                            "===== AddWordActivity onOptionsItemSelected wordBookIdForAddOrEdit $wordBookIdForAddOrEdit")
+                        intent.putExtra("updateWordBookMain", wordBookIdForAddOrEdit)
                         setResult(Activity.RESULT_OK, intent)
                         dialog.dismiss()
                         finish()
