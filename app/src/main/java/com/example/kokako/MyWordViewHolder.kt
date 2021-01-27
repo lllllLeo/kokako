@@ -1,7 +1,6 @@
 package com.example.kokako
 
 import android.view.View
-import android.widget.PopupMenu
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordBook
 import kotlinx.android.synthetic.main.rv_my_word_list.view.*
@@ -37,7 +36,7 @@ class MyWordViewHolder(itemView: View, myWordListRecyclerViewInterface: MyWordLi
                 this.myWordListRecyclerViewInterface?.onViewClicked(v, adapterPosition)
             }
             R.id.my_word_btn_options -> {
-                this.myWordListRecyclerViewInterface?.onPopupMenuClicked(v, myWordBtnViewOption, adapterPosition)
+                this.myWordListRecyclerViewInterface?.onPopupMenuWordBookClicked(v, myWordBtnViewOption, adapterPosition)
             }
         }
     }

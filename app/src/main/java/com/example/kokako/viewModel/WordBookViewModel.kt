@@ -43,7 +43,6 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateWordBookCount(updateWordBookMain: Long) {
-
         UpdateWordBookCountAsyncTask().execute(updateWordBookMain)
     }
 

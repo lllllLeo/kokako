@@ -34,16 +34,16 @@ import kotlinx.android.synthetic.main.activity_main.*
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
 // TODO: 2021-01-26 dimens 만들기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
-    private lateinit var toolbarBinding: ActivityToolbarBinding
-    private lateinit var binding : ActivityMainBinding
+    private lateinit var                toolbarBinding: ActivityToolbarBinding
+    private lateinit var                binding : ActivityMainBinding
     //    var backPressedTime: Long = 0
-    private var recyclerview: RecyclerView? = null
-    private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
-    private lateinit var imm : InputMethodManager
-    private var wordBookModel : WordBookViewModel? = null
-    private var wordModel : WordViewModel? = null
-    private var wordBookDatas : ArrayList<WordBook>? = null
-    private var wordBookIdForAdd : Long? = null
+    private var                         recyclerview: RecyclerView? = null
+    private lateinit var                myWordRecyclerAdapter: MyWordRecyclerAdapter
+    private lateinit var                imm : InputMethodManager
+    private var                         wordBookModel : WordBookViewModel? = null
+    private var                         wordModel : WordViewModel? = null
+    private var                         wordBookDatas : ArrayList<WordBook>? = null
+    private var                         wordBookIdForAdd : Long? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         startActivity(intent)
     }
 
-    override fun onPopupMenuClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
+    override fun onPopupMenuWordBookClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
         Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
         popup.inflate(R.menu.view_word_menu)

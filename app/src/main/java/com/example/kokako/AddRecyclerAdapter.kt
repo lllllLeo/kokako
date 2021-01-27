@@ -1,11 +1,13 @@
 package com.example.kokako
 
+import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.Word
 
 class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): ListAdapter<Word, AddViewHolder>(MyDiffCallback) {
@@ -64,9 +66,24 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
     }
     //     목록의 수
     override fun getItemCount(): Int { return wordDatas.size }
-    // 외부에서 데이터 넘기기, 단어, 뜻 추가시킴          이걸로 갱신만하면 될듯 그래서 삭제도 이걸로 갱신만하면될듯
 
+    // 외부에서 데이터 넘기기, 단어, 뜻 추가시킴
+//    DB에있는 내용을 뿌리는 작업
     fun submitDataList(word: ArrayList<Word>){
         this.wordDatas = word
+        notifyDataSetChanged()
+//        notifyItemInserted()
+    }
+
+    fun removeItem(position: Int) {
+        wordDatas.removeAt(position)
+        notifyItemRemoved(position)
+        notifyItemRangeChanged(position, itemCount)
+
+    }
+
+    fun addItem(word: Word) {
+        wordDatas.add(word)
+        notifyDataSetChanged()
     }
 }

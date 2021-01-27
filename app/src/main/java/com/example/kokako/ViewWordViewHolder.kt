@@ -10,10 +10,12 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     private var starButton = itemView.view_my_star
     private var wordTextView = itemView.view_my_word
     private var meanTextView = itemView.view_my_mean
+    private var myWordBtnViewOption = itemView.my_word_btn_options
     private var viewWordRecyclerViewInterface : ViewWordRecyclerViewInterface? = null
 
     init {
         starButton.setOnClickListener(this)
+        myWordBtnViewOption.setOnClickListener(this)
         this.viewWordRecyclerViewInterface = viewWordRecyclerViewInterface
     }
 
@@ -28,7 +30,14 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     }
 
     override fun onClick(v: View?) {
-        this.viewWordRecyclerViewInterface?.onStarClicked(v!!, adapterPosition)
+        when(v!!.id) {
+            R.id.my_word_btn_options -> {
+                this.viewWordRecyclerViewInterface?.onPopupMenuWordClicked(v, myWordBtnViewOption, adapterPosition)
+            }
+            R.id.view_my_star -> {
+                this.viewWordRecyclerViewInterface?.onStarClicked(v, adapterPosition)
+            }
+        }
     }
 
 }

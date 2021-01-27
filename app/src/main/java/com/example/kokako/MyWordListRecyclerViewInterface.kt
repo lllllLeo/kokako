@@ -7,5 +7,5 @@ import android.widget.Button
 interface MyWordListRecyclerViewInterface {
     fun onRemoveClicked(v : View, position: Int)
     fun onViewClicked(v: View, adapterPosition: Int)
-    fun onPopupMenuClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int)
+    fun onPopupMenuWordBookClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int)
 }

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -255,7 +256,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     }
 
     override fun onStarClicked(v: View, adapterPosition: Int) {
-        val word: Word = viewRecyclerAdapter.getItems()[adapterPosition]
+        val word: Word = viewRecyclerAdapter.getItem()[adapterPosition]
         if (word.bookMarkCheck == 0) {
             word.bookMarkCheck = 1
         } else {
@@ -263,5 +264,72 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         }
 //        word.bookMarkCheck = !word.bookMarkCheck
         updateStar(word)
+    }
+
+    // FIXME: 2021-01-27 단어 삭제하고 메인으로 가면 카운트가 안없어짐
+    override fun onPopupMenuWordClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
+        Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
+        val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
+        popup.inflate(R.menu.view_word_menu)
+        popup.setOnMenuItemClickListener(
+            PopupMenu.OnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_edit -> {
+//                        val container = LinearLayout(this)
+//                        container.orientation = LinearLayout.VERTICAL
+//                        val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+//                            LinearLayout.LayoutParams.WRAP_CONTENT)
+//                        lp.setMargins(50, 0, 50, 0) // editText Margin
+//
+//                        val dialogEditText = EditText(this)
+//                        dialogEditText.maxLines = 1
+//                        dialogEditText.setLines(1)
+//                        container.addView(dialogEditText, lp)
+//                        val mBuilder = AlertDialog.Builder(this)
+////                .setTitle("단어장 이름 변경")
+//                            .setMessage("변경할 단어장 이름을 입력해주세요.")
+//                            .setView(container)
+//                            .setNegativeButton("취소", null)
+//                            .setPositiveButton("확인", null)
+//                            .create()
+//                        mBuilder.setOnShowListener {
+//                            val b: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
+//                            b.setOnClickListener(View.OnClickListener {
+//                                if (dialogEditText.text!!.trim().isEmpty()) {
+//                                    Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT)
+//                                        .show()
+////                        TODO 특문제외
+//                                } else {
+//                                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+//                                    myWordRecyclerAdapter.getItem()[adapterPosition].title =
+//                                        dialogEditText.text.toString()
+//                                    Log.d("     TAG", "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
+//                                    updateWordBookTitle(myWordRecyclerAdapter.getItem()[adapterPosition])
+//                                    mBuilder.dismiss()
+//                                }
+//                            })
+//                        }
+//                        mBuilder.show()
+                    }
+                    R.id.menu_delete -> {
+                        Log.d("     TAG",
+                            "===== MainActivity - onRemoveClicked() IN " + viewRecyclerAdapter.getItem()[adapterPosition].toString())
+                        val mBuilder = AlertDialog.Builder(this)
+                        mBuilder.setTitle("삭제")
+                            .setMessage("단어 : " + viewRecyclerAdapter.getItem()[adapterPosition].word.toString() + "\n뜻 : " + viewRecyclerAdapter.getItem()[adapterPosition].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
+                            .setPositiveButton("확인",
+                                DialogInterface.OnClickListener { _, _ ->
+                                    model?.delete(viewRecyclerAdapter.getItem()[adapterPosition])
+                                })
+                            .setNegativeButton("취소",
+                                DialogInterface.OnClickListener { dialog, _ ->
+                                    dialog.cancel()
+                                })
+                        mBuilder.show()
+                    }
+                }
+                true
+            })
+        popup.show()
     }
 }
