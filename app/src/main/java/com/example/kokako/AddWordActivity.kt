@@ -24,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityAddWordBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
-import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_add_word.*
 import java.lang.NullPointerException
@@ -32,7 +31,6 @@ import java.lang.NullPointerException
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-23 Upsert
 // FIXME: 2021-01-23 단어장 편집하기로 불러온 상태에서 맨위값 삭제하면 스크롤이 맨위로 안올라감
-// FIXME: 2021-01-23 wordCount 고치기
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private var _binding : ActivityAddWordBinding? = null
@@ -47,6 +45,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private var word = ArrayList<Word>()
     var word2 = ArrayList<Word>()
     var wordBookIdForAddOrEdit : Long = 0
+    var checkActivity = false
     companion object Constant {
         const val INPUT_WORD_ID : Int = 101101101110.toInt()
         const val INPUT_MEAN_ID : Int = 10000000001000.toInt()
@@ -57,10 +56,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         val view = binding.root
         setContentView(view)
         wordBookIdForAddOrEdit = intent.getLongExtra("wordBookIdForAddOrEdit",0)
-        val checkActivity = intent.getBooleanExtra("checkActivity",false)
-//        val wordBookIdForView = intent.getLongExtra("wordBookIdForView",0)
-          Log.d("     TAG", "===== AddWordActivity getLongExtra() wordBookIdForAdd 값은 : $wordBookIdForAddOrEdit ")
-//          Log.d("     TAG", "===== AddWordActivity getLongExtra() wordBookIdForView 값은 : $wordBookIdForView ")
+        Log.d("     TAG", "===== AddWordActivity getLongExtra() wordBookIdForAdd 값은 : $wordBookIdForAddOrEdit ")
+        checkActivity = intent.getBooleanExtra("checkActivity",false)
         toolbarBinding = binding.includeToolbar
         tvWordCount = binding.wordCount
         input_word.id = INPUT_WORD_ID
@@ -107,8 +104,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 addRecyclerAdapter.submitDataList(word)
             }
         }
-
-        // FIXME: 2021-01-23 count
 
 //        countString = "${findViewById<EditText>(currentFocusId)}/$currentWordCount"
 //        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
@@ -177,7 +172,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         word.add(Word(0,
                             input_word.text.toString(),
                             input_mean.text.toString(),
-                            false,
+                            0,
                             wordBookIdForAddOrEdit))
                         Log.d("     TAG",
                             "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
@@ -309,21 +304,14 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-                        Log.d("     TAG",
-                            "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인1")
-                        model?.deleteWordById(wordBookIdForAddOrEdit)
-                        model?.insertAllDatas(word)
                         // TODO: 2021-01-26 여기서 단어장 count업데이트 여기말고 메인에서 activityResult에서하면되겟다
-                        Log.d("     TAG", "===== AddWordActivity onOptionsItemSelected word $word")
-                        Log.d("     TAG",
-                            "===== AddWordActivity onOptionsItemSelected 단어장으로 추가 확인2")
                         val intent = Intent()
-
-//                        Main에 업데이트용
-//                        intent.putExtra("updateWordBookMain", model?.wordArrayList as ArrayList<*>)
-                        Log.d("     TAGG",
-                            "===== AddWordActivity onOptionsItemSelected wordBookIdForAddOrEdit $wordBookIdForAddOrEdit")
-                        intent.putExtra("updateWordBookMain", wordBookIdForAddOrEdit)
+                        intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
+                        if (!checkActivity) {
+                            model?.insertAllDatas(word)
+                        } else {
+                            intent.putParcelableArrayListExtra("word", word)
+                        }
                         setResult(Activity.RESULT_OK, intent)
                         dialog.dismiss()
                         finish()

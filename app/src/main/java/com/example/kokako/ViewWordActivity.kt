@@ -20,10 +20,12 @@ import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_view_word.*
+import java.io.Serializable
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-22 정렬, 가리기 구현
 // TODO: 2021-01-22 편집 하나씩 Dialog로 구현
+// TODO: 2021-01-27 뷰페이지 에서 편집 -> AddActivity에서 편집 -> 뷰 -> 메인 가면 업뎃안돼잇음 ㅅㅂ 다 존나 처리해야하나 ㅈ같네
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private var _binding: ActivityViewWordBinding? = null
@@ -208,11 +210,11 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 100 -> {
-                    Log.d("     TAG", "===== ViewWordActivity - onActivityResult when called 2222 $wordBookIdForView")
-                    val wordList = model?.getWordFromWordBook222(wordBookIdForView)
-                    updateWordList(wordList)
-                    Log.d("     TAG",
-                        "===== ViewWordActivity - onActivityResult when wordBookIdForView : $wordBookIdForView")
+                    val wordBookIdForAddOrEdit = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
+                    val word = data.getParcelableArrayListExtra<Word>("word")
+                    model?.deleteWordById(wordBookIdForAddOrEdit)
+                    model?.insertAllDatas(word)
+                    wordBookModel?.updateWordBookCount(wordBookIdForAddOrEdit)
                 }
             }
         }
@@ -224,9 +226,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         val mBuilder = AlertDialog.Builder(this)
         when (item.itemId) {
             android.R.id.home -> {
-                // FIXME: 2021-01-24 count는 startActivityForResult이렇게하니까 안되네 in ViewWordActivity
-/*                val intent = Intent()
-                setResult(Activity.RESULT_OK, intent)*/
                 finish()
             }
             R.id.menu_edit -> {
@@ -257,7 +256,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 
     override fun onStarClicked(v: View, adapterPosition: Int) {
         val word: Word = viewRecyclerAdapter.getItems()[adapterPosition]
-        word.bookMarkCheck = !word.bookMarkCheck
+        if (word.bookMarkCheck == 0) {
+            word.bookMarkCheck = 1
+        } else {
+            word.bookMarkCheck = 0
+        }
+//        word.bookMarkCheck = !word.bookMarkCheck
         updateStar(word)
     }
 }

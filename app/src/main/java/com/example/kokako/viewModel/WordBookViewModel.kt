@@ -43,12 +43,14 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun updateWordBookCount(updateWordBookMain: Long) {
+
         UpdateWordBookCountAsyncTask().execute(updateWordBookMain)
     }
 
     @SuppressLint("StaticFieldLeak")
     private inner class UpdateWordBookCountAsyncTask() : AsyncTask<Long, Void, Void>() {
         override fun doInBackground(vararg updateWordBookMain: Long?): Void? {
+            Log.d("     TAG", "===== WordBookViewModel UpdateWordBookCountAsyncTask : $updateWordBookMain")
             wordBookDao.updateWordBookCount(updateWordBookMain)
             return null
         }

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "tb_word_book")
 data class WordBook(
@@ -13,6 +14,7 @@ data class WordBook(
     var count : Int,
     var addTime : Long
 )
+
 // FIXME: 2021-01-24 Date 
 /*
 {

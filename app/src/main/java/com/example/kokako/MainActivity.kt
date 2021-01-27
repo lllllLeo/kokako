@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityMainBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
+import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
@@ -31,8 +32,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 // TODO: 2021-01-23 스크롤하면 툴바 숨기기?
 // TODO: 2021-01-23 툴바 클래스로
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
-// FIXME: 2021-01-24 wordBook에 count 업데이트해야함 지금은 select로 뽑기만하고있는데
-// TODO: 2021-01-24 메인에서 편집 삭제, 다이얼로그or롱터치
 // TODO: 2021-01-26 dimens 만들기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
     private lateinit var toolbarBinding: ActivityToolbarBinding
@@ -217,7 +216,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                         dialogEditText.text.toString()
                                     Log.d("     TAG", "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
                                     updateWordBookTitle(myWordRecyclerAdapter.getItem()[adapterPosition])
-//                                안되면 update갱신코드에 넣기
                                     mBuilder.dismiss()
                                 }
                             })
@@ -232,7 +230,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             .setMessage(myWordRecyclerAdapter.getItem()[adapterPosition].title.toString() + " 단어장을 삭제하시겠습니까?")
                             .setPositiveButton("확인",
                                 DialogInterface.OnClickListener { _, _ ->
-// TODO: 2021-01-22 여기서 지우면 바로 LIveData 적용됨
                                     deleteWordBook(adapterPosition)
                                     Log.d("TAG",
                                         "MainActivity onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[adapterPosition].toString() + " 삭제완료")
@@ -254,10 +251,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun updateWordBookCount(updateWordBookMain: Long) {
+        Log.d("     TAGG", "===== MainActivity - updateWordBookCount called ")
         wordBookModel?.updateWordBookCount(updateWordBookMain)
     }
 
-// FIXME: 2021-01-24 count는 startActivityForResult이렇게하니까 안되네 in MainActivity
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -265,11 +262,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             when (requestCode) {
                 100 -> {
                     Log.d("     TAG", "===== MainActivity - onActivityResult when called")
-                    // TODO: 2021-01-26 여기서  업데이트 워드북
-
 //                    var updateWordBookMain  = intent.getLongExtra("updateWordBookMain",0)
-//                    Log.d("     TAGG", "===== MainActivity - onActivityResult updateWordBookMain $updateWordBookMain")
-                    updateWordBookCount(wordBookIdForAdd!!) // putExtra로 보낸 값
+                    val wordBookIdForAdd = data!!.getLongExtra("wordBookIdForAddOrEdit",0)
+                    Log.d("     TAGG", "===== MainActivity - onActivityResult a는~~~~~?  $wordBookIdForAdd")
+                    updateWordBookCount(wordBookIdForAdd)
                 }
             }
         }

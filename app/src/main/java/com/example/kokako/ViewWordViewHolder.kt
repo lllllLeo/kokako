@@ -20,7 +20,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     fun bind(wordDatas: ArrayList<Word>, position: Int) {
         wordTextView.text = wordDatas[position].word
         meanTextView.text = wordDatas[position].mean
-        if (wordDatas[position].bookMarkCheck) {
+        if (wordDatas[position].bookMarkCheck == 1) {
             starButton.setBackgroundResource(R.drawable.star_visible)
         } else {
             starButton.setBackgroundResource(R.drawable.star_invisible)
