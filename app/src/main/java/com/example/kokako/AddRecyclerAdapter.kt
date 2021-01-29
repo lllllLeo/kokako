@@ -31,7 +31,6 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
 //        return AddViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_add_list_item, parent, false), this.addRecyclerViewInterface!!)
 
         val addViewHolder = AddViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_add_list_item, parent, false), this.addRecyclerViewInterface!!)
-//        Log.d("     TAG","===== AddViewHolder position $position")
         addViewHolder.wordEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
@@ -67,23 +66,20 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
     //     목록의 수
     override fun getItemCount(): Int { return wordDatas.size }
 
-    // 외부에서 데이터 넘기기, 단어, 뜻 추가시킴
-//    DB에있는 내용을 뿌리는 작업
     fun submitDataList(word: ArrayList<Word>){
         this.wordDatas = word
         notifyDataSetChanged()
 //        notifyItemInserted()
     }
-
     fun removeItem(position: Int) {
         wordDatas.removeAt(position)
         notifyItemRemoved(position)
         notifyItemRangeChanged(position, itemCount)
 
     }
-
     fun addItem(word: Word) {
         wordDatas.add(word)
+        Log.d("     TAG", "===== AddRecyclerAdapter addItem : $wordDatas")
         notifyDataSetChanged()
     }
 }

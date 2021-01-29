@@ -13,10 +13,10 @@ import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 // 커스텀 뷰홀더 를 어댑터에 넣어줌
 //  Log.d("     TAG", "===== AddViewHolder")
 class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
-    var wordEditText: EditText = itemView.rv_word
-    var meanEditText: EditText = itemView.rv_mean
+    var wordEditText: EditText =        itemView.rv_word
+    var meanEditText: EditText =        itemView.rv_mean
 //    var removeButton: FrameLayout = itemView.rv_remove_word
-    var removeButton: Button = itemView.rv_remove_word
+    var removeButton: Button =          itemView.rv_remove_word
 
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
 

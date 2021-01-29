@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.*
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,22 +20,21 @@ import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_view_word.*
-import java.io.Serializable
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-22 정렬, 가리기 구현
 // TODO: 2021-01-22 편집 하나씩 Dialog로 구현
 // TODO: 2021-01-27 뷰페이지 에서 편집 -> AddActivity에서 편집 -> 뷰 -> 메인 가면 업뎃안돼잇음 ㅅㅂ 다 존나 처리해야하나 ㅈ같네
+// TODO: 2021-01-29 데이터 많은 상태에서 여기로 들어오면 스크롤이 맨 위가 아님
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
-    private lateinit var toolbarBinding: ActivityToolbarBinding
-    private var _binding: ActivityViewWordBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var viewRecyclerAdapter: ViewWordRecyclerAdapter
-    private var model: WordViewModel? = null
-    private var wordBookModel: WordBookViewModel? = null
-    var wordBookIdForView: Long = 0
-
-    var wordBookNameForView: String? = null
+    private lateinit var            toolbarBinding: ActivityToolbarBinding
+    private var                     _binding: ActivityViewWordBinding? = null
+    private val                     binding get() = _binding!!
+    private lateinit var            viewRecyclerAdapter: ViewWordRecyclerAdapter
+    private var                     wordModel: WordViewModel? = null
+    private var                     wordBookModel: WordBookViewModel? = null
+    var                             wordBookIdForView: Long = 0
+    var                             wordBookNameForView: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,24 +55,29 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
         toolbarBinding.toolbarTitle.text = wordBookNameForView
 
+        viewRecyclerAdapter = ViewWordRecyclerAdapter(this)
+
+
+
         Log.d("     TAG",
             "===== ViewWordActivity getExtra wordBookIdForView 값은 1111 : $wordBookIdForView")
+        wordBookModel = ViewModelProvider(this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(
+            WordBookViewModel::class.java)
 
-        model = ViewModelProvider(this, object : ViewModelProvider.Factory {
+        wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return WordViewModel(application, wordBookIdForView) as T
             }
         }).get(WordViewModel::class.java)
 
-        model?.wordList?.observe(this, {
-            Log.d("     TAG", "===== ViewWordActivity observe IN")
-            updateWordList(it)
-            Log.d("     TAG", "===== ViewWordActivity observe OUT")
-        })
-        wordBookModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(this.application)).get(
-            WordBookViewModel::class.java)
+        wordModel?.wordList?.observe(this, { updateWordList(it) })
 
+        rv_list_word_view.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) // reverseLayout이엇다 ㅅㅂ..
+            setHasFixedSize(true)
+            adapter = viewRecyclerAdapter
+        }
 
         val sortArrayAdapter = object : ArrayAdapter<String>(this, R.layout.sort_spinner) {
             @SuppressLint("CutPasteId")
@@ -112,7 +115,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 
                     }
                     2 -> { // 단어 ▲
-                        model?.getWordAscendingOrder(wordBookIdForView)
+                        wordModel?.getWordAscendingOrder(wordBookIdForView)
                     }
                     3 -> { // 단어 ▼
 
@@ -179,16 +182,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 
     private fun updateWordList(word: List<Word>?) {
         Log.d("     TAG", "===== ViewWordActivity updateWordList IN")
-        viewRecyclerAdapter = ViewWordRecyclerAdapter(this)
+        Log.d("     TAG", "===== ViewWordActivity updateWordList $word")
         viewRecyclerAdapter.submitList(word as ArrayList<Word>)
-        rv_list_word_view.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-            setHasFixedSize(true)
-            if (word.isNotEmpty()) {
-                scrollToPosition(word.size - 1)
-            }
-            adapter = viewRecyclerAdapter
-        }
         Log.d("     TAG", "===== ViewWordActivity updateWordList OUT")
     }
 
@@ -213,8 +208,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 100 -> {
                     val wordBookIdForAddOrEdit = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
                     val word = data.getParcelableArrayListExtra<Word>("word")
-                    model?.deleteWordById(wordBookIdForAddOrEdit)
-                    model?.insertAllDatas(word)
+                    wordModel?.deleteWordById(wordBookIdForAddOrEdit)
+                    wordModel?.insertAllDatas(word)
                     wordBookModel?.updateWordBookCount(wordBookIdForAddOrEdit)
                 }
             }
@@ -252,7 +247,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     }
 
     private fun updateStar(word: Word) {
-        model?.updateStarChecked(word)
+        wordModel?.updateStarChecked(word)
     }
 
     override fun onStarClicked(v: View, adapterPosition: Int) {
@@ -319,7 +314,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                             .setMessage("단어 : " + viewRecyclerAdapter.getItem()[adapterPosition].word.toString() + "\n뜻 : " + viewRecyclerAdapter.getItem()[adapterPosition].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
                             .setPositiveButton("확인",
                                 DialogInterface.OnClickListener { _, _ ->
-                                    model?.delete(viewRecyclerAdapter.getItem()[adapterPosition])
+                                    wordModel?.delete(viewRecyclerAdapter.getItem()[adapterPosition])
                                 })
                             .setNegativeButton("취소",
                                 DialogInterface.OnClickListener { dialog, _ ->

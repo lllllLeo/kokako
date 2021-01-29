@@ -13,6 +13,7 @@ import androidx.room.Room
 import com.example.kokako.databinding.ActivityImportBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
 
+
 class ImportActivity : AppCompatActivity() {
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private var _binding : ActivityImportBinding? = null

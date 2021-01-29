@@ -23,6 +23,8 @@ class ViewWordRecyclerAdapter(viewWordRecyclerViewInterface: ViewWordRecyclerVie
     override fun getItemCount(): Int { return wordDatas.size }
     fun submitList(words: ArrayList<Word>) {
         this.wordDatas = words
+        notifyDataSetChanged() // 이거 넣으니까 별표나 뭐 눌러도 스크롤 안내려감 밑으로
+
     }
 
     fun getItem() : ArrayList<Word> {

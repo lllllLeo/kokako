@@ -34,6 +34,7 @@ import java.lang.NullPointerException
 // FIXME: 2021-01-23 단어장 편집하기로 불러온 상태에서 맨위값 삭제하면 스크롤이 맨위로 안올라감
 // FIXME: 2021-01-27 단어 는 입력하고 뜻 은 입력 안하고 체크누르는거 예외처리
 // TODO: 2021-01-27 키보드를 아예 보이지말까
+// FIXME: 2021-01-28
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private lateinit var            toolbarBinding: ActivityToolbarBinding
     private var                     _binding : ActivityAddWordBinding? = null
@@ -46,7 +47,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private var                     tvWordCount: TextView? = null
     private lateinit var            imm : InputMethodManager   // 여기 선언한다고 lateinit 함
     private var                     word = ArrayList<Word>()
-    var                             word2 = ArrayList<Word>()
     var                             wordBookIdForAddOrEdit : Long = 0
     var                             checkActivity = false
     companion object Constant {
@@ -58,13 +58,13 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         _binding = ActivityAddWordBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        input_word.id =             INPUT_WORD_ID
+        input_mean.id =             INPUT_MEAN_ID
         wordBookIdForAddOrEdit = intent.getLongExtra("wordBookIdForAddOrEdit",0)
         Log.d("     TAG", "===== AddWordActivity getLongExtra() wordBookIdForAdd 값은 : $wordBookIdForAddOrEdit ")
         checkActivity = intent.getBooleanExtra("checkActivity",false)
         toolbarBinding = binding.includeToolbar
         tvWordCount = binding.wordCount
-        input_word.id = INPUT_WORD_ID
-        input_mean.id = INPUT_MEAN_ID
 
         Log.d("     TAG", "===== AddWordActivity input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 $INPUT_WORD_ID \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
 
@@ -96,9 +96,16 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
 
         addRecyclerAdapter = AddRecyclerAdapter(this)
+        word            = model?.getWordFromWordBook222(wordBookIdForAddOrEdit)!!
+        addRecyclerAdapter.submitDataList(word)
         rv_list_item.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-            //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
+
+            if (checkActivity){
+                (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(word.size,0)
+                Log.d("     TAG", "===== AddWordActivity checkActivity 편집 if문 $word")
+            }
+            Log.d("     TAG", "===== AddWordActivity checkActivity 추가로 들어온 else 문 $word")
             setHasFixedSize(true)
 //            if(word.size != 0) smoothScrollToPosition(word.size - 1)    // 데이터가 없으면 에러
             adapter = addRecyclerAdapter
@@ -106,13 +113,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             val recyclerViewState : Parcelable = rv_list_item.layoutManager?.onSaveInstanceState()!!
             rv_list_item.layoutManager!!.onRestoreInstanceState(recyclerViewState)
 
-            if (checkActivity){
-                word            = model?.getWordFromWordBook222(wordBookIdForAddOrEdit)!!
-                currentCount    = word.size
-                addRecyclerAdapter.submitDataList(word)
-                (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(word.size,0)
             }
-        }
 
 
 //        countString = "${findViewById<EditText>(currentFocusId)}/$currentWordCount"
@@ -177,37 +178,19 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
                     } else {
                         // FIXME: 2021-01-23 입력한 값들에서 빈값 예외처리 / 추후
-//                        word.add(Word(0,
-//                            input_word.text.toString(),
-//                            input_mean.text.toString(),
-//                            0,
-//                            wordBookIdForAddOrEdit))
                         Log.d("     TAG",
                             "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
                         Log.d("     TAG", "===== AddWordActivity word 값은 : $word")
 
+//                        이제 word에 추가가되네 add로
                         addRecyclerAdapter.addItem(Word
                             (0,
                             input_word.text.toString(),
                             input_mean.text.toString(),
                             0,
                             wordBookIdForAddOrEdit))
-//                        addRecyclerAdapter.submitDataList(word)
 
-
-
-
-//                        addRecyclerAdapter = AddRecyclerAdapter(this)
-/*                        rv_list_item.apply {
-                            layoutManager =
-                                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-                            //                            (layoutManager as LinearLayoutManager).stackFromEnd = true
-                            setHasFixedSize(true)
-                            (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(word.size,0)
-//                            smoothScrollToPosition(word.size - 1)
-                            adapter = addRecyclerAdapter
-                            addRecyclerAdapter.submitDataList(word)
-                        }*/
+                        Log.d("     TAG", "===== AddWordActivity word 값은2222222222 : $word")
                         input_word.text.clear()
                         input_mean.text.clear()
                         input_word.requestFocus()
@@ -220,7 +203,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 }
             }
         }
-
         delete_all.setOnClickListener(btnListener)
         btn_remove_text.setOnClickListener(btnListener)
         btn_move_left.setOnClickListener(btnListener)
@@ -228,60 +210,10 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         btn_add_word.setOnClickListener(btnListener)
     }
 
-    private fun addWord(wordBookId: Long){
-//        val word = Word(0,
-//            binding.inputWord.text.toString(),
-//            binding.inputMean.text.toString(),
-//            wordBookId)
-//        model?.insert(word)
-//        model?.insert(Word(0, binding.inputWord.text.toString(),binding.inputMean.text.toString(), wordBookId))
-    }
-    private fun deleteWord(position: Int) {
-        model?.delete(addRecyclerAdapter.getItem()[position])
-    }
-    private fun updateWord(){
-
-    }
-    private fun deleteAllWord(wordBookIdForView : Long){
-        model?.deleteWordById(wordBookIdForView)
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun updateWordList(words: List<Word>?) {
-        addRecyclerAdapter = AddRecyclerAdapter(this)
-        addRecyclerAdapter.submitDataList(words as ArrayList<Word>)
-        val swipeHelperCallback = SwipeHelperCallback().apply {
-            setClamp(200f)
-        }
-        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
-        itemTouchHelper.attachToRecyclerView(rv_list_item)
-        // 리사이클러뷰 설정
-        rv_list_item.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-//                            (layoutManager as LinearLayoutManager).stackFromEnd = true
-            setHasFixedSize(true)
-            // 어답터 장착
-            adapter = addRecyclerAdapter
-//            addItemDecoration(ItemDecoration())
-
-            setOnTouchListener { _, _ ->
-                swipeHelperCallback.removePreviousClamp(this)
-                false
-            }
-        }
-    }
 
     /*
 * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
 * */
-
-    //    fun removeWord(wordDto: ArrayList<WordDTO>, position: Int){
-//        wordDto.removeAt(position)
-//        notifyItemRemoved(position){ // 뜻 ▲
-//
-//                }
-//        notifyItemRangeChanged(position, wordDto.size)
-//    }
     override fun onRemoveClicked(view: View, position: Int) {
         Log.d("     TAG","===== AddWordActivity onRemoveClicked position $position")
         val mBuilder = AlertDialog.Builder(view.context)
@@ -289,13 +221,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             .setMessage("단어 : " + addRecyclerAdapter.getItem()[position].word.toString() + "\n뜻 : " + addRecyclerAdapter.getItem()[position].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
-
                     addRecyclerAdapter.removeItem(position)
-//                    word.removeAt(position)
-//                    addRecyclerAdapter.notifyItemRemoved(position)
-//                    addRecyclerAdapter.notifyItemRangeChanged(position, addRecyclerAdapter.itemCount)
-////                    addRecyclerAdapter.notifyDataSetChanged() // 이거 추가하니까 아예 갱신도 안되노
-//                    currentWordCount--
 //                    countString = "$currentCount/$currentWordCount"
 //                    tvWordCount?.text = countString
                 })
@@ -309,11 +235,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         menuInflater.inflate(R.menu.menu_check, menu)
         return true
     }
-
-
-
-
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val mBuilder = AlertDialog.Builder(this)
@@ -332,8 +253,10 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         val intent = Intent()
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
                         if (!checkActivity) {
+                            Log.d("     TAG","===== AddWordActivity onOptionsItemSelected if 문 word는 $word")
                             model?.insertAllDatas(word)
                         } else {
+                            Log.d("     TAG","===== AddWordActivity onOptionsItemSelected else 문 word는 $word")
                             intent.putParcelableArrayListExtra("word", word)
                         }
                         setResult(Activity.RESULT_OK, intent)
@@ -386,3 +309,30 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     }*/
 
 }
+
+/*
+ @SuppressLint("ClickableViewAccessibility")
+    private fun updateWordList(words: List<Word>?) {
+        addRecyclerAdapter = AddRecyclerAdapter(this)
+        addRecyclerAdapter.submitDataList(words as ArrayList<Word>)
+        val swipeHelperCallback = SwipeHelperCallback().apply {
+            setClamp(200f)
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
+        itemTouchHelper.attachToRecyclerView(rv_list_item)
+        // 리사이클러뷰 설정
+        rv_list_item.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
+//                            (layoutManager as LinearLayoutManager).stackFromEnd = true
+            setHasFixedSize(true)
+            // 어답터 장착
+            adapter = addRecyclerAdapter
+//            addItemDecoration(ItemDecoration())
+
+            setOnTouchListener { _, _ ->
+                swipeHelperCallback.removePreviousClamp(this)
+                false
+            }
+        }
+    }
+* */

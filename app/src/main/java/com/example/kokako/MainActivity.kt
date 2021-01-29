@@ -33,11 +33,12 @@ import kotlinx.android.synthetic.main.activity_main.*
 // TODO: 2021-01-23 툴바 클래스로
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
 // TODO: 2021-01-26 dimens 만들기
+// TODO: 2021-01-28 extended floating button or floating button, 위로 스크롤하면 보이게 하기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
-    private lateinit var                toolbarBinding: ActivityToolbarBinding
-    private lateinit var                binding : ActivityMainBinding
     //    var backPressedTime: Long = 0
     private var                         recyclerview: RecyclerView? = null
+    private lateinit var                toolbarBinding: ActivityToolbarBinding
+    private lateinit var                binding : ActivityMainBinding
     private lateinit var                myWordRecyclerAdapter: MyWordRecyclerAdapter
     private lateinit var                imm : InputMethodManager
     private var                         wordBookModel : WordBookViewModel? = null
@@ -77,11 +78,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
         binding.navView.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음
 
+
+
         rv_word_book.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 || dy < 0 && fab_add_note.isShown) fab_add_note.hide()
             }
-
             // FIXME: 2021-01-23 스크롤을 올리면 뜨게? 그러면
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) fab_add_note.show()
@@ -98,8 +100,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         fab_add_note.setOnClickListener { view ->
-
-
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
                 InputMethodManager.HIDE_IMPLICIT_ONLY)
 
@@ -135,7 +135,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             "===== MainActivity - floating - 단어장추가 - wordBookIdForAdd 값은 : $wordBookIdForAdd")
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAdd)
                         startActivityForResult(intent, 100)
-//                        startActivity(intent)
                         mBuilder.dismiss()
                     }
                 })
@@ -264,7 +263,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Log.d("     TAG", "===== MainActivity - onActivityResult when called")
 //                    var updateWordBookMain  = intent.getLongExtra("updateWordBookMain",0)
                     val wordBookIdForAdd = data!!.getLongExtra("wordBookIdForAddOrEdit",0)
-                    Log.d("     TAGG", "===== MainActivity - onActivityResult a는~~~~~?  $wordBookIdForAdd")
+                    Log.d("     TAGG", "===== MainActivity - onActivityResult ~~~~~?  $wordBookIdForAdd --- $")
                     updateWordBookCount(wordBookIdForAdd)
                 }
             }
@@ -324,7 +323,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             .setMessage(myWordRecyclerAdapter.getItem()[position].title.toString() + " 단어장을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
-// TODO: 2021-01-22 여기서 지우면 바로 LIveData 적용됨
                     deleteWordBook(position)
                     Log.d("TAG",
                         "MainActivity onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[position].toString() + " 삭제완료")
