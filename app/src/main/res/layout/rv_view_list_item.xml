@@ -7,17 +7,30 @@
     >
 
     <LinearLayout
-        android:id="@+id/view_word_book_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="1dp">
+        android:layout_height="45dp"
+        android:weightSum="1"
+        android:gravity="center"
+        >
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
+            android:id="@+id/view_word_book_list"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:layout_marginVertical="5dp"
+            android:layout_weight="0.9"
+            android:background="?attr/selectableItemBackground"
             android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/view_my_check"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:checked="false"
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp" />
 
             <ToggleButton
                 android:id="@+id/view_my_star"
@@ -26,22 +39,25 @@
                 android:layout_gravity="center"
                 android:textOn=""
                 android:textOff=""
-                android:layout_marginLeft="7dp"
-                android:layout_marginRight="5dp"
+                android:stateListAnimator="@null"
                 android:background="@drawable/star_invisible"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="7dp" />
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="45dp"
+                android:orientation="vertical"
+                android:gravity="center_vertical"
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp">
 
                 <TextView
                     android:id="@+id/view_my_word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
+                    android:singleLine="true"
+                    android:ellipsize="end"
                     android:text="단어 1"
                     android:textSize="17sp"
                     android:textStyle="bold"
@@ -51,29 +67,34 @@
                     android:id="@+id/view_my_mean"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
+                    android:singleLine="true"
+                    android:ellipsize="end"
                     android:textSize="13sp"
-                    android:layout_marginLeft="7dp"
                     android:text="뜻1"
                     tools:ignore="RtlSymmetry"
-                    android:layout_marginStart="7dp" />
+                    />
             </LinearLayout>
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_weight="1"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_weight="0.1">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical">
+                android:layout_height="match_parent"
+                android:gravity="center">
             <Button
                 android:id="@+id/my_word_btn_options"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:gravity="center"
-                android:layout_weight="0.1"
                 android:background="@drawable/ic_baseline_more_vert_12" />
             </LinearLayout>
+        </LinearLayout>
 <!--            <ToggleButton-->
 <!--                android:id="@+id/view_my_star"-->
 <!--                android:layout_width="30dp"-->
@@ -84,7 +105,6 @@
 <!--                android:layout_marginRight="5dp"-->
 <!--                android:background="@drawable/star_invisible"-->
 <!--                android:layout_marginEnd="5dp" />-->
-        </LinearLayout>
     </LinearLayout>
 </FrameLayout>
 

@@ -19,7 +19,6 @@ interface WordDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAllDatas(word: ArrayList<Word>)
 
-    // TODO: 2021-01-22 편집구현
     @Update
     fun update(word: Word)
 

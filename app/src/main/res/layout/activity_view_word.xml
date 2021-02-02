@@ -6,18 +6,94 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <include
-        android:id="@+id/include_toolbar"
-        layout="@layout/activity_toolbar"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:background="@color/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:contentInsetStart="0dp"
+        >
+        <!--        app:menu="@menu/sub_menu"-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/view_back_btn"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                />
+
+            <ImageView
+                android:id="@+id/view_cancel_btn"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_clear_24"
+                />
+
+<!--            <ImageView
+                android:id="@+id/view_home_button"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                android:layout_marginTop="7dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="7dp"
+                android:layout_marginRight="5dp"
+                tools:ignore="RtlHardcoded" />-->
+
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="아이"
+                android:textColor="#ffffff"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <ImageView
+                android:id="@+id/view_delete_btn"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:visibility="gone"
+                android:src="@drawable/ic_baseline_delete_24"
+                />
+            <ImageView
+                android:id="@+id/view_add_or_edit_btn"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:src="@drawable/ic_baseline_post_add_24"
+                />
+        </LinearLayout>
+
+    </androidx.appcompat.widget.Toolbar>
     <LinearLayout
         android:id="@+id/spinner"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:weightSum="1"
+        android:layout_marginHorizontal="2dp"
         android:orientation="horizontal">
 <!--        android:overlapAnchor="false"   -->
+        <TextView
+            android:id="@+id/current_count"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textSize="17sp"
+            />
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -27,14 +103,14 @@
             android:id="@+id/sort_spinner"
             android:dropDownWidth="90dp"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
+            android:layout_height="match_parent"
             android:layout_weight="0.15"
             />
         <Spinner
             android:id="@+id/hide_spinner"
             android:dropDownWidth="90dp"
             android:layout_width="wrap_content"
-            android:layout_height="35dp"
+            android:layout_height="match_parent"
             android:layout_weight="0.15"
             tools:ignore="RtlHardcoded" />
 <!--        정렬, 가리기 -->
@@ -42,9 +118,7 @@
     <FrameLayout
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/spinner"
-        >
+        android:layout_height="match_parent">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list_word_view"
             android:layout_width="match_parent"

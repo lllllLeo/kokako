@@ -15,7 +15,6 @@ data class WordBook(
     var addTime : Long
 )
 
-// FIXME: 2021-01-24 Date 
 /*
 {
 //    만약 DB로 해당 컬럼 값에 null이 insert 될 경우 기본값

@@ -81,5 +81,6 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
         wordDatas.add(word)
         Log.d("     TAG", "===== AddRecyclerAdapter addItem : $wordDatas")
         notifyDataSetChanged()
+
     }
 }

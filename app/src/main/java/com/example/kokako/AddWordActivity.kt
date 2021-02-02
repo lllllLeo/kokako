@@ -30,11 +30,8 @@ import kotlinx.android.synthetic.main.activity_add_word.*
 import java.lang.NullPointerException
 
 //  Log.d("     TAG", "===== AddWordActivity")
-// TODO: 2021-01-23 Upsert
-// FIXME: 2021-01-23 단어장 편집하기로 불러온 상태에서 맨위값 삭제하면 스크롤이 맨위로 안올라감
-// FIXME: 2021-01-27 단어 는 입력하고 뜻 은 입력 안하고 체크누르는거 예외처리
 // TODO: 2021-01-27 키보드를 아예 보이지말까
-// FIXME: 2021-01-28
+// TODO: 2021-02-02 추가하면 스크롤 위로안감
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private lateinit var            toolbarBinding: ActivityToolbarBinding
     private var                     _binding : ActivityAddWordBinding? = null
@@ -101,6 +98,9 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         rv_list_item.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
 
+            // TODO: 2021-01-31 위에 reverseLayout이랑 밑에꺼 같이하더라 일단 추가
+            (layoutManager as LinearLayoutManager).stackFromEnd = true
+
             if (checkActivity){
                 (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(word.size,0)
                 Log.d("     TAG", "===== AddWordActivity checkActivity 편집 if문 $word")
@@ -108,13 +108,11 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             Log.d("     TAG", "===== AddWordActivity checkActivity 추가로 들어온 else 문 $word")
             setHasFixedSize(true)
 //            if(word.size != 0) smoothScrollToPosition(word.size - 1)    // 데이터가 없으면 에러
-            adapter = addRecyclerAdapter
-
+// TODO: 2021-01-31 내폰은 ㄱㅊ은데 엄ㄴ마폰은 삭제가 이상하게됨
             val recyclerViewState : Parcelable = rv_list_item.layoutManager?.onSaveInstanceState()!!
             rv_list_item.layoutManager!!.onRestoreInstanceState(recyclerViewState)
-
+            adapter = addRecyclerAdapter
             }
-
 
 //        countString = "${findViewById<EditText>(currentFocusId)}/$currentWordCount"
 //        Toast.makeText(this.context, countString, Toast.LENGTH_SHORT).show()
@@ -146,7 +144,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         input_mean.requestFocus()
                     }
                 }
-                // TODO 2021-01-22 LongTouch하면 쭉쭉쭉쭉가게? 오바
                 R.id.btn_move_right -> {
                     Log.d("     TAG",
                         "===== AddWordActivity btn_move_right input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
@@ -253,10 +250,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         val intent = Intent()
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
                         if (!checkActivity) {
-                            Log.d("     TAG","===== AddWordActivity onOptionsItemSelected if 문 word는 $word")
                             model?.insertAllDatas(word)
                         } else {
-                            Log.d("     TAG","===== AddWordActivity onOptionsItemSelected else 문 word는 $word")
                             intent.putParcelableArrayListExtra("word", word)
                         }
                         setResult(Activity.RESULT_OK, intent)

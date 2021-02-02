@@ -28,12 +28,8 @@ import com.example.kokako.viewModel.WordViewModel
 import com.google.android.material.navigation.NavigationView
 import kotlinx.android.synthetic.main.activity_main.*
 
-// TODO: 2021-01-23 스크롤하면 네이게이션에서 스크롤바 숨기기
 // TODO: 2021-01-23 스크롤하면 툴바 숨기기?
-// TODO: 2021-01-23 툴바 클래스로
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
-// TODO: 2021-01-26 dimens 만들기
-// TODO: 2021-01-28 extended floating button or floating button, 위로 스크롤하면 보이게 하기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
     //    var backPressedTime: Long = 0
     private var                         recyclerview: RecyclerView? = null
