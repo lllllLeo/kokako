@@ -32,6 +32,7 @@ class MyWordRecyclerAdapter(myWordListRecyclerViewInterface: MyWordListRecyclerV
 
     fun submitList(wordBook: ArrayList<WordBook>) {
         this.wordBookDatas = wordBook
+        notifyDataSetChanged()
     }
 
 

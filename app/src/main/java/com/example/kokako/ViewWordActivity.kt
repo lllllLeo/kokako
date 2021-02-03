@@ -40,6 +40,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     private lateinit var            imm : InputMethodManager
     private var                     checkboxList = ArrayList<CheckBoxData>()
     private var                     checkboxCount : Int? = 0
+    private var                     isDeleteMode : Boolean = false
 /*    companion object {
         var checkboxList = arrayListOf<CheckBoxData>()
     }*/
@@ -90,10 +91,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         val btnListener = View.OnClickListener { view ->
             when (view.id) {
                 R.id.view_back_btn -> {
-                    val intent = Intent()
-                    intent.putExtra("wordBookIdForView", wordBookIdForView)
-                    setResult(101, intent)
-                    finish()
+                    goBackToPreviousActivity()
                 }
                 R.id.view_cancel_btn -> {
 //                    체크버튼 clear해야함
@@ -229,6 +227,13 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 //        fab_add_note.setOnClickListener { view -> }
     }
 
+    private fun goBackToPreviousActivity() {
+        val intent = Intent()
+        intent.putExtra("wordBookIdForView", wordBookIdForView)
+        setResult(101, intent)
+        finish()
+    }
+
     @SuppressLint("SetTextI18n")
     override fun onCheckboxClicked(v: View, adapterPosition: Int, checkboxListToView: ArrayList<CheckBoxData>) {
         Log.d("TAGGG", "ViewWordActivity  들어온 checkboxList adapterPosition : / ${checkboxListToView[adapterPosition].checked}")
@@ -338,7 +343,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                     .setMessage("단어장을 삭제하시겠습니까?")
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-                        // FIXME: 2021-01-22 삭제하고 MainActivity로 돌아오면 LiveData반영 안되어있음 / 이거랑 위에꺼 해결
                         wordBookModel?.deleteWordBookById(wordBookIdForView)
                         dialog.dismiss()
                         finish()
@@ -435,7 +439,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                         mBuilder.show()
                     }
                     R.id.menu_delete -> {
-                        Log.d("     TAG", "===== MainActivity - onRemoveClicked() IN $currentValue")
                         val mBuilder = AlertDialog.Builder(this)
                         mBuilder.setTitle("삭제")
                             .setMessage("단어 : " + currentValue.word.toString() + "\n뜻 : " + currentValue.mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
@@ -464,6 +467,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         viewRecyclerAdapter.notifyDataSetChanged()
 
         if (num == 1) {
+            isDeleteMode = true
             binding.viewAddOrEditBtn.visibility = View.GONE
             binding.viewBackBtn.visibility = View.GONE
             binding.viewDeleteBtn.visibility = View.VISIBLE
@@ -475,6 +479,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             binding.sortSpinner.visibility = View.INVISIBLE
             binding.currentCount.visibility = View.GONE
         } else {
+            isDeleteMode = false
             binding.viewAddOrEditBtn.visibility = View.VISIBLE
             binding.viewBackBtn.visibility = View.VISIBLE
             binding.viewDeleteBtn.visibility = View.GONE
@@ -488,8 +493,10 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         }
     }
 
-    // FIXME: 2021-02-03 이전화면으로도 가야함
     override fun onBackPressed() {
-        longClick(0)
+        if(isDeleteMode) {
+            longClick(0)
+        } else
+            goBackToPreviousActivity()
     }
 }

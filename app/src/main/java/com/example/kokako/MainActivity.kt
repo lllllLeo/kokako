@@ -86,12 +86,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         })
 
+        myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
         wordBookModel = ViewModelProvider(this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(
                 this.application)).get(WordBookViewModel::class.java)
-        wordBookModel?.wordBookList?.observe(this, {
-            updateWordBookList(it)
-        })
+        wordBookModel?.wordBookList?.observe(this, { updateWordBookList(it) })
+        rv_word_book.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            setHasFixedSize(true)
+            adapter = myWordRecyclerAdapter
+        }
 
 
         fab_add_note.setOnClickListener { view ->
@@ -153,13 +157,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun updateWordBookList(wordBook: List<WordBook>?) {
         Log.d("     TAG", "===== MainActivity - updateWordBookList called")
         Log.d("     TAG", "===== MainActivity - updateWordBookList wordBook : $wordBook")
-        myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
+
         myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
-        rv_word_book.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-//            recyclerview?.layoutManager
-            adapter = myWordRecyclerAdapter
-        }
+
     }
 
     override fun onViewClicked(v: View, adapterPosition: Int) {
