@@ -39,6 +39,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
     var                             wordBookNameForView: String? = null
     private lateinit var            imm : InputMethodManager
     private var                     checkboxList = ArrayList<CheckBoxData>()
+    private var                     checkboxCount : Int? = 0
 /*    companion object {
         var checkboxList = arrayListOf<CheckBoxData>()
     }*/
@@ -57,7 +58,10 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         toolbar = findViewById<Toolbar>(R.id.toolbar)
         /*---- Tool Bar ----*/
         setSupportActionBar(toolbar!!.toolbar)
+
         toolbar!!.toolbar_title.text = wordBookNameForView
+
+
         supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
         supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
 //        supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -86,6 +90,9 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         val btnListener = View.OnClickListener { view ->
             when (view.id) {
                 R.id.view_back_btn -> {
+                    val intent = Intent()
+                    intent.putExtra("wordBookIdForView", wordBookIdForView)
+                    setResult(101, intent)
                     finish()
                 }
                 R.id.view_cancel_btn -> {
@@ -222,13 +229,22 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 //        fab_add_note.setOnClickListener { view -> }
     }
 
-    override fun onCheckboxClicked(v: View, adapterPosition: Int, checkboxList: ArrayList<CheckBoxData>) {
-        Log.d("TAGGG", "ViewWordActivity  들어온 checkboxList adapterPosition : / ${checkboxList[adapterPosition].checked}")
-        checkboxList[adapterPosition].checked = v.view_my_check.isChecked   // v. 을 해줘야함 onClick에서 보내주는걸 받고 고쳐야지
-        viewRecyclerAdapter.setCheckboxList(checkboxList)
+    @SuppressLint("SetTextI18n")
+    override fun onCheckboxClicked(v: View, adapterPosition: Int, checkboxListToView: ArrayList<CheckBoxData>) {
+        Log.d("TAGGG", "ViewWordActivity  들어온 checkboxList adapterPosition : / ${checkboxListToView[adapterPosition].checked}")
+//        checkboxList[adapterPosition].checked = v.view_my_check.isChecked   // v. 을 해줘야함 onClick에서 보내주는걸 받고 고쳐야지
+        if(v.view_my_check.isChecked) {
+            checkboxListToView[adapterPosition].checked = true
+            checkboxCount = checkboxCount!! + 1
+        } else {
+            checkboxListToView[adapterPosition].checked = false
+            checkboxCount = checkboxCount!! - 1
+        }
+        viewRecyclerAdapter.setCheckboxList(checkboxListToView)
+        binding.checkboxCount.text = "${checkboxCount.toString()} 개 선택됨"
 
-        this.checkboxList = checkboxList
-        Log.d("TAGGG", "ViewWordActivity 나간 checkboxList adapterPosition :  / ${checkboxList[adapterPosition].checked}")
+        this.checkboxList = checkboxListToView
+        Log.d("TAGGG", "ViewWordActivity 나간 checkboxList adapterPosition :  / ${checkboxListToView[adapterPosition].checked}")
     }
 
 
@@ -236,7 +252,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         Log.d("TAG", "deleteWordDialog 사이즈 : ${checkboxList.size}")
         val mBuilder = AlertDialog.Builder(this)
 //        mBuilder.setTitle("삭제")
-            .setMessage("체크된 단어들을 모두 삭제합니다.\n정말 삭제하시겠습니까?")
+            .setMessage("선택된 단어들을 모두 삭제합니다.\n정말 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
                     var i = 0
@@ -452,28 +468,27 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             binding.viewBackBtn.visibility = View.GONE
             binding.viewDeleteBtn.visibility = View.VISIBLE
             binding.viewCancelBtn.visibility = View.VISIBLE
+            binding.checkboxCount.visibility = View.VISIBLE
 
             binding.fabTestWord.visibility = View.INVISIBLE
             binding.hideSpinner.visibility = View.INVISIBLE // 여기에 선택된 갯수 표시?
             binding.sortSpinner.visibility = View.INVISIBLE
-            binding.currentCount.visibility = View.INVISIBLE
-
-//            binding.viewAllCheckRbt.visibility = View.VISIBLE
+            binding.currentCount.visibility = View.GONE
         } else {
             binding.viewAddOrEditBtn.visibility = View.VISIBLE
             binding.viewBackBtn.visibility = View.VISIBLE
             binding.viewDeleteBtn.visibility = View.GONE
             binding.viewCancelBtn.visibility = View.GONE
+            binding.checkboxCount.visibility = View.GONE
 
             binding.fabTestWord.visibility = View.VISIBLE
             binding.hideSpinner.visibility = View.VISIBLE // 여기에 선택된 갯수 표시?
             binding.sortSpinner.visibility = View.VISIBLE
             binding.currentCount.visibility = View.VISIBLE
-
-//            binding.viewAllCheckRbt.visibility = View.GONE
         }
     }
 
+    // FIXME: 2021-02-03 이전화면으로도 가야함
     override fun onBackPressed() {
         longClick(0)
     }

@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityMainBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
-import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
@@ -170,7 +169,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
         intent.putExtra("wordBookNameForView",
         myWordRecyclerAdapter.getItem()[adapterPosition].title)
-        startActivity(intent)
+        startActivityForResult(intent, 101)
     }
 
     override fun onPopupMenuWordBookClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
@@ -253,7 +252,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 100 -> {
                     Log.d("     TAG", "===== MainActivity - onActivityResult when called")
@@ -262,8 +260,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     Log.d("     TAGG", "===== MainActivity - onActivityResult ~~~~~?  $wordBookIdForAdd --- $")
                     updateWordBookCount(wordBookIdForAdd)
                 }
+                101 -> {
+                    Log.d("     TAG", "===== MainActivity - onActivityResult when called")
+//                    var updateWordBookMain  = intent.getLongExtra("updateWordBookMain",0)
+                    val wordBookIdForView = data!!.getLongExtra("wordBookIdForView",0)
+                    Log.d("     TAGG", "===== MainActivity - onActivityResult ~~~~~?  ${wordBookIdForView.toString()} --- $")
+                    updateWordBookCount(wordBookIdForView)
+
+                }
             }
-        }
     }
 
     override fun onBackPressed() {

@@ -92,7 +92,20 @@
             android:id="@+id/current_count"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
             android:textSize="17sp"
+            />
+        <TextView
+            android:id="@+id/checkbox_count"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:gravity="center"
+            android:textSize="17sp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:visibility="gone"
             />
         <View
             android:layout_width="0dp"
