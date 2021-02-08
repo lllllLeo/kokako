@@ -52,7 +52,7 @@
                         android:id="@+id/rv_remove_word"
                         android:layout_width="30dp"
                         android:layout_height="30dp"
-                        android:background="@drawable/ic_baseline_close_24" />
+                        android:background="@drawable/ic_baseline_remove_circle_outline_24" />
                     <!-- 삭제하시겠습니까 dialog-->
 
         </LinearLayout>

@@ -85,6 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="35dp"
         android:weightSum="1"
+        android:gravity="center"
         android:layout_marginHorizontal="2dp"
         android:orientation="horizontal">
 <!--        android:overlapAnchor="false"   -->
@@ -92,12 +93,13 @@
             android:id="@+id/current_count"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
             android:textSize="17sp"
             />
         <TextView
-            android:id="@+id/checkbox_count"
+            android:id="@+id/ckbox_count_tv"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
@@ -105,7 +107,6 @@
             android:textSize="17sp"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
-            android:visibility="gone"
             />
         <View
             android:layout_width="0dp"
@@ -136,11 +137,19 @@
             android:id="@+id/rv_list_word_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginHorizontal="5dp"
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
             tools:listitem="@layout/rv_view_list_item"/>
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="작성된 단어가 없습니다."
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="gone"
+            />
         <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fab_test_word"
             android:layout_width="wrap_content"

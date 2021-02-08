@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/menu_edit"
-        android:title="편집하기"
+        android:title="이름 변경하기"
         />
     <item
         android:id="@+id/menu_delete"

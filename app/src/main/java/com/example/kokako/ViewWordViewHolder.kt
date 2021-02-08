@@ -3,10 +3,12 @@ package com.example.kokako
 import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kokako.ViewWordActivity.Companion.checkboxList
 import com.example.kokako.model.CheckBoxData
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_view_list_item.view.*
 import kotlin.collections.ArrayList
+import kotlin.math.log
 
 class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWordRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
     private var starButton = itemView.view_my_star
@@ -16,36 +18,24 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     private var wordCheckBox = itemView.view_my_check
     private var wordList = itemView.view_word_book_list
     private var viewWordRecyclerViewInterface : ViewWordRecyclerViewInterface? = null
-//    private var                     checkboxList = ArrayList<CheckBoxData>()
-    private var lilist = ArrayList<CheckBoxData>()
-/*    companion object {
-        var checkboxList = ArrayList<CheckBoxData>()
-    }*/
-
-    private var checkboxListToView = ArrayList<CheckBoxData>()
 
     init {
         starButton.setOnClickListener(this)
         myWordBtnViewOption.setOnClickListener(this)
         wordList.setOnLongClickListener(this)
+        wordList.setOnClickListener(this)
         wordCheckBox.setOnClickListener(this)
         this.viewWordRecyclerViewInterface = viewWordRecyclerViewInterface
     }
 
-    fun bind(
-        wordDatas: ArrayList<Word>,
-        position: Int,
-        num: Int,
-        checkboxList: ArrayList<CheckBoxData>
-    ) {
+    fun bind(wordDatas: ArrayList<Word>, position: Int, num: Int,showAndHideNumber: Int, currentLongClickPosition: Int?) {
         wordTextView.text = wordDatas[position].word
         meanTextView.text = wordDatas[position].mean
-
-
+        Log.d(TAG, "bind: 들어오나")
         if(num == 1) {
             wordCheckBox.visibility = View.VISIBLE
             starButton.visibility = View.GONE
-            myWordBtnViewOption.visibility = View.INVISIBLE
+            myWordBtnViewOption.visibility = View.GONE
         } else {
             wordCheckBox.visibility = View.GONE
             starButton.visibility = View.VISIBLE
@@ -57,16 +47,36 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                 starButton.setBackgroundResource(R.drawable.star_invisible)
             }
         }
+            when (showAndHideNumber) {
+                0 -> {
+                    wordTextView.visibility = View.VISIBLE
+                    meanTextView.visibility = View.VISIBLE
+                }
+                1 -> {
+                    wordTextView.visibility = View.INVISIBLE
+                    meanTextView.visibility = View.VISIBLE
+                }
+                2 -> {
+                    wordTextView.visibility = View.VISIBLE
+                    meanTextView.visibility = View.INVISIBLE
+                }
+            }
+
         if (position >= checkboxList.size) {
             checkboxList.add(position, CheckBoxData(wordDatas[position].id, false))
         }
-            checkboxListToView = checkboxList
-        if (num == 0) {
-            checkboxList[position].checked = false
-        } else {
-            wordCheckBox.isChecked = checkboxList[position].checked
+        if (position == currentLongClickPosition) {
+            checkboxList[currentLongClickPosition] = CheckBoxData(wordDatas[position].id, true)
         }
-
+// TODO: 2021-02-08 별도 스레드
+        if (num == 0 && currentLongClickPosition == -1) {
+            for (i in 0 until checkboxList.size) {
+                if (checkboxList[i].checked) {
+                    checkboxList[i].checked = false
+                }
+            }
+        }
+        wordCheckBox.isChecked = checkboxList[position].checked
     }
 
     override fun onClick(v: View?) {
@@ -78,7 +88,10 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                 this.viewWordRecyclerViewInterface?.onStarClicked(v, adapterPosition)
             }
             R.id.view_my_check -> {
-                this.viewWordRecyclerViewInterface?.onCheckboxClicked(v, adapterPosition, checkboxListToView)
+                this.viewWordRecyclerViewInterface?.onCheckboxClicked(v, adapterPosition)
+            }
+            R.id.view_word_book_list -> {
+                this.viewWordRecyclerViewInterface?.onViewClicked(v, adapterPosition)
             }
 
         }
@@ -87,5 +100,9 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     override fun onLongClick(v: View?): Boolean {
         this.viewWordRecyclerViewInterface?.onWordLongClicked(v!!, adapterPosition)
         return true
+    }
+
+    companion object {
+        private const val TAG = "TAG ViewWordViewHolder"
     }
 }

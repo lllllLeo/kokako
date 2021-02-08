@@ -37,12 +37,12 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     private var                     _binding : ActivityAddWordBinding? = null
     private val                     binding get() = _binding!!
     private lateinit var            addRecyclerAdapter: AddRecyclerAdapter
-    private var                     model : WordViewModel? = null // 바로 WordDatabase안부르고 뷰모델 통해서 부름
+    private var                     model : WordViewModel? = null
     var                             currentWordCount: Int = 0
     var                             currentCount: Int = 0
     var                             countString: String? = null
     private var                     tvWordCount: TextView? = null
-    private lateinit var            imm : InputMethodManager   // 여기 선언한다고 lateinit 함
+    private lateinit var            imm : InputMethodManager
     private var                     word = ArrayList<Word>()
     var                             wordBookIdForAddOrEdit : Long = 0
     var                             checkActivity = false

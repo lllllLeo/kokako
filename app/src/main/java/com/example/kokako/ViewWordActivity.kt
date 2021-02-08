@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
@@ -23,28 +24,35 @@ import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_view_word.*
 import kotlinx.android.synthetic.main.activity_view_word.view.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import com.example.kokako.model.CheckBoxData
+import kotlinx.android.synthetic.main.rv_view_list_item.*
 import kotlinx.android.synthetic.main.rv_view_list_item.view.*
+import kotlin.collections.ArrayList
 
 //  Log.d("     TAG", "===== AddWordActivity")
+// TODO: 2021-02-04  단어장 삭제를 만들어말아
+// TODO: 2021-02-04 터치하면 색깔바뀌게    98
+// FIXME: 2021-02-08
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
-//    private lateinit var            toolbarBinding: ActivityToolbarBinding
+    //    private lateinit var            toolbarBinding: ActivityToolbarBinding
     private var                     toolbar: Toolbar? = null
     private var                     _binding: ActivityViewWordBinding? = null
     private val                     binding get() = _binding!!
     private lateinit var            viewRecyclerAdapter: ViewWordRecyclerAdapter
     private var                     wordModel: WordViewModel? = null
     private var                     wordBookModel: WordBookViewModel? = null
-    var                             wordBookIdForView: Long = 0
-    var                             wordBookNameForView: String? = null
+    private var                     wordBookIdForView: Long = 0
+    private var                     wordBookNameForView: String? = null
     private lateinit var            imm : InputMethodManager
-    private var                     checkboxList = ArrayList<CheckBoxData>()
-    private var                     checkboxCount : Int? = 0
-    private var                     isDeleteMode : Boolean = false
-/*    companion object {
-        var checkboxList = arrayListOf<CheckBoxData>()
-    }*/
-
+    private var                     checkboxCount : Int = 1
+    private var                     isDelete : Boolean = false
+    private var                     wordList : ArrayList<Word>? = null
+    private var                     getFalseList = ArrayList<CheckBoxData>()
+    companion object {
+        val                     TAG = "TAG ViewWordActivity"
+        var                     checkboxList = ArrayList<CheckBoxData>()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +77,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 //        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
         viewRecyclerAdapter = ViewWordRecyclerAdapter(this)
 
-        longClick(0)
+        checkboxList.clear()
+        isDeleteMode(0, -2)
 
 
         wordBookModel = ViewModelProvider(this,
@@ -83,9 +92,14 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         wordModel?.wordList?.observe(this, { updateWordList(it) })
         rv_list_word_view.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+//            (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(viewRecyclerAdapter.itemCount,0)
+//            scrollToPosition(viewRecyclerAdapter.itemCount-1)  안되네 ㅅㅂ
+
             setHasFixedSize(true)
             adapter = viewRecyclerAdapter
         }
+        wordList = viewRecyclerAdapter.getItem()
+        Log.d(TAG, "onCreate: $wordList")
 
 
         val btnListener = View.OnClickListener { view ->
@@ -94,10 +108,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                     goBackToPreviousActivity()
                 }
                 R.id.view_cancel_btn -> {
-//                    체크버튼 clear해야함
-//                    var clear  = checkboxList
-//                    viewRecyclerAdapter.setCheckboxList(clear)
-                    longClick(0)
+                    isDeleteMode(0, -1)
                 }
                 R.id.view_add_or_edit_btn -> {
                     val intent = Intent(this, AddWordActivity::class.java)
@@ -157,7 +168,11 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 
                     }
                     2 -> { // 단어 ▲
-                        wordModel?.getWordAscendingOrder(wordBookIdForView)
+      /*                  wordList!!.sortWith(kotlin.Comparator {Word1, Word2 -> Word1.word!!.compareTo(Word2.word!!)})
+                        wordList!!.sortBy { Word -> Word.word }
+                        viewRecyclerAdapter.notifyDataSetChanged()*/
+//                        updateWordList(wordBookIdForView)
+//                        wordModel?.getWordAscendingOrder(wordBookIdForView)
                     }
                     3 -> { // 단어 ▼
 
@@ -187,7 +202,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 }
                 return v
             }
-
             override fun getCount(): Int {
                 return super.getCount() - 1
             }
@@ -198,21 +212,16 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         hide_spinner.setSelection(hideArrayAdapter.count)
         hide_spinner.dropDownVerticalOffset = dipToPixels(35f).toInt()
         hide_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long,
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?,view: View?,position: Int,id: Long,) {
                 when (position) {
                     0 -> { // 전체보기
-
+                        viewRecyclerAdapter.showAndHide(0)
                     }
                     1 -> { // 단어 가리기
-
+                        viewRecyclerAdapter.showAndHide(1)
                     }
                     2 -> { // 뜻 가리기
-
+                        viewRecyclerAdapter.showAndHide(2)
                     }
                     3 -> { // 랜덤
 
@@ -227,37 +236,57 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
 //        fab_add_note.setOnClickListener { view -> }
     }
 
-    private fun goBackToPreviousActivity() {
-        val intent = Intent()
-        intent.putExtra("wordBookIdForView", wordBookIdForView)
-        setResult(101, intent)
-        finish()
-    }
 
     @SuppressLint("SetTextI18n")
-    override fun onCheckboxClicked(v: View, adapterPosition: Int, checkboxListToView: ArrayList<CheckBoxData>) {
-        Log.d("TAGGG", "ViewWordActivity  들어온 checkboxList adapterPosition : / ${checkboxListToView[adapterPosition].checked}")
-//        checkboxList[adapterPosition].checked = v.view_my_check.isChecked   // v. 을 해줘야함 onClick에서 보내주는걸 받고 고쳐야지
-        if(v.view_my_check.isChecked) {
-            checkboxListToView[adapterPosition].checked = true
-            checkboxCount = checkboxCount!! + 1
+    private fun updateWordList(word: List<Word>?) {
+        viewRecyclerAdapter.submitList(word as ArrayList<Word>)
+        binding.currentCount.text = "단어 개수 : " + word.size.toString()
+        if(word.isNotEmpty()) {
+            binding.emptyView.visibility = View.GONE
         } else {
-            checkboxListToView[adapterPosition].checked = false
-            checkboxCount = checkboxCount!! - 1
+            binding.emptyView.visibility = View.VISIBLE
         }
-        viewRecyclerAdapter.setCheckboxList(checkboxListToView)
-        binding.checkboxCount.text = "${checkboxCount.toString()} 개 선택됨"
-
-        this.checkboxList = checkboxListToView
-        Log.d("TAGGG", "ViewWordActivity 나간 checkboxList adapterPosition :  / ${checkboxListToView[adapterPosition].checked}")
     }
 
+    // FIXME: 2021-02-08 체크박스 클릭시 색상변경
+    @SuppressLint("SetTextI18n")
+    override fun onCheckboxClicked(v: View, adapterPosition: Int) {
+//        val parent : LinearLayout = view_word_book_list
+        if(v.view_my_check.isChecked) {
+            checkboxList[adapterPosition].checked = true
+//            parent.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
+            Log.d(TAG, "onCheckboxClicked: $v")
+            checkboxCount += 1
+        } else {
+            checkboxList[adapterPosition].checked = false
+//            parent.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
+            checkboxCount -= 1
+        }
+        binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
+    }
+
+    override fun onViewClicked(v: View, adapterPosition: Int) {
+        v.view_my_check.isChecked = !v.view_my_check.isChecked
+        if(v.view_my_check.visibility==View.VISIBLE) {
+            if (v.view_my_check.isChecked) {
+                checkboxList[adapterPosition].checked = true
+                Log.d(TAG, "onViewClicked: $v")
+                v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
+                checkboxCount += 1
+            } else {
+                checkboxList[adapterPosition].checked = false
+                v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
+                checkboxCount -= 1
+            }
+            binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
+        }
+    }
 
     private fun deleteWordDialog(checkboxList: ArrayList<CheckBoxData>) {
-        Log.d("TAG", "deleteWordDialog 사이즈 : ${checkboxList.size}")
+        Log.d(TAG, "deleteWordDialog 사이즈 : ${checkboxList.size}")
         val mBuilder = AlertDialog.Builder(this)
 //        mBuilder.setTitle("삭제")
-            .setMessage("선택된 단어들을 모두 삭제합니다.\n정말 삭제하시겠습니까?")
+            .setMessage("선택된 $checkboxCount 개의 단어를 삭제합니다.\n정말 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
                     var i = 0
@@ -269,16 +298,17 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                             temp.add(viewRecyclerAdapter.getItem()[i])
                             */
                             wordModel?.delete(viewRecyclerAdapter.getItem()[i])
+                            checkboxList.removeAt(i)
                         }
                         i++
                         j = 1
                     }
                     if (j == 1)
-                        Toast.makeText(this, "단어 삭제 완료.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "단어 삭제 완료", Toast.LENGTH_SHORT).show()
                     else
-                        Toast.makeText(this, "삭제할 단어를 체크해주세요.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "삭제할 단어를 체크해주세요", Toast.LENGTH_SHORT).show()
 
-                    longClick(0)
+                    isDeleteMode(0, -1)
                 }
             )
             .setNegativeButton("취소",
@@ -288,10 +318,58 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         mBuilder.show()
     }
 
+    override fun onWordLongClicked(v: View, adapterPosition: Int) {
+        isDeleteMode(1, adapterPosition)
+        v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
+    }
+
     @SuppressLint("SetTextI18n")
-    private fun updateWordList(word: List<Word>?) {
-        viewRecyclerAdapter.submitList(word as ArrayList<Word>)
-        binding.currentCount.text = "단어 개수 : " + word.size.toString()
+    private fun isDeleteMode(num: Int, adapterPosition: Int) {
+        viewRecyclerAdapter.updateCheckbox(num, adapterPosition)
+        if (num == 1) {
+            isDelete = true
+            viewRecyclerAdapter.showAndHide(0)
+            binding.viewAddOrEditBtn.visibility = View.GONE
+            binding.viewBackBtn.visibility = View.GONE
+            binding.viewDeleteBtn.visibility = View.VISIBLE
+            binding.viewCancelBtn.visibility = View.VISIBLE
+            binding.ckboxCountTv.visibility = View.VISIBLE
+            binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
+
+            binding.fabTestWord.visibility = View.INVISIBLE
+            binding.hideSpinner.visibility = View.INVISIBLE
+            binding.sortSpinner.visibility = View.INVISIBLE
+            binding.currentCount.visibility = View.GONE
+        } else {
+            isDelete = false
+            checkboxCount = 1
+            binding.viewAddOrEditBtn.visibility = View.VISIBLE
+            binding.viewBackBtn.visibility = View.VISIBLE
+            binding.viewDeleteBtn.visibility = View.GONE
+            binding.viewCancelBtn.visibility = View.GONE
+            binding.ckboxCountTv.visibility = View.GONE
+
+            binding.fabTestWord.visibility = View.VISIBLE
+            binding.hideSpinner.visibility = View.VISIBLE
+            binding.sortSpinner.visibility = View.VISIBLE
+            binding.currentCount.visibility = View.VISIBLE
+        }
+        viewRecyclerAdapter.notifyDataSetChanged()
+    }
+
+    override fun onBackPressed() {
+        if(isDelete) { // 롱클릭에서 뒤로가기하면 2번 호출되는지 확인하기
+            isDeleteMode(0, -1)
+            binding.hideSpinner.setSelection(0)
+        } else
+            goBackToPreviousActivity()
+    }
+
+    private fun goBackToPreviousActivity() {
+        val intent = Intent()
+        intent.putExtra("wordBookIdForView", wordBookIdForView)
+        setResult(101, intent)
+        finish()
     }
 
     private fun dipToPixels(dipValue: Float): Float {
@@ -301,11 +379,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             resources.displayMetrics
         )
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.add_or_edit_menu, menu)
-//        return true
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("     TAG", "===== ViewWordActivity - onActivityResult called")
@@ -323,52 +396,17 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         }
     }
 
-
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-//        val mBuilder = AlertDialog.Builder(this)
-        when (item.itemId) {
-            android.R.id.home -> {
-                finish()
-            }
-            R.id.view_add_or_edit_btn -> {
-//                val intent = Intent(this, AddWordActivity::class.java)
-//                intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForView)
-//                intent.putExtra("checkActivity", true)
-//                startActivityForResult(intent, 100)
-            }
-            /*R.id.menu_delete -> {
-                mBuilder.setTitle("단어장 삭제")
-                    .setMessage("단어장을 삭제하시겠습니까?")
-                    .setNegativeButton("취소", null)
-                    .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-                        wordBookModel?.deleteWordBookById(wordBookIdForView)
-                        dialog.dismiss()
-                        finish()
-                    })
-                mBuilder.create().show()
-            }*/
-        }
-        return true
+    override fun onStarClicked(v: View, adapterPosition: Int) {
+        val word: Word = viewRecyclerAdapter.getItem()[adapterPosition]
+        if (word.bookMarkCheck == 0) { word.bookMarkCheck = 1 }
+        else { word.bookMarkCheck = 0 }
+        updateStar(word)
     }
 
     private fun updateStar(word: Word) {
         wordModel?.updateStarChecked(word)
     }
 
-    override fun onStarClicked(v: View, adapterPosition: Int) {
-        val word: Word = viewRecyclerAdapter.getItem()[adapterPosition]
-        if (word.bookMarkCheck == 0) {
-            word.bookMarkCheck = 1
-        } else {
-            word.bookMarkCheck = 0
-        }
-//        word.bookMarkCheck = !word.bookMarkCheck
-        updateStar(word)
-    }
-
-    // FIXME: 2021-01-27 단어 삭제하고 메인으로 가면 카운트가 안없어짐
     override fun onPopupMenuWordClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
         Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
@@ -456,47 +494,5 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 true
             })
         popup.show()
-    }
-
-    override fun onWordLongClicked(v: View, adapterPosition: Int) {
-        longClick(1)
-    }
-
-    private fun longClick(num: Int) {
-        viewRecyclerAdapter.updateCheckbox(num)
-        viewRecyclerAdapter.notifyDataSetChanged()
-
-        if (num == 1) {
-            isDeleteMode = true
-            binding.viewAddOrEditBtn.visibility = View.GONE
-            binding.viewBackBtn.visibility = View.GONE
-            binding.viewDeleteBtn.visibility = View.VISIBLE
-            binding.viewCancelBtn.visibility = View.VISIBLE
-            binding.checkboxCount.visibility = View.VISIBLE
-
-            binding.fabTestWord.visibility = View.INVISIBLE
-            binding.hideSpinner.visibility = View.INVISIBLE // 여기에 선택된 갯수 표시?
-            binding.sortSpinner.visibility = View.INVISIBLE
-            binding.currentCount.visibility = View.GONE
-        } else {
-            isDeleteMode = false
-            binding.viewAddOrEditBtn.visibility = View.VISIBLE
-            binding.viewBackBtn.visibility = View.VISIBLE
-            binding.viewDeleteBtn.visibility = View.GONE
-            binding.viewCancelBtn.visibility = View.GONE
-            binding.checkboxCount.visibility = View.GONE
-
-            binding.fabTestWord.visibility = View.VISIBLE
-            binding.hideSpinner.visibility = View.VISIBLE // 여기에 선택된 갯수 표시?
-            binding.sortSpinner.visibility = View.VISIBLE
-            binding.currentCount.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onBackPressed() {
-        if(isDeleteMode) {
-            longClick(0)
-        } else
-            goBackToPreviousActivity()
     }
 }

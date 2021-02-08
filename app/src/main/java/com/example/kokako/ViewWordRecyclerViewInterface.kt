@@ -8,5 +8,6 @@ interface ViewWordRecyclerViewInterface {
     fun onStarClicked(v: View, adapterPosition: Int)
     fun onPopupMenuWordClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int)
     fun onWordLongClicked(v: View, adapterPosition: Int)
-    fun onCheckboxClicked(v: View, adapterPosition: Int, wordCheckBox: ArrayList<CheckBoxData>)
+    fun onCheckboxClicked(v: View, adapterPosition: Int)
+    fun onViewClicked(v: View, adapterPosition: Int)
 }

@@ -33,7 +33,6 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     fun insertAllDatas(word : ArrayList<Word>) {
         InsertAllWordAsyncTask().execute(word)
     }
-
     fun insert(word: Word) {
         InsertWordAsyncTask().execute(word)
     }
