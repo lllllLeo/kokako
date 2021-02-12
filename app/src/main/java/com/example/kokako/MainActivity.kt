@@ -1,11 +1,16 @@
 package com.example.kokako
 
-import android.app.Activity
+import android.Manifest
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.database.Cursor
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.OpenableColumns
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -15,17 +20,26 @@ import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityMainBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
+import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import com.google.android.material.navigation.NavigationView
+import com.opencsv.CSVReader
+import com.opencsv.CSVReaderBuilder
+import com.opencsv.enums.CSVReaderNullFieldIndicator
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.*
+
 
 // TODO: 2021-01-23 스크롤하면 툴바 숨기기?
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
@@ -40,6 +54,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var                         wordModel : WordViewModel? = null
     private var                         wordBookDatas : ArrayList<WordBook>? = null
     private var                         wordBookIdForAdd : Long? = null
+    private var                         excelWordBookId : Long? = null
+
+    companion object {
+        val                     TAG = "TAG MainActivity"
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -79,6 +98,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy > 0 || dy < 0 && fab_add_note.isShown) fab_add_note.hide()
             }
+
             // FIXME: 2021-01-23 스크롤을 올리면 뜨게? 그러면
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) fab_add_note.show()
@@ -87,8 +107,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         })
 
         myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
-        wordBookModel = ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(
+        wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory{
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return WordViewModel(application, -1) as T
+            }}).get(WordViewModel::class.java)
+        wordBookModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(
                 this.application)).get(WordBookViewModel::class.java)
         wordBookModel?.wordBookList?.observe(this, { updateWordBookList(it) })
         rv_word_book.apply {
@@ -99,9 +122,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
         fab_add_note.setOnClickListener { view ->
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED,
-                InputMethodManager.HIDE_IMPLICIT_ONLY)
-
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
             val container = LinearLayout(this)
             container.orientation = LinearLayout.VERTICAL
             val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
@@ -168,11 +189,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val intent = Intent(this, ViewWordActivity::class.java)
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
         intent.putExtra("wordBookNameForView",
-        myWordRecyclerAdapter.getItem()[adapterPosition].title)
+            myWordRecyclerAdapter.getItem()[adapterPosition].title)
         startActivityForResult(intent, 101)
     }
 
-    override fun onPopupMenuWordBookClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
+    override fun onPopupMenuWordBookClicked(
+        v: View,
+        myWordBtnViewOption: Button,
+        adapterPosition: Int,
+    ) {
         Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
         popup.inflate(R.menu.view_word_menu)
@@ -208,7 +233,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                                     myWordRecyclerAdapter.getItem()[adapterPosition].title =
                                         dialogEditText.text.toString()
-                                    Log.d("     TAG", "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
+                                    Log.d("     TAG",
+                                        "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
                                     updateWordBookTitle(myWordRecyclerAdapter.getItem()[adapterPosition])
                                     mBuilder.dismiss()
                                 }
@@ -254,23 +280,74 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onActivityResult(requestCode, resultCode, data)
             when (requestCode) {
                 100 -> {
-                    Log.d("     TAG", "===== MainActivity - onActivityResult when called")
-//                    var updateWordBookMain  = intent.getLongExtra("updateWordBookMain",0)
-                    val wordBookIdForAdd = data!!.getLongExtra("wordBookIdForAddOrEdit",0)
-                    Log.d("     TAGG", "===== MainActivity - onActivityResult ~~~~~?  $wordBookIdForAdd --- $")
+                    val wordBookIdForAdd = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
                     updateWordBookCount(wordBookIdForAdd)
                 }
                 101 -> {
-                    Log.d("     TAG", "===== MainActivity - onActivityResult when called")
-//                    var updateWordBookMain  = intent.getLongExtra("updateWordBookMain",0)
-                    val wordBookIdForView = data!!.getLongExtra("wordBookIdForView",0)
-                    Log.d("     TAGG", "===== MainActivity - onActivityResult ~~~~~?  ${wordBookIdForView.toString()} --- $")
+                    val wordBookIdForView = data!!.getLongExtra("wordBookIdForView", 0)
                     updateWordBookCount(wordBookIdForView)
-
+                }
+                10 -> {
+                    try {
+                        readCsvFile(data)
+                    } catch (e: FileNotFoundException) {
+                        e.printStackTrace()
+                    }
                 }
             }
     }
 
+    private fun readCsvFile(data: Intent?) {
+        try {
+            val importWordList = ArrayList<Word>()
+            val uri: Uri = data!!.data!!
+            val fileName = getFileName(uri)!!.split(".")[0]
+            val folderAndName = uri.path!!.split(":")[1]
+            val reader = CSVReaderBuilder(FileReader(getExternalPath(folderAndName))).withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS).build()
+            if (reader != null) {
+                excelWordBookId = addWordBook(fileName)
+                for (cell in reader.iterator()) {
+                    if (cell[0].isNotEmpty() && cell[1].isNotEmpty()) {
+                        val word = Word(0, "default word", "default mean", 0, excelWordBookId!!)
+                        word.word = cell[0]
+                        word.mean = cell[1]
+                        importWordList.add(word)
+                    }
+                }
+                wordModel?.insertAllDatas(importWordList)
+                updateWordBookCount(excelWordBookId!!)
+            }
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+    }
+    private fun getFileName(uri: Uri): String? {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor: Cursor? =
+                applicationContext?.contentResolver?.query(uri,
+                    null,
+                    null,
+                    null,
+                    null)
+            try {
+                if (cursor != null && cursor.moveToFirst()) {
+                    result = cursor.getString(cursor.getColumnIndex(
+                        OpenableColumns.DISPLAY_NAME))
+                }
+            } finally {
+                cursor?.close()
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result!!.lastIndexOf('/')
+            if (cut != -1) {
+                result = result.substring(cut + 1)
+            }
+        }
+        return result
+    }
     override fun onBackPressed() {
         /*if (System.currentTimeMillis() - backPressedTime > 2000) {
             Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
@@ -303,7 +380,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuInflater.inflate(R.menu.sub_menu, menu)
         return true
     }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             R.id.menu_import -> {
@@ -313,9 +389,31 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             R.id.menu_sort -> {
                 Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
             }
+            R.id.menu_excel -> {
+                setupPermissions()
+                val intent = Intent(Intent.ACTION_GET_CONTENT)
+                intent.addCategory(Intent.CATEGORY_OPENABLE)
+                intent.type = "text/*"
+                startActivityForResult(Intent.createChooser(intent, "Open CSV"), 10)
+            }
         }
         return true
     }
+
+    // TODO: 2021-02-11 권한요청
+    private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+//            val path = "/storage/emulated/0"
+//            val file = File("$path/number.txt")
+//            val pln = file.readText()
+//            plnText.text = pln
+        }
+        else{
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 101)
+        }
+    }
+
     override fun onRemoveClicked(view: View, position: Int) {
         Log.d("     TAG",
             "===== MainActivity - onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[position].toString())
@@ -351,6 +449,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //ignored }}
     }
 
+    private fun getExternalPath(forlderName: String): String? {
+        var sdPath = ""
+        val ext = Environment.getExternalStorageState()
+        sdPath = if (ext == Environment.MEDIA_MOUNTED) {
+            Environment.getExternalStorageDirectory().absolutePath + "/" + forlderName
+        } else {
+            "$filesDir/$forlderName"
+        }
+        return sdPath
+    }
 
 
 

@@ -25,8 +25,8 @@ import kotlinx.android.synthetic.main.activity_view_word.*
 import kotlinx.android.synthetic.main.activity_view_word.view.*
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.example.kokako.model.CheckBoxData
-import kotlinx.android.synthetic.main.rv_view_list_item.*
 import kotlinx.android.synthetic.main.rv_view_list_item.view.*
 import kotlin.collections.ArrayList
 
@@ -94,7 +94,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 //            (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(viewRecyclerAdapter.itemCount,0)
 //            scrollToPosition(viewRecyclerAdapter.itemCount-1)  안되네 ㅅㅂ
-
+            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
             setHasFixedSize(true)
             adapter = viewRecyclerAdapter
         }
@@ -242,50 +242,46 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         viewRecyclerAdapter.submitList(word as ArrayList<Word>)
         binding.currentCount.text = "단어 개수 : " + word.size.toString()
         if(word.isNotEmpty()) {
-            binding.emptyView.visibility = View.GONE
+            binding.emptyText.visibility = View.GONE
+            binding.emptyIcon.visibility = View.GONE
         } else {
-            binding.emptyView.visibility = View.VISIBLE
+            binding.emptyText.visibility = View.VISIBLE
+            binding.emptyIcon.visibility = View.VISIBLE
         }
     }
-
     // FIXME: 2021-02-08 체크박스 클릭시 색상변경
     @SuppressLint("SetTextI18n")
     override fun onCheckboxClicked(v: View, adapterPosition: Int) {
-//        val parent : LinearLayout = view_word_book_list
         if(v.view_my_check.isChecked) {
             checkboxList[adapterPosition].checked = true
-//            parent.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
-            Log.d(TAG, "onCheckboxClicked: $v")
             checkboxCount += 1
         } else {
             checkboxList[adapterPosition].checked = false
-//            parent.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
             checkboxCount -= 1
         }
         binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
     }
-
     override fun onViewClicked(v: View, adapterPosition: Int) {
         v.view_my_check.isChecked = !v.view_my_check.isChecked
         if(v.view_my_check.visibility==View.VISIBLE) {
             if (v.view_my_check.isChecked) {
                 checkboxList[adapterPosition].checked = true
-                Log.d(TAG, "onViewClicked: $v")
-                v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
+                /*v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
+                Log.d(TAG, "onViewClicked: adapterPosition 는 $adapterPosition")*/
                 checkboxCount += 1
             } else {
                 checkboxList[adapterPosition].checked = false
-                v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
+//                v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
                 checkboxCount -= 1
             }
             binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
         }
     }
-
     private fun deleteWordDialog(checkboxList: ArrayList<CheckBoxData>) {
         Log.d(TAG, "deleteWordDialog 사이즈 : ${checkboxList.size}")
         val mBuilder = AlertDialog.Builder(this)
 //        mBuilder.setTitle("삭제")
+            // TODO: 2021-02-12 0개 예외처리
             .setMessage("선택된 $checkboxCount 개의 단어를 삭제합니다.\n정말 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
@@ -317,12 +313,13 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
                 })
         mBuilder.show()
     }
-
     override fun onWordLongClicked(v: View, adapterPosition: Int) {
-        isDeleteMode(1, adapterPosition)
-        v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryLight))
+        if (v.view_my_check.visibility != View.VISIBLE) {
+            isDeleteMode(1, adapterPosition)
+            v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this,
+                R.color.colorSelectItem))
+        }
     }
-
     @SuppressLint("SetTextI18n")
     private fun isDeleteMode(num: Int, adapterPosition: Int) {
         viewRecyclerAdapter.updateCheckbox(num, adapterPosition)
@@ -356,7 +353,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         }
         viewRecyclerAdapter.notifyDataSetChanged()
     }
-
     override fun onBackPressed() {
         if(isDelete) { // 롱클릭에서 뒤로가기하면 2번 호출되는지 확인하기
             isDeleteMode(0, -1)
@@ -364,14 +360,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
         } else
             goBackToPreviousActivity()
     }
-
     private fun goBackToPreviousActivity() {
         val intent = Intent()
         intent.putExtra("wordBookIdForView", wordBookIdForView)
         setResult(101, intent)
         finish()
     }
-
     private fun dipToPixels(dipValue: Float): Float {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -379,7 +373,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             resources.displayMetrics
         )
     }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("     TAG", "===== ViewWordActivity - onActivityResult called")
         super.onActivityResult(requestCode, resultCode, data)
@@ -395,18 +388,15 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface {
             }
         }
     }
-
     override fun onStarClicked(v: View, adapterPosition: Int) {
         val word: Word = viewRecyclerAdapter.getItem()[adapterPosition]
         if (word.bookMarkCheck == 0) { word.bookMarkCheck = 1 }
         else { word.bookMarkCheck = 0 }
         updateStar(word)
     }
-
     private fun updateStar(word: Word) {
         wordModel?.updateStarChecked(word)
     }
-
     override fun onPopupMenuWordClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
         Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)

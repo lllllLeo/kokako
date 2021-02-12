@@ -16,7 +16,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     var wordList : LiveData<List<Word>>
     var wordArrayList : List<Word>? = null
     private var wordDao : WordDAO
-
+    companion object {
+        val                     TAG = "TAG WordViewModel"
+    }
     init {
         Log.d("     TAG", "===== WordViewModel - init called")
         val db : WordDatabase = Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
@@ -31,6 +33,7 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         }
     }
     fun insertAllDatas(word : ArrayList<Word>) {
+        Log.d(TAG, "insertAllDatas: 여기")
         InsertAllWordAsyncTask().execute(word)
     }
     fun insert(word: Word) {

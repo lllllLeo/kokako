@@ -168,15 +168,11 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     input_word.text.toString().trim()
                     input_mean.text.toString().trim()
 //                    if (input_word.text.equals("") || input_mean.text.equals("")) {
-                    if (input_mean.text.toString().trim().isEmpty() || input_word.text.toString()
-                            .trim()
-                            .isEmpty()
-                    ) {
+                    if (input_mean.text.toString().trim().isEmpty() || input_word.text.toString().trim().isEmpty()) {
                         Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
                     } else {
                         // FIXME: 2021-01-23 입력한 값들에서 빈값 예외처리 / 추후
-                        Log.d("     TAG",
-                            "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
+                        Log.d("     TAG","===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
                         Log.d("     TAG", "===== AddWordActivity word 값은 : $word")
 
 //                        이제 word에 추가가되네 add로

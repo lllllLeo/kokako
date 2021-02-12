@@ -2,6 +2,7 @@ package com.example.kokako
 
 import android.util.Log
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.ViewWordActivity.Companion.checkboxList
 import com.example.kokako.model.CheckBoxData
@@ -31,7 +32,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     fun bind(wordDatas: ArrayList<Word>, position: Int, num: Int,showAndHideNumber: Int, currentLongClickPosition: Int?) {
         wordTextView.text = wordDatas[position].word
         meanTextView.text = wordDatas[position].mean
-        Log.d(TAG, "bind: 들어오나")
         if(num == 1) {
             wordCheckBox.visibility = View.VISIBLE
             starButton.visibility = View.GONE
@@ -72,6 +72,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         if (num == 0 && currentLongClickPosition == -1) {
             for (i in 0 until checkboxList.size) {
                 if (checkboxList[i].checked) {
+//                    itemView.view_word_book_list.setBackgroundColor(ContextCompat.getColor(itemView.context,R.color.colorSelectItem))
                     checkboxList[i].checked = false
                 }
             }
@@ -88,17 +89,24 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                 this.viewWordRecyclerViewInterface?.onStarClicked(v, adapterPosition)
             }
             R.id.view_my_check -> {
+                /*if (v.view_my_check.isChecked) {
+                    itemView.view_word_book_list.setBackgroundColor(ContextCompat.getColor(itemView.context,
+                        R.color.colorSelectItem))
+                    Log.d(TAG, "onClick: view_my_check adapterPosition는 $adapterPosition")
+                } else {
+                    itemView.view_word_book_list.setBackgroundColor(ContextCompat.getColor(itemView.context,
+                        R.color.colorWhite))
+                }*/
                 this.viewWordRecyclerViewInterface?.onCheckboxClicked(v, adapterPosition)
             }
             R.id.view_word_book_list -> {
                 this.viewWordRecyclerViewInterface?.onViewClicked(v, adapterPosition)
             }
-
         }
     }
 
-    override fun onLongClick(v: View?): Boolean {
-        this.viewWordRecyclerViewInterface?.onWordLongClicked(v!!, adapterPosition)
+    override fun onLongClick(v: View): Boolean {
+        this.viewWordRecyclerViewInterface?.onWordLongClicked(v, adapterPosition)
         return true
     }
 
