@@ -290,6 +290,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 10 -> {
                     try {
                         readCsvFile(data)
+                        Toast.makeText(this, "단어장 가져오기 완료", Toast.LENGTH_SHORT).show()
                     } catch (e: FileNotFoundException) {
                         e.printStackTrace()
                     }
@@ -316,6 +317,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
                 wordModel?.insertAllDatas(importWordList)
                 updateWordBookCount(excelWordBookId!!)
+//                Toast.makeText(this, "$fileName 가져오기 완료", Toast.LENGTH_SHORT).show()
             }
         } catch (e: FileNotFoundException) {
             e.printStackTrace()

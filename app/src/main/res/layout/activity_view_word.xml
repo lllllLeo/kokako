@@ -136,10 +136,15 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list_word_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginHorizontal="5dp"
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
+            app:fastScrollEnabled="true"
+            app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+            app:fastScrollHorizontalTrackDrawable="@drawable/line_drawable"
+            app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+            app:fastScrollVerticalTrackDrawable="@drawable/line_drawable"
             tools:listitem="@layout/rv_view_list_item"/>
         <LinearLayout
             android:layout_width="match_parent"
@@ -163,7 +168,7 @@
                 android:text="작성된 단어가 없습니다.\n단어를 추가해주세요"
                 />
         </LinearLayout>
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        <!--<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
             android:id="@+id/fab_test_word"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -179,6 +184,6 @@
             app:iconTint="@color/colorWhite"
             app:iconPadding="0dp"
             app:icon="@drawable/ic_baseline_check_24"
-            />
+            />-->
     </FrameLayout>
 </LinearLayout>

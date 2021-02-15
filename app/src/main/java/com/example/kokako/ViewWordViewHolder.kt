@@ -2,27 +2,27 @@ package com.example.kokako
 
 import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.ViewWordActivity.Companion.checkboxList
 import com.example.kokako.model.CheckBoxData
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_view_list_item.view.*
 import kotlin.collections.ArrayList
-import kotlin.math.log
 
 class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWordRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
     private var starButton = itemView.view_my_star
     private var wordTextView = itemView.view_my_word
     private var meanTextView = itemView.view_my_mean
-    private var myWordBtnViewOption = itemView.my_word_btn_options
     private var wordCheckBox = itemView.view_my_check
     private var wordList = itemView.view_word_book_list
+    private var wordOptionsButton = itemView.word_options
+    private var wordShowAndHideButton = itemView.word_show_and_hide
     private var viewWordRecyclerViewInterface : ViewWordRecyclerViewInterface? = null
 
     init {
         starButton.setOnClickListener(this)
-        myWordBtnViewOption.setOnClickListener(this)
+        wordOptionsButton.setOnClickListener(this)
+        wordShowAndHideButton.setOnClickListener(this)
         wordList.setOnLongClickListener(this)
         wordList.setOnClickListener(this)
         wordCheckBox.setOnClickListener(this)
@@ -35,32 +35,56 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         if(num == 1) {
             wordCheckBox.visibility = View.VISIBLE
             starButton.visibility = View.GONE
-            myWordBtnViewOption.visibility = View.GONE
+            this.wordOptionsButton.visibility = View.GONE
         } else {
             wordCheckBox.visibility = View.GONE
             starButton.visibility = View.VISIBLE
-            myWordBtnViewOption.visibility = View.VISIBLE
+            this.wordOptionsButton.visibility = View.VISIBLE
 
             if (wordDatas[position].bookMarkCheck == 1) {
-                starButton.setBackgroundResource(R.drawable.star_visible)
+                starButton.setBackgroundResource(R.drawable.favorite_pressed_background)
             } else {
-                starButton.setBackgroundResource(R.drawable.star_invisible)
+                starButton.setBackgroundResource(R.drawable.favorite_normal_background)
             }
         }
-            when (showAndHideNumber) {
-                0 -> {
+
+        when (showAndHideNumber) {
+
+            0 -> {
+                wordOptionsButton.visibility = View.VISIBLE
+                wordShowAndHideButton.visibility = View.GONE
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.VISIBLE
+            }
+            1 -> {
+                wordOptionsButton.visibility = View.GONE
+                wordShowAndHideButton.visibility = View.VISIBLE
+                wordTextView.visibility = View.INVISIBLE
+                meanTextView.visibility = View.VISIBLE
+            }
+            2 -> {
+                wordOptionsButton.visibility = View.GONE
+                wordShowAndHideButton.visibility = View.VISIBLE
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.INVISIBLE
+            }
+            // TODO: 2021-02-14 누르면 또 랜덤으로 하기
+            3 -> {
+                wordOptionsButton.visibility = View.GONE
+                wordShowAndHideButton.visibility = View.VISIBLE
+                val random = (1..10).shuffled().first()
+                Log.d(TAG, "bind: random 은 $random")
+                if (random % 2 == 0) {
                     wordTextView.visibility = View.VISIBLE
-                    meanTextView.visibility = View.VISIBLE
-                }
-                1 -> {
+                    meanTextView.visibility = View.INVISIBLE
+                } else {
                     wordTextView.visibility = View.INVISIBLE
                     meanTextView.visibility = View.VISIBLE
                 }
-                2 -> {
-                    wordTextView.visibility = View.VISIBLE
-                    meanTextView.visibility = View.INVISIBLE
-                }
             }
+
+        }
+
 
         if (position >= checkboxList.size) {
             checkboxList.add(position, CheckBoxData(wordDatas[position].id, false))
@@ -82,11 +106,12 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
 
     override fun onClick(v: View?) {
         when(v!!.id) {
-            R.id.my_word_btn_options -> {
-                this.viewWordRecyclerViewInterface?.onPopupMenuWordClicked(v, myWordBtnViewOption, adapterPosition)
+            R.id.word_show_and_hide -> {
+                this.viewWordRecyclerViewInterface?.onPopupMenuWordClicked(v,
+                    this.wordOptionsButton, adapterPosition)
             }
             R.id.view_my_star -> {
-                this.viewWordRecyclerViewInterface?.onStarClicked(v, adapterPosition)
+                this.viewWordRecyclerViewInterface?.onFavoriteButtonClicked(v, adapterPosition)
             }
             R.id.view_my_check -> {
                 /*if (v.view_my_check.isChecked) {
@@ -114,3 +139,21 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         private const val TAG = "TAG ViewWordViewHolder"
     }
 }
+
+
+/*
+                wordOptionsButton.isClickable = false
+
+                if(wordShowAndHideButton.isChecked) {
+                    wordShowAndHideButton.setBackgroundResource(R.drawable.ic_baseline_visibility_24)
+                    wordTextView.visibility = View.VISIBLE
+                    meanTextView.visibility = View.VISIBLE
+                } else {
+                    wordShowAndHideButton.setBackgroundResource(R.drawable.ic_baseline_visibility_off_24)
+                    wordTextView.visibility = View.INVISIBLE
+                    meanTextView.visibility = View.VISIBLE
+                }
+
+
+*/
+

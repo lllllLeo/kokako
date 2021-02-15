@@ -86,7 +86,7 @@
 
 
             <Button
-                android:id="@+id/my_word_btn_options"
+                android:id="@+id/word_show_and_hide"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:gravity="center"

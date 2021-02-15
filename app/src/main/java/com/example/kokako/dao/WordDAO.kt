@@ -34,11 +34,32 @@ interface WordDAO {
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView")
     fun getWordFromWordBook(wordBookIdForView: Array<out Long?>): LiveData<List<Word>>
 
-    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView")
-    fun getWordFromWordBook222(wordBookIdForView: Array<out Long?>): List<Word>
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY word ASC")
+    fun getWordFromWordBook333(wordBookIdForView: Array<out Long?>): LiveData<List<Word>>
+
+
+
+
+
+
+
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ")
+    fun getWordFromWordBookAddAndEdit(wordBookIdForView: Array<out Long?>): List<Word>
+
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView AND bookMarkCheck = 1")
+    fun getWordFavorite(wordBookIdForView: Array<out Long?>): List<Word>
 
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY word ASC")
-    fun getWordAscendingOrder(wordBookIdForView: Array<out Long?>): LiveData<List<Word>>
+    fun getWordAscendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
+
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY word DESC")
+    fun getWordDescendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
+
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY mean ASC")
+    fun getMeanAscendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
+
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY mean DESC")
+    fun getMeanDescendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
 
 }
 

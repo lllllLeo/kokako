@@ -1,8 +1,6 @@
 package com.example.kokako
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
@@ -20,14 +18,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityAddWordBinding
 import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_add_word.*
-import java.lang.NullPointerException
+import kotlin.NullPointerException
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-27 키보드를 아예 보이지말까
@@ -93,7 +90,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
 
         addRecyclerAdapter = AddRecyclerAdapter(this)
-        word            = model?.getWordFromWordBook222(wordBookIdForAddOrEdit)!!
+        word            = model?.getWordFromWordBookForAddAndEdit(wordBookIdForAddOrEdit)!!
         addRecyclerAdapter.submitDataList(word)
         rv_list_item.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
@@ -108,7 +105,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             Log.d("     TAG", "===== AddWordActivity checkActivity 추가로 들어온 else 문 $word")
             setHasFixedSize(true)
 //            if(word.size != 0) smoothScrollToPosition(word.size - 1)    // 데이터가 없으면 에러
-// TODO: 2021-01-31 내폰은 ㄱㅊ은데 엄ㄴ마폰은 삭제가 이상하게됨
+// TODO: 2021-01-31 내폰은 ㄱㅊ은데 엄ㄴ마폰은 삭제가 이상하게됨 -> ㄱㅊ아졋음 다시한번해보기
             val recyclerViewState : Parcelable = rv_list_item.layoutManager?.onSaveInstanceState()!!
             rv_list_item.layoutManager!!.onRestoreInstanceState(recyclerViewState)
             adapter = addRecyclerAdapter
@@ -119,81 +116,92 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 //        tvWordCount?.text = countString
 
         val btnListener = View.OnClickListener { view ->
-            val currentFocusId = currentFocus!!.id
-            when (view.id) {
-                R.id.delete_all -> {
-                    input_word.text.clear()
-                    input_mean.text.clear()
-                    input_word.requestFocus()
-                }
-                R.id.btn_remove_text -> {
-                    if (input_word.isFocused) {
+            try {
+                val currentFocusId = currentFocus!!.id
+                when (view.id) {
+                    R.id.delete_all -> {
                         input_word.text.clear()
-                    } else if (input_mean.isFocused)
                         input_mean.text.clear()
-                }
-                R.id.btn_move_left -> {
-                    if (findViewById<EditText>(currentFocusId + 1) != null) {
-                        findViewById<EditText>(currentFocusId + 1).requestFocus()
-                    } else if (currentFocus!!.id == INPUT_MEAN_ID){
                         input_word.requestFocus()
-                    } else if (currentFocus!!.id == INPUT_WORD_ID){
-                        "do nothing"
                     }
-                    else {
-                        input_mean.requestFocus()
+                    R.id.btn_remove_text -> {
+                        if (input_word.isFocused) {
+                            input_word.text.clear()
+                        } else if (input_mean.isFocused)
+                            input_mean.text.clear()
                     }
-                }
-                R.id.btn_move_right -> {
-                    Log.d("     TAG",
-                        "===== AddWordActivity btn_move_right input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
-                    Log.d("     TAG",
-                        "===== AddWordActivity btn_move_right currentFocus!!.id ${currentFocus!!.id} 와 INPUT_MEAN_ID ${INPUT_MEAN_ID} ")
-                    if (currentFocus!!.id == INPUT_WORD_ID) {
-                        input_mean.requestFocus()
-                        Log.d("     TAG", "===== AddWordActivity btn_move_right if문 ")
-                    } else if (currentFocus!!.id == INPUT_MEAN_ID && addRecyclerAdapter.itemCount != 0) {
-                        try {
-                            findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).requestFocus()
-                        } catch(e : NullPointerException) {
-                            return@OnClickListener
+                    R.id.btn_move_left -> {
+                        when {
+                            findViewById<EditText>(currentFocusId + 1) != null -> {
+                                findViewById<EditText>(currentFocusId + 1).requestFocus()
+                            }
+                            currentFocus!!.id == INPUT_MEAN_ID -> {
+                                input_word.requestFocus()
+                            }
+                            currentFocus!!.id == INPUT_WORD_ID -> {
+                                "do nothing"
+                            }
+                            else -> {
+                                input_mean.requestFocus()
+                            }
                         }
-                    } else if (findViewById<EditText>(currentFocusId - 1) != null) {
-                        Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 2")
-                        findViewById<EditText>(currentFocusId - 1).requestFocus()
                     }
-                }
+                    R.id.btn_move_right -> {
+                        Log.d("     TAG",
+                            "===== AddWordActivity btn_move_right input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 ${INPUT_WORD_ID} \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
+                        Log.d("     TAG",
+                            "===== AddWordActivity btn_move_right currentFocus!!.id ${currentFocus!!.id} 와 INPUT_MEAN_ID ${INPUT_MEAN_ID} ")
+                        if (currentFocus!!.id == INPUT_WORD_ID) {
+                            input_mean.requestFocus()
+                            Log.d("     TAG", "===== AddWordActivity btn_move_right if문 ")
+                        } else if (currentFocus!!.id == INPUT_MEAN_ID && addRecyclerAdapter.itemCount != 0) {
+                            try {
+                                findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).requestFocus()
+                            } catch (e: NullPointerException) {
+                                return@OnClickListener
+                            }
+                        } else if (findViewById<EditText>(currentFocusId - 1) != null) {
+                            Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 2")
+                            findViewById<EditText>(currentFocusId - 1).requestFocus()
+                        }
+                    }
 // data없으면  무시하기 -> textViewLayout?
-                R.id.btn_add_word -> {
-                    input_word.text.toString().trim()
-                    input_mean.text.toString().trim()
+                    R.id.btn_add_word -> {
+                        input_word.text.toString().trim()
+                        input_mean.text.toString().trim()
 //                    if (input_word.text.equals("") || input_mean.text.equals("")) {
-                    if (input_mean.text.toString().trim().isEmpty() || input_word.text.toString().trim().isEmpty()) {
-                        Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
-                    } else {
-                        // FIXME: 2021-01-23 입력한 값들에서 빈값 예외처리 / 추후
-                        Log.d("     TAG","===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
-                        Log.d("     TAG", "===== AddWordActivity word 값은 : $word")
+                        if (input_mean.text.toString().trim().isEmpty() || input_word.text.toString().trim()
+                                .isEmpty()
+                        ) {
+                            Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // FIXME: 2021-01-23 입력한 값들에서 빈값 예외처리 / 추후
+                            Log.d("     TAG",
+                                "===== AddWordActivity 입력한 단어, 뜻 : ${input_word.text}, ${input_mean.text}")
+                            Log.d("     TAG", "===== AddWordActivity word 값은 : $word")
 
 //                        이제 word에 추가가되네 add로
-                        addRecyclerAdapter.addItem(Word
-                            (0,
-                            input_word.text.toString(),
-                            input_mean.text.toString(),
-                            0,
-                            wordBookIdForAddOrEdit))
+                            addRecyclerAdapter.addItem(Word
+                                (0,
+                                input_word.text.toString(),
+                                input_mean.text.toString(),
+                                0,
+                                wordBookIdForAddOrEdit))
 
-                        Log.d("     TAG", "===== AddWordActivity word 값은2222222222 : $word")
-                        input_word.text.clear()
-                        input_mean.text.clear()
-                        input_word.requestFocus()
-                        // TODO: 2021-01-23 wordCount
+                            Log.d("     TAG", "===== AddWordActivity word 값은2222222222 : $word")
+                            input_word.text.clear()
+                            input_mean.text.clear()
+                            input_word.requestFocus()
+                            // TODO: 2021-01-23 wordCount
 //                        wordCount++
 //                        countString = "$currentCount/$wordCount"
 //                        tvWordCount?.text = countString
 //                        Toast.makeText(this, "wordCount는 $wordCount", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
+            } catch (e: NullPointerException) {
+                e.printStackTrace()
             }
         }
         delete_all.setOnClickListener(btnListener)
@@ -242,7 +250,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
                         // TODO: 2021-01-27 잠시 키보드 넣음
 //                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-                        // TODO: 2021-01-26 여기서 단어장 count업데이트 여기말고 메인에서 activityResult에서하면되겟다
                         val intent = Intent()
                         intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
                         if (!checkActivity) {

@@ -16,4 +16,5 @@
     <color name="transparent">#00F5F5F5</color>
     <color name="colorDarkBackground">#4A4A4A</color>
     <color name="colorDarkText">#BDBDBD</color>
+    <color name="colorFavorite">#FFD600</color>
 </resources>

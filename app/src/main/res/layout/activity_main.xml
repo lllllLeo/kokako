@@ -26,13 +26,14 @@
             android:id="@+id/include_toolbar"
             layout="@layout/activity_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="50dp"/>
          <!-- android:theme="?attr/actionBarTheme" 지우고 저거로 대체하니까 흰색됨-->
 
+        <!-- fixme 마진고치기 -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_marginTop="50dp"
             android:orientation="vertical"
             tools:context=".MainActivity">
 

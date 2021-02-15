@@ -46,27 +46,51 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         Log.d("     TAG", "===== WordViewModel - deleteWordById called")
         DeleteAllWordAsyncTask().execute(wordBookIdForView)
     }
-    fun getWordFromWordBook(wordBookIdForView: Long): LiveData<List<Word>> {
-        wordList = GetWordFromWordBookAsyncTask().execute(wordBookIdForView).get()
+    fun getWordFromWordBook333(wordBookIdForView: Long): LiveData<List<Word>> {
+        wordList = GetWordFromWordBook333AsyncTask().execute(wordBookIdForView).get()
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : $wordList")
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : ${wordList.value}")
         return wordList
     }
-    fun getWordFromWordBook222(wordBookIdForView: Long): ArrayList<Word> {
+    fun getWordFromWordBookForAddAndEdit(wordBookIdForView: Long): ArrayList<Word> {
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordBookIdForView 값은 : $wordBookIdForView")
-        wordArrayList = GetWordFromWordBookAsyncTask222().execute(wordBookIdForView).get()
+        wordArrayList = GetWordFromWordBookForAddAndEditAsyncTask().execute(wordBookIdForView).get()
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordArrayList 값은 : $wordArrayList")
         return wordArrayList as ArrayList<Word>
     }
 
-    fun getWordAscendingOrder(wordBookIdForView: Long): LiveData<List<Word>>{
-        wordList = GetWordAscendingOrderAsyncTask().execute(wordBookIdForView).get()
+    fun getWordFavorite(wordBookIdForView: Long): ArrayList<Word>{
+        wordArrayList = GetWordFavoriteAsyncTask().execute(wordBookIdForView).get()
         Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
-        return wordList
+        return wordArrayList as ArrayList<Word>
     }
 
-    fun updateStarChecked(word: Word) {
-        UpdateStarCheckedAsyncTask().execute(word)
+    fun getWordAscendingOrder(wordBookIdForView: Long): ArrayList<Word>{
+        wordArrayList = GetWordAscendingOrderAsyncTask().execute(wordBookIdForView).get()
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        return wordArrayList as ArrayList<Word>
+    }
+
+    fun getWordDescendingOrder(wordBookIdForView: Long): ArrayList<Word>{
+        wordArrayList = GetWordDescendingOrderAsyncTask().execute(wordBookIdForView).get()
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        return wordArrayList as ArrayList<Word>
+    }
+
+    fun getMeanAscendingOrder(wordBookIdForView: Long): ArrayList<Word>{
+        wordArrayList = GetMeanAscendingOrderAsyncTask().execute(wordBookIdForView).get()
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        return wordArrayList as ArrayList<Word>
+    }
+
+    fun getMeanDescendingOrder(wordBookIdForView: Long): ArrayList<Word>{
+        wordArrayList = GetMeanDescendingOrderAsyncTask().execute(wordBookIdForView).get()
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        return wordArrayList as ArrayList<Word>
+    }
+
+    fun updateFavoriteChecked(word: Word) {
+        UpdateFavoriteCheckedAsyncTask().execute(word)
     }
 
     fun update(word: Word) {
@@ -84,7 +108,7 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     }
 
     @SuppressLint("StaticFieldLeak")
-    private inner class UpdateStarCheckedAsyncTask : AsyncTask<Word, Void, Void>(){
+    private inner class UpdateFavoriteCheckedAsyncTask : AsyncTask<Word, Void, Void>(){
         override fun doInBackground(vararg word: Word?): Void? {
             Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - doInBackground called")
             wordDao.update(word[0]!!)
@@ -93,26 +117,63 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         }
     }
 
-    // FIXME: 2021-01-25 오른차순 고치기
     @SuppressLint("StaticFieldLeak")
-    private inner class GetWordAscendingOrderAsyncTask : AsyncTask<Long, Void, LiveData<List<Word>>>(){
-        override fun doInBackground(vararg wordBookIdForView: Long?): LiveData<List<Word>> {
+    private inner class GetWordFavoriteAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
             Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground called")
             Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground out")
-            var a = wordDao.getWordAscendingOrder(wordBookIdForView)
-            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground 값은 : ${a.value}")
-            return a
+            return wordDao.getWordFavorite(wordBookIdForView)
         }
 
     }
 
     @SuppressLint("StaticFieldLeak")
-    private inner class GetWordFromWordBookAsyncTask222 : AsyncTask<Long, Void, List<Word>>(){
+    private inner class GetWordAscendingOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground called")
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground out")
+            return wordDao.getWordAscendingOrder(wordBookIdForView)
+        }
+
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetWordDescendingOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground called")
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground out")
+            return wordDao.getWordDescendingOrder(wordBookIdForView)
+        }
+
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetMeanAscendingOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground called")
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground out")
+            return wordDao.getMeanAscendingOrder(wordBookIdForView)
+        }
+
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetMeanDescendingOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground called")
+            Log.d("     TAG", "===== WordViewModel - GetWordAscendingOrderAsyncTask - doInBackground out")
+            return wordDao.getMeanDescendingOrder(wordBookIdForView)
+        }
+
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetWordFromWordBookForAddAndEditAsyncTask : AsyncTask<Long, Void, List<Word>>(){
         override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground called")
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground 값은 : ${wordBookIdForView[0]}")
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground out")
-            return wordDao.getWordFromWordBook222(wordBookIdForView)
+            return wordDao.getWordFromWordBookAddAndEdit(wordBookIdForView)
         }
 
     }
@@ -129,12 +190,12 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         }
     }
     @SuppressLint("StaticFieldLeak")
-    private inner class GetWordFromWordBookAsyncTask : AsyncTask<Long, Void, LiveData<List<Word>>>(){
+    private inner class GetWordFromWordBook333AsyncTask : AsyncTask<Long, Void, LiveData<List<Word>>>(){
         override fun doInBackground(vararg wordBookIdForView: Long?): LiveData<List<Word>> {
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground called")
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground 값은 : ${wordBookIdForView[0]}")
             Log.d("     TAG", "===== WordViewModel - GetWordFromWordBookAsyncTask - doInBackground out")
-            return wordDao.getWordFromWordBook(wordBookIdForView)
+            return wordDao.getWordFromWordBook333(wordBookIdForView)
         }
 
     }
@@ -143,6 +204,7 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     private inner class DeleteWordAsyncTask : AsyncTask<Word, Void, Void>() {
         override fun doInBackground(vararg word: Word?): Void? {
             Log.d("     TAG", "===== WordViewModel - DeleteWordAsyncTask - doInBackground called")
+            Log.d("     TAG", "===== WordViewModel - DeleteWordAsyncTask - doInBackground ${word[0]!!}")
             wordDao.delete(word[0]!!)
             Log.d("     TAG", "===== WordViewModel - DeleteWordAsyncTask - doInBackground out")
             return null

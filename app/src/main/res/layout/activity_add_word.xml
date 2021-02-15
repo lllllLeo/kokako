@@ -12,12 +12,12 @@
         android:id="@+id/include_toolbar"
         layout="@layout/activity_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="50dp"/>
     <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_below="@+id/include_toolbar"
         android:weightSum="1">
 
         <TextView

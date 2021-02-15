@@ -25,22 +25,23 @@
 
             <CheckBox
                 android:id="@+id/view_my_check"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:checked="false"
+                android:button="@drawable/checkbox_custom"
                 android:layout_marginStart="6dp"
                 android:layout_marginLeft="6dp" />
 
             <ToggleButton
                 android:id="@+id/view_my_star"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
                 android:layout_gravity="center"
                 android:textOn=""
                 android:textOff=""
                 android:stateListAnimator="@null"
-                android:background="@drawable/star_invisible"
+                android:background="@drawable/favorite_custom"
                 android:layout_marginStart="6dp"
                 android:layout_marginLeft="6dp" />
 
@@ -90,11 +91,29 @@
                     android:layout_marginRight="6dp" />-->
             </LinearLayout>
             <Button
-                android:id="@+id/my_word_btn_options"
+                android:id="@+id/word_options"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:gravity="center"
                 android:background="@drawable/ic_baseline_more_vert_12" />
+            <ToggleButton
+                android:id="@+id/word_show_and_hide"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:textOn=""
+                android:textOff=""
+                android:stateListAnimator="@null"
+                android:visibility="gone"
+                android:background="@drawable/ic_baseline_visibility_off_24"
+                />
+            <!--<Button
+                android:id="@+id/word_show_and_hide"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:background="@drawable/ic_baseline_visibility_off_24" />-->
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>
