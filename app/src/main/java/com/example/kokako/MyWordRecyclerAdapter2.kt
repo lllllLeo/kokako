@@ -49,7 +49,7 @@ class MyWordRecyclerAdapter2: RecyclerView.Adapter<RecyclerView.ViewHolder>{
             }
         }
 //        예제에선 null
-        return MyWordViewHolder2(LayoutInflater.from(parent.context).inflate(R.layout.rv_my_word_list, parent, false))
+        return MyWordViewHolder2(LayoutInflater.from(parent.context).inflate(R.layout.rv_wordbook_list, parent, false))
     }
 
 //    하나하나 생성될 떄 마다 호출이되니까 포지션을 안다

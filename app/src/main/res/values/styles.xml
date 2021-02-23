@@ -12,7 +12,7 @@
         <item name="colorControlNormal">@color/colorControlNormal</item>
     </style>
 
-    <style name="ButtonStyle" parent="Widget.AppCompat.Button.Colored">
+    <style name="ButtonTheme" parent="Widget.AppCompat.Button.Colored">
         <item name="colorButtonNormal">@color/colorWhite</item>
     </style>
 
@@ -23,7 +23,13 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
-    <style name="DialogStyle" parent="Theme.Design.Light.BottomSheetDialog">
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item> <!--Android 10 / 상태바를 회색이 덮음 -> 이게 끝까지 덮네-->
         <item name="android:windowSoftInputMode">adjustResize</item>
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+<!--        <item name="android:background">@drawable/bsd_radius_8dp</item>-->
+    </style>
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/bsd_radius_16dp</item>
     </style>
 </resources>

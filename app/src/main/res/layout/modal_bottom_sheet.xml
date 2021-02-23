@@ -4,13 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:orientation="horizontal">
+        android:layout_height="35dp"
+        android:orientation="horizontal"
+        android:layout_marginHorizontal="2dp"
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -19,20 +20,20 @@
             android:layout_marginStart="14dp"
             android:layout_marginTop="8dp"
             android:text="단어 수정"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginLeft="14dp" />
 
         <ImageView
             android:id="@+id/bsd_delete_btn"
-            android:layout_width="50dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:scaleType="center"
             android:src="@drawable/ic_baseline_delete_24"
             app:tint="@color/colorDarkBackground" />
         <ImageView
             android:id="@+id/bsd_cancel_btn"
-            android:layout_width="50dp"
+            android:layout_width="40dp"
             android:layout_height="match_parent"
             android:scaleType="center"
             android:src="@drawable/ic_baseline_clear_24"
@@ -40,9 +41,9 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/toolbar_division"
+        android:id="@+id/bsd_division"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="@color/colorDivision"
         android:orientation="horizontal" />
 
@@ -50,7 +51,8 @@
         android:id="@+id/bsd_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="2dp"
+        android:layout_marginHorizontal="4dp"
+        android:background="@color/colorWhite"
         android:gravity="center"
         android:weightSum="1">
 
@@ -66,6 +68,7 @@
             android:privateImeOptions="defaultInputmode=english"
             android:imeOptions="actionNext"
             android:nextFocusDown="@id/bsd_input_mean"
+            android:backgroundTint="@color/colorPrimary"
             android:singleLine="true">
             <requestFocus/>
         </EditText>
@@ -80,15 +83,17 @@
             android:inputType="text"
             android:nextFocusDown="@id/bsd_input_word"
             android:singleLine="true"
+            android:backgroundTint="@color/colorPrimary"
             android:privateImeOptions="defaultInputmode=korean"
             android:imeOptions="actionNext"
             />
-
     </LinearLayout>
+
     <LinearLayout
         android:id="@+id/bsd_btn_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/colorWhite"
         android:gravity="bottom"
         android:weightSum="1">
 
@@ -98,34 +103,47 @@
             android:layout_height="wrap_content"
             android:stateListAnimator="@null"
             android:text="지우기"
-            android:theme="@style/ButtonStyle" />
+            android:theme="@style/ButtonTheme"/>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@color/colorDivision"/>
 
         <ImageButton
             android:id="@+id/bsd_btn_move_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:theme="@style/ButtonStyle"
+            android:theme="@style/ButtonTheme"
             android:stateListAnimator="@null"
             android:imeOptions="actionPrevious"
             android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
-
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@color/colorDivision"/>
         <ImageButton
             android:id="@+id/bsd_btn_move_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:theme="@style/ButtonStyle"
+            android:theme="@style/ButtonTheme"
             android:stateListAnimator="@null"
             android:imeOptions="actionNext"
             android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
-
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@color/colorDivision"/>
         <Button
             android:id="@+id/bsd_btn_update_word"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:text="수정"
-            android:theme="@style/ButtonStyle"
+            android:theme="@style/ButtonTheme"
             android:stateListAnimator="@null"/>
     </LinearLayout>
 </LinearLayout>

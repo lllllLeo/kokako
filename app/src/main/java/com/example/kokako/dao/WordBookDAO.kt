@@ -10,12 +10,16 @@ import com.example.kokako.model.WordBook
     var title : String?,
     var count : Int,
     var addTime : Long
+    var order : Int
 * */
 @Dao
 interface WordBookDAO {
 
-    @Insert
-    fun insert(wordBook: WordBook):Long
+//    @Insert
+//    fun insert(wordBook: WordBook):Long
+
+    @Query("INSERT INTO tb_word_book (title, count, itemOrder)VALUES (:title, :count, :itemOrder)")
+    fun insert(title: String?, count: Int, itemOrder: Int):Long
 
     @Update
     fun update(wordBook: Array<out WordBook?>)
@@ -26,12 +30,15 @@ interface WordBookDAO {
     @Query("DELETE FROM tb_word_book WHERE id = :wordBookIdForView")
     fun deleteWordBookById(wordBookIdForView: Long)
 
-    @Query("SELECT * FROM tb_word_book")
-//    @Query("SELECT id, title, (SELECT count(word) FROM tb_word WHERE wordBookId = tb_word_book.id) AS count, addTime FROM tb_word_book")
+    @Query("SELECT * FROM tb_word_book ORDER BY itemOrder ASC")
     fun getAll(): LiveData<List<WordBook>>
 
-//    @Update
-//    fun updateWordBookName(wordBookDatas: Array<out WordBook?>)
+    @Query("SELECT MAX(itemOrder) FROM tb_word_book")
+    fun getMaxOrder(): Int
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateAll(wordBook: ArrayList<WordBook>)
+
     @Query("UPDATE tb_word_book SET count = (SELECT count(word) FROM tb_word WHERE wordBookId = :updateWordBookMain) WHERE id = :updateWordBookMain")
     fun updateWordBookCount(updateWordBookMain: Array<out Long?>)
 

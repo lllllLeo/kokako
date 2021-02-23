@@ -16,69 +16,77 @@
     <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:layout_below="@+id/include_toolbar"
         android:weightSum="1">
 
         <TextView
             android:id="@+id/word_count"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="match_parent"
+            android:gravity="center|left"
+            android:textSize="13sp"
+            android:textColor="@android:color/black"
+            android:layout_marginStart="15dp"
+            android:layout_marginLeft="15dp"
             android:layout_weight="0.6"
             />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.4"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_vertical"
-            android:weightSum="1">
+            android:gravity="center"
+            android:layout_marginEnd="15dp"
+            android:layout_marginRight="15dp"
+            android:weightSum="1"
+            >
 
             <ImageView
                 android:id="@+id/exclamationMark"
                 android:layout_width="15dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:src="@drawable/ic_baseline_priority_high_24" />
 
             <TextView
                 android:id="@+id/duplicateCheck"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:gravity="center_vertical"
                 android:text="중복된 단어 ? 쌍"
+                android:textSize="13sp"
                 android:textColor="#FF1C26" />
 
             <TextView
                 android:id="@+id/duplicateNumber"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:gravity="right"
+                android:gravity="center|right"
+                android:textSize="13sp"
                 android:text="10,13번쩨" />
         </LinearLayout>
     </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/toolbar_division"
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:layout_below="@+id/info"-->
+<!--        android:background="@color/colorDivision"-->
+<!--        android:orientation="horizontal" />-->
+    <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/info"
-        android:background="@color/colorDivision"
-        android:orientation="horizontal" />
-
+        android:layout_height="0.8dp"
+        android:layout_below="@id/info"
+        android:background="@color/colorDivision"/>
     <LinearLayout
         android:id="@+id/input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/toolbar_division"
-
+        android:layout_below="@id/info"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="7dp"
+        android:layout_marginHorizontal="3dp"
         android:gravity="center"
         android:weightSum="1">
 
@@ -98,11 +106,23 @@
             <requestFocus/>
         </EditText>
 
+<!--        <LinearLayout
+            android:id="@+id/add_word_division"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorDivision"
+            android:orientation="horizontal" />-->
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:background="@color/colorDivision"/>
+
         <EditText
             android:id="@+id/input_mean"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/add_word"
             android:layout_weight="0.5"
             android:hint="  뜻"
             android:textSize="15sp"
@@ -117,7 +137,8 @@
             android:layout_width="23dp"
             android:layout_height="23dp"
             android:layout_marginRight="1dp"
-            android:background="@drawable/ic_baseline_cancel_24" />
+            android:background="@drawable/ic_baseline_cancel_24"
+            android:layout_marginEnd="1dp" />
     </LinearLayout>
 
 <!--    <LinearLayout
@@ -128,19 +149,27 @@
         android:background="@color/colorDivision"
         android:orientation="horizontal" />-->
 
+
+
     <FrameLayout
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/input_layout"
         android:layout_above="@id/btn_bottom">
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0.5dp"-->
+<!--            android:layout_below="@+id/info"-->
+<!--            android:background="@color/colorDivision"-->
+<!--            android:orientation="horizontal"-->
+<!--            />-->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list_item"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="5dp"
-            android:layout_marginLeft="3dp"
-            android:layout_marginRight="3dp"
+            android:layout_marginHorizontal="3dp"
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -148,49 +177,49 @@
     </FrameLayout>
 
     <LinearLayout
-    android:id="@+id/btn_bottom"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="bottom"
-    android:layout_alignParentBottom="true"
-    android:weightSum="1">
-
-    <Button
-        android:id="@+id/btn_remove_text"
-        android:layout_width="80dp"
+        android:id="@+id/btn_bottom"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stateListAnimator="@null"
-        android:text="지우기"
-        android:theme="@style/ButtonStyle" />
+        android:gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:weightSum="1">
 
-    <ImageButton
-        android:id="@+id/btn_move_left"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:theme="@style/ButtonStyle"
-        android:stateListAnimator="@null"
-        android:imeOptions="actionPrevious"
+        <Button
+            android:id="@+id/btn_remove_text"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:stateListAnimator="@null"
+            android:text="지우기"
+            android:theme="@style/ButtonTheme" />
 
-        android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
+        <ImageButton
+            android:id="@+id/btn_move_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:theme="@style/ButtonTheme"
+            android:stateListAnimator="@null"
+            android:imeOptions="actionPrevious"
 
-    <ImageButton
-        android:id="@+id/btn_move_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:theme="@style/ButtonStyle"
-        android:stateListAnimator="@null"
-        android:imeOptions="actionNext"
-        android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
+            android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
 
-    <Button
-        android:id="@+id/btn_add_word"
-        android:layout_width="80dp"
-        android:layout_height="wrap_content"
-        android:text="추가"
-        android:theme="@style/ButtonStyle"
-        android:stateListAnimator="@null"/>
+        <ImageButton
+            android:id="@+id/btn_move_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:theme="@style/ButtonTheme"
+            android:stateListAnimator="@null"
+            android:imeOptions="actionNext"
+            android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
+
+        <Button
+            android:id="@+id/btn_add_word"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="추가"
+            android:theme="@style/ButtonTheme"
+            android:stateListAnimator="@null"/>
     </LinearLayout>
 </RelativeLayout>
 

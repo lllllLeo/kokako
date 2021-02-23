@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1"
+        android:gravity="center"
+        >
+<!--        android:background="?attr/selectableItemBackground"-->
+
+        <LinearLayout
+            android:id="@+id/view_word_book_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="1dp"
+            android:gravity="center"
+            android:layout_weight="0.9"
+            android:background="@drawable/item_selector"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/view_check"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_gravity="center"
+                android:checked="false"
+                android:button="@drawable/checkbox_custom"
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp" />
+
+            <ToggleButton
+                android:id="@+id/view_star"
+                android:layout_width="17dp"
+                android:layout_height="17dp"
+                android:layout_gravity="center"
+                android:textOn=""
+                android:textOff=""
+                android:stateListAnimator="@null"
+                android:background="@drawable/favorite_custom"
+                android:layout_marginStart="7dp"
+                android:layout_marginLeft="7dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="13dp"
+                android:layout_marginLeft="13dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+<!--                    android:gravity="center|left"-->
+                    <LinearLayout
+                        android:id="@+id/view_word_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <TextView
+                            android:id="@+id/view_word"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="15sp"
+                            android:text="단어 1"
+                            />
+                    </LinearLayout>
+<!--                        android:textColor="@android:color/black"-->
+                    <LinearLayout
+                        android:id="@+id/view_mean_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                        <TextView
+                            android:id="@+id/view_mean"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textSize="13sp"
+                            android:textColor="@color/colorDarkGray"
+                            android:text="뜻1"
+                            tools:ignore="RtlSymmetry"
+                            />
+                    </LinearLayout>
+                </LinearLayout>
+<!--                <CheckBox
+                    android:id="@+id/view_my_check"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="6dp"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:layout_marginRight="6dp" />-->
+            </LinearLayout>
+            <!--<Button
+                android:id="@+id/word_options"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:background="@drawable/ic_baseline_more_vert_12" />-->
+            <!--<ToggleButton
+                android:id="@+id/view_my_star"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="13dp"
+                android:layout_marginRight="13dp"
+                android:textOn=""
+                android:textOff=""
+                android:stateListAnimator="@null"
+                android:background="@drawable/favorite_custom"
+                />-->
+            <LinearLayout
+                android:id="@+id/view_listen"
+                android:layout_width="33dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="13dp"
+                android:layout_marginRight="13dp"
+                android:gravity="center"
+                android:background="@drawable/button_round">
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:background="@drawable/ic_baseline_volume_up_24"/>
+            </LinearLayout>
+<!--            <ToggleButton-->
+
+            <CheckBox
+                android:id="@+id/visible_check"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center"
+                android:checked="false"
+                android:button="@drawable/visiblity_custom"
+                android:layout_marginEnd="13dp"
+                android:layout_marginRight="13dp" />
+
+            <!--<Button
+                android:id="@+id/word_show_and_hide"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:gravity="center"
+                android:visibility="gone"
+                android:background="@drawable/ic_baseline_visibility_off_24" />-->
+        </LinearLayout>
+    </LinearLayout>
+<!--    <View-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0.5dp"-->
+<!--        android:background="@color/colorDivision"/>-->
+    <LinearLayout
+        android:id="@+id/rv_view_division"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorDivision"
+        android:orientation="horizontal" />
+</FrameLayout>
+
+

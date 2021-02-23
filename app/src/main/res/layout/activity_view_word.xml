@@ -10,12 +10,13 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:gravity="center_vertical"
         android:background="@color/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
         app:contentInsetStart="0dp"
         >
+<!--        android:gravity="center_vertical"-->
         <!--        app:menu="@menu/sub_menu"-->
 
         <LinearLayout
@@ -58,7 +59,6 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="아이"
                 android:textColor="#ffffff"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -70,12 +70,19 @@
                 android:visibility="gone"
                 android:src="@drawable/ic_baseline_delete_24"
                 />
+<!--            <ImageView-->
+<!--                android:id="@+id/view_sort"-->
+<!--                android:layout_width="50dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:scaleType="center"-->
+<!--                android:src="@drawable/ic_baseline_sort_24"-->
+<!--                />-->
             <ImageView
                 android:id="@+id/view_add_or_edit_btn"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:scaleType="center"
-                android:src="@drawable/ic_baseline_post_add_24"
+                android:src="@drawable/ic_baseline_edit_24"
                 />
         </LinearLayout>
 
@@ -83,30 +90,44 @@
     <LinearLayout
         android:id="@+id/spinner"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:layout_height="wrap_content"
         android:weightSum="1"
         android:gravity="center"
-        android:layout_marginHorizontal="2dp"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        >
 <!--        android:overlapAnchor="false"   -->
+        <LinearLayout
+            android:id="@+id/view_listen"
+            android:layout_width="33dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:gravity="center"
+            android:background="@drawable/button_round">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:background="@drawable/ic_baseline_volume_up_24"/>
+        </LinearLayout>
         <TextView
             android:id="@+id/current_count"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp"
-            android:textSize="17sp"
+            android:textSize="13sp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:textColor="@android:color/black"
             />
         <TextView
             android:id="@+id/ckbox_count_tv"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="17sp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginStart="5dp"
+            android:textSize="13sp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:textColor="@android:color/black"
             />
         <View
             android:layout_width="0dp"
@@ -115,24 +136,36 @@
         <!-- TODO 글자 화살표 사이 간격 안줄어듦-->
         <Spinner
             android:id="@+id/sort_spinner"
-            android:dropDownWidth="90dp"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="30dp"
             android:layout_weight="0.15"
+            android:dropDownWidth="90dp"
+            android:gravity="center"
             />
         <Spinner
             android:id="@+id/hide_spinner"
-            android:dropDownWidth="90dp"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="30dp"
             android:layout_weight="0.15"
-            tools:ignore="RtlHardcoded" />
-<!--        정렬, 가리기 -->
+            android:dropDownWidth="90dp"
+            android:gravity="center"
+            />
     </LinearLayout>
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="0.5dp"-->
+<!--        android:background="@color/colorDivision"-->
+<!--        android:orientation="horizontal" />-->
     <FrameLayout
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.8dp"
+            android:background="@color/colorDivision"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list_word_view"
             android:layout_width="match_parent"
@@ -145,7 +178,7 @@
             app:fastScrollHorizontalTrackDrawable="@drawable/line_drawable"
             app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
             app:fastScrollVerticalTrackDrawable="@drawable/line_drawable"
-            tools:listitem="@layout/rv_view_list_item"/>
+            tools:listitem="@layout/rv_word_list"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

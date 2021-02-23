@@ -1,11 +1,13 @@
 package com.example.kokako
 
+import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.util.TypedValue
 import android.view.*
@@ -13,22 +15,31 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityViewWordBinding
+import com.example.kokako.model.CheckBoxData
+import com.example.kokako.model.VisibleCheckBoxData
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
+import com.google.android.material.snackbar.Snackbar
+import com.opencsv.CSVWriter
 import kotlinx.android.synthetic.main.activity_view_word.*
 import kotlinx.android.synthetic.main.activity_view_word.view.*
-import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.DividerItemDecoration
-import com.example.kokako.model.CheckBoxData
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.modal_bottom_sheet.view.*
-import kotlinx.android.synthetic.main.rv_view_list_item.view.*
+import kotlinx.android.synthetic.main.rv_word_list.view.*
+import java.io.File
+import java.io.FileWriter
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.collections.ArrayList
+
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-02-04  단어장 삭제를 만들어말아
@@ -37,6 +48,7 @@ import kotlin.collections.ArrayList
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, BottomSheetDialog.BottomSheetInterface {
     //    private lateinit var            toolbarBinding: ActivityToolbarBinding
     private var                     toolbar: Toolbar? = null
+
     private var                     _binding: ActivityViewWordBinding? = null
     private val                     binding get() = _binding!!
     private lateinit var            viewRecyclerAdapter: ViewWordRecyclerAdapter
@@ -49,13 +61,20 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     private var                     isDelete : Boolean = false
     private var                     wordList : ArrayList<Word>? = null
     private var                     sortId : Int = 0
-
+    private var                     isWordShowed = false
+    private var                     itemVisivled : String? = null
+    private var                     folderName = "1111단어장" // 어플이름 폴더이름
     /*private var                     currentShowSnackBarTime : Long = 0
     private var                     mLastClickTime : Long = 0L*/
     companion object {
 //        const val                     MIN_CLICK_INTERVAL = 600
-        val                     TAG = "TAG ViewWordActivity"
-        var                     checkboxList = ArrayList<CheckBoxData>()
+        val                         TAG = "TAG ViewWordActivity"
+        var                         checkboxList = ArrayList<CheckBoxData>()
+        var                         visibleCheckboxList = ArrayList<VisibleCheckBoxData>()
+        const val                   EDIT_WORD_CODE = 100
+        const val                   GET_WORD_VIEW_CODE = 101
+        const val                   COMPLETE_CODE = 10
+        const val                   CANCEL_CODE = 11
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,8 +91,15 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         /*---- Tool Bar ----*/
         setSupportActionBar(toolbar!!.toolbar)
 
+        toolbar!!.toolbar_title.gravity = Gravity.LEFT
         toolbar!!.toolbar_title.text = wordBookNameForView
+        toolbar
 
+        ViewCompat.setOnApplyWindowInsetsListener(view) { view, insets ->
+            insets.replaceSystemWindowInsets(0, 0, 0, insets.systemWindowInsetBottom).apply {
+                ViewCompat.onApplyWindowInsets(view, this)
+            }
+        }
 
         supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
         supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
@@ -101,7 +127,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 //            (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(viewRecyclerAdapter.itemCount,0)
 //            scrollToPosition(viewRecyclerAdapter.itemCount-1)  안되네 ㅅㅂ
-            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
+//            addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
             setHasFixedSize(true)
             adapter = viewRecyclerAdapter
         }
@@ -123,7 +149,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                     val intent = Intent(this, AddWordActivity::class.java)
                     intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForView)
                     intent.putExtra("checkActivity", true)
-                    startActivityForResult(intent, 100)
+                    startActivityForResult(intent, EDIT_WORD_CODE)
                 }
                 R.id.view_delete_btn -> {
                     deleteCheckedWordDialog(checkboxList)
@@ -137,41 +163,70 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         view_delete_btn.setOnClickListener(btnListener)
 
 
+        sort_spinner.adapter = ArrayAdapter(this, R.layout.sort_spinner, sortItems)
+        sort_spinner.dropDownVerticalOffset = dipToPixels(30f).toInt()
+        sort_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                println(sortItems[position])
+                getSortWhen(position)
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                println(sortItems[0])
+            }
+        }
+        hide_spinner.adapter = ArrayAdapter(this, R.layout.hide_spinner, hideItems)
+        hide_spinner.dropDownVerticalOffset = dipToPixels(30f).toInt()
+        hide_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                println(hideItems[position])
+                when (position) {
+                    0 -> {
+                        viewRecyclerAdapter.showAndHide(0)
+                    } // 전체보기
+                    1 -> {
+                        viewRecyclerAdapter.showAndHide(1)
+                    } // 단어 가리기
+                    2 -> {
+                        viewRecyclerAdapter.showAndHide(2)
+                    } // 뜻 가리기
+                    3 -> {
+                        viewRecyclerAdapter.showAndHide(3)
+                    } // 랜덤
+                }
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+                println(hideItems[0])
+            }
+        }
 
 
-
-
-        val sortArrayAdapter = object : ArrayAdapter<String>(this, R.layout.sort_spinner) {
+/*        val sortArrayAdapter = object : ArrayAdapter<String>(this, R.layout.sort_spinner) {
             @SuppressLint("CutPasteId")
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val v = super.getView(position, convertView, parent)
                 if (position == count) {
-                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).text = getItem(count)
+                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).text = ""
+                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).hint = getItem(count)
+//                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).height = ViewGroup.LayoutParams.MATCH_PARENT
+                    (v.findViewById<View>(R.id.sort_item_spinner) as TextView).gravity = Gravity.CENTER
                 }
                 return v
             }
-
             override fun getCount(): Int {
                 return super.getCount() - 1
             }
         }
         sortArrayAdapter.addAll(sortItems.toMutableList())
         sortArrayAdapter.add("정렬")
-        // TODO 정렬 :생성일순 처럼 처음 default는 정렬 만나오게하고 밑에 클릭하면 정렬 : ~~하게 나오면 좋겠다
-
         sort_spinner.adapter = sortArrayAdapter
         sort_spinner.setSelection(sortArrayAdapter.count)
-        sort_spinner.dropDownVerticalOffset = dipToPixels(35f).toInt()
+        sort_spinner.dropDownVerticalOffset = dipToPixels(30f).toInt()
         sort_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long,
-            ) {
+            override fun onItemSelected(parent: AdapterView<*>?,view: View?,position: Int,id: Long) {
+                val v = sortArrayAdapter.getView(position, view, parent!!)
+                (v.findViewById<View>(R.id.sort_item_spinner) as TextView).gravity = Gravity.CENTER
                 getSortWhen(position)
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
@@ -182,6 +237,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 if (position == count) {
                     (v.findViewById<View>(R.id.hide_item_spinner) as TextView).text = ""
                     (v.findViewById<View>(R.id.hide_item_spinner) as TextView).hint = getItem(count)
+//                    (v.findViewById<View>(R.id.hide_item_spinner) as TextView).height = ViewGroup.LayoutParams.MATCH_PARENT
+                    (v.findViewById<View>(R.id.hide_item_spinner) as TextView).gravity = Gravity.CENTER
                 }
                 return v
             }
@@ -193,9 +250,11 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         hideArrayAdapter.add("보기/가리기")
         hide_spinner.adapter = hideArrayAdapter
         hide_spinner.setSelection(hideArrayAdapter.count)
-        hide_spinner.dropDownVerticalOffset = dipToPixels(35f).toInt()
+        hide_spinner.dropDownVerticalOffset = dipToPixels(30f).toInt()
         hide_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?,view: View?,position: Int,id: Long,) {
+                val v = hideArrayAdapter.getView(position, view, parent!!)
+                (v.findViewById<View>(R.id.hide_item_spinner) as TextView).gravity = Gravity.CENTER
                 when (position) {
                     0 -> { viewRecyclerAdapter.showAndHide(0) } // 전체보기
                     1 -> { viewRecyclerAdapter.showAndHide(1) } // 단어 가리기
@@ -205,13 +264,101 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+        }*/
 
-    // TODO: 2021-01-23  putExtra(wordBookIdForView) -> 순서 정하는 Activity
+            // TODO: 2021-01-23  putExtra(wordBookIdForView) -> 순서 정하는 Activity
 //        fab_add_note.setOnClickListener { view -> }
+
+    }
+
+//  폴더생성
+    private fun getSaveFolder(): File? {
+        val dir = File(Environment.getExternalStorageDirectory()
+            .absolutePath + "/" + folderName)
+        if (!dir.exists()) {
+            Log.d(TAG, "getSaveFolder: 폴더 만듬")
+            dir.mkdirs()
+        }
+        Log.d(TAG, "getSaveFolder: dir ${dir.toString()}")
+        return dir
+    }
+    private fun getExternalPath(folderName: String): String? {
+        var sdPath = ""
+        val ext = Environment.getExternalStorageState()
+        sdPath = if (ext == Environment.MEDIA_MOUNTED) {
+            Environment.getExternalStorageDirectory().absolutePath + "/" + folderName
+        } else {
+            "$filesDir/$folderName"
+        }
+        return sdPath
+    }
+    @SuppressLint("SimpleDateFormat")
+    private fun writeCsvFile(filePath: String) {
+        val time = System.currentTimeMillis()
+        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
+        val date = Date(time)
+        val strTime = simpleDateFormat.format(date)
+
+        val folderPath = getExternalPath(folderName)
+        val wordListForCSV = wordModel?.getWordFromWordBookForAddAndEdit(wordBookIdForView)
+        Log.d(TAG, "writeCsvFile: $wordListForCSV")
+        val csv = ArrayList<Array<String>>()
+        for (i in 0 until wordListForCSV!!.size) {
+            val item : Array<String> = arrayOf<String>(wordListForCSV[i].word.toString(), wordListForCSV[i].mean.toString(), wordListForCSV[i].option.toString())
+            csv.add(item)
+        }
+        Log.d(TAG, "writeCsvFile: $folderPath/내보내기_${strTime}_$filePath")
+        val writer = CSVWriter(FileWriter("$folderPath/내보내기_${strTime}_$filePath"))
+        writer.writeAll(csv)
+        writer.close()
+        Log.d(TAG, "writeCsvFile: 완료")
+        Toast.makeText(this, "내보내기 완료", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+//            val path = "/storage/emulated/0"
+//            val file = File("$path/number.txt")
+//            val pln = file.readText()
+//            plnText.text = pln
+            getSaveFolder()
+            writeCsvFile("$wordBookNameForView.csv")
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 101)
+            Toast.makeText(this, "파일 접근 권한이 없습니다. 권한을 허용해주세요 ", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
+
+
+
+
+
+
+
+
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val menuInflater : MenuInflater = menuInflater
+        menuInflater.inflate(R.menu.view_sub_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_sort -> {
+
+            }
+            R.id.menu_export -> {
+                setupPermissions()
+
+            }
+        }
+        return true
+    }
 
     @SuppressLint("SetTextI18n")
     private fun updateWordList(word: List<Word>, sortId: Int, wordList: ArrayList<Word>) {
@@ -222,7 +369,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         if (sortId == 0) {
             Log.d(TAG, "updateWordList: if문")
             viewRecyclerAdapter.submitList(word as ArrayList<Word>)
-            binding.currentCount.text = "단어 개수 : " + word.size.toString()
+            binding.currentCount.text = "입력한 단어  " + word.size.toString()
             if(word.isNotEmpty()) {
                 binding.emptyText.visibility = View.GONE
                 binding.emptyIcon.visibility = View.GONE
@@ -233,11 +380,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         } else {
             Log.d(TAG, "updateWordList: else문") // 리사이클러뷰만 살아잇는거임(이전데이터) 실제데이터는 사라짐
             viewRecyclerAdapter.submitList(wordList)
-            binding.currentCount.text = "단어 개수 : " + wordList.size.toString()
+            binding.currentCount.text = "입력한 단어  " + wordList.size.toString()
             if(wordList.isNotEmpty()) {
                 binding.emptyText.visibility = View.GONE
                 binding.emptyIcon.visibility = View.GONE
             } else {
+                if(sortId == 1) { binding.emptyText.text = "북마크한 단어가 없습니다" }
                 binding.emptyText.visibility = View.VISIBLE
                 binding.emptyIcon.visibility = View.VISIBLE
             }
@@ -246,19 +394,20 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     // FIXME: 2021-02-08 체크박스 클릭시 색상변경
     @SuppressLint("SetTextI18n")
     override fun onCheckboxClicked(v: View, adapterPosition: Int) {
-        if(v.view_my_check.isChecked) {
+        if(v.view_check.isChecked) {
             checkboxList[adapterPosition].checked = true
             checkboxCount += 1
         } else {
             checkboxList[adapterPosition].checked = false
             checkboxCount -= 1
         }
+        v.view_word_book_list.isSelected = checkboxList[adapterPosition].checked
         binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
     }
     override fun onViewClicked(v: View, adapterPosition: Int) {
-        if(v.view_my_check.visibility==View.VISIBLE) {
-            v.view_my_check.isChecked = !v.view_my_check.isChecked
-            if (v.view_my_check.isChecked) {
+        if(v.view_check.visibility==View.VISIBLE) {
+            v.view_check.isChecked = !v.view_check.isChecked
+            if (v.view_check.isChecked) {
                 checkboxList[adapterPosition].checked = true
                 /*v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
                 Log.d(TAG, "onViewClicked: adapterPosition 는 $adapterPosition")*/
@@ -268,6 +417,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
 //                v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
                 checkboxCount -= 1
             }
+            v.view_word_book_list.isSelected = checkboxList[adapterPosition].checked
             binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
         } else {
             val wordForBottomSheet = viewRecyclerAdapter.getItem()[adapterPosition]
@@ -293,7 +443,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                             // TODO: 2021-02-07 deleteAll(ArrayList<Word>) 만들기
                             wordModel?.delete(viewRecyclerAdapter.getItem()[i])
                             checkboxList.drop(i)
-                        j = 1
+                            j = 1
                         }
                         i += 1
                     }
@@ -314,14 +464,55 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         mBuilder.show()
     }
     override fun onWordLongClicked(v: View, adapterPosition: Int) {
-        if (v.view_my_check.visibility != View.VISIBLE) {
+        if (v.view_check.visibility != View.VISIBLE) {
             isDeleteMode(1, adapterPosition)
 //            v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
         }
     }
+
+    override fun onVisibilityCheckboxClicked(v: View,_visibilityOptions: Int,wordLayout: LinearLayout,meanLayout: LinearLayout,adapterPosition: Int) {
+        Log.d(TAG, "onVisibilityCheckboxClicked: ${v.visible_check.isChecked}")
+        if(v.visible_check.isChecked) {
+            visibleCheckboxList[adapterPosition].checked = true
+            Log.d(TAG, "onVisibilityCheckboxClicked: if")
+        } else {
+            visibleCheckboxList[adapterPosition].checked = false
+            Log.d(TAG, "onVisibilityCheckboxClicked: else")
+        }
+        if (_visibilityOptions == 1) {
+            wordLayout.isSelected = visibleCheckboxList[adapterPosition].checked
+        } else if (_visibilityOptions == 2){
+            meanLayout.isSelected = visibleCheckboxList[adapterPosition].checked
+        }
+
+    /* if (!isWordShowed) {
+            if ((v.findViewById<View>(R.id.view_word) as TextView).visibility == View.INVISIBLE) {
+                (v.findViewById<View>(R.id.view_word) as TextView).visibility = View.VISIBLE
+                v.findViewById<ImageView>(R.id.word_show_and_hide).setBackgroundResource(R.drawable.ic_baseline_visibility_24)
+                itemVisivled = "word"
+            } else if ((v.findViewById<View>(R.id.view_mean) as TextView).visibility == View.INVISIBLE) {
+                (v.findViewById<View>(R.id.view_mean) as TextView).visibility = View.VISIBLE
+                v.findViewById<ImageView>(R.id.word_show_and_hide).setBackgroundResource(R.drawable.ic_baseline_visibility_24)
+                itemVisivled = "mean"
+            }
+            isWordShowed = true
+        } else {
+            if (itemVisivled.equals("word")) {
+                v.view_word.visibility = View.INVISIBLE
+                v.findViewById<ImageView>(R.id.word_show_and_hide).setBackgroundResource(R.drawable.ic_baseline_visibility_off_24)
+            } else {
+                v.view_mean.visibility = View.INVISIBLE
+                v.findViewById<ImageView>(R.id.word_show_and_hide).setBackgroundResource(R.drawable.ic_baseline_visibility_off_24)
+            }
+            isWordShowed = false
+        }*/
+    }
+
+
+
     @SuppressLint("SetTextI18n")
     private fun isDeleteMode(num: Int, adapterPosition: Int) {
-        viewRecyclerAdapter.updateCheckbox(num, adapterPosition)
+        viewRecyclerAdapter.updateCheckbox(num, adapterPosition) // 처음 LongClick하면 들어옴
         if (num == 1) {
             isDelete = true
             viewRecyclerAdapter.showAndHide(0)
@@ -331,6 +522,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             binding.viewCancelBtn.visibility = View.VISIBLE
             binding.ckboxCountTv.visibility = View.VISIBLE
             binding.ckboxCountTv.text = "${checkboxCount.toString()} 개 선택됨"
+//            toolbar!!.toolbar_title.text = "${checkboxCount.toString()} 개 선택됨"
 
 //            binding.fabTestWord.visibility = View.INVISIBLE
             binding.hideSpinner.visibility = View.INVISIBLE
@@ -344,6 +536,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             binding.viewDeleteBtn.visibility = View.GONE
             binding.viewCancelBtn.visibility = View.GONE
             binding.ckboxCountTv.visibility = View.GONE
+//            toolbar!!.toolbar_title.text = wordBookNameForView
 
 //            binding.fabTestWord.visibility = View.VISIBLE
             binding.hideSpinner.visibility = View.VISIBLE
@@ -362,7 +555,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     private fun goBackToPreviousActivity() {
         val intent = Intent()
         intent.putExtra("wordBookIdForView", wordBookIdForView)
-        setResult(101, intent)
+        setResult(GET_WORD_VIEW_CODE, intent)
         finish()
     }
     private fun dipToPixels(dipValue: Float): Float {
@@ -375,18 +568,22 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Log.d("     TAG", "===== ViewWordActivity - onActivityResult called")
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
-                100 -> {
-                    val wordBookIdForAddOrEdit = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
-                    val word = data.getParcelableArrayListExtra<Word>("word")
-                    wordModel?.deleteWordById(wordBookIdForAddOrEdit)
-                    wordModel?.insertAllDatas(word)
-                    wordBookModel?.updateWordBookCount(wordBookIdForAddOrEdit)
-                    getSortWhen(sortId)
+                EDIT_WORD_CODE -> {
+                    when (resultCode) {
+                        COMPLETE_CODE -> {
+                            val wordBookIdForAddOrEdit = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
+                            val word = data.getParcelableArrayListExtra<Word>("word")
+                            wordModel?.deleteWordById(wordBookIdForAddOrEdit)
+                            wordModel?.insertAllDatas(word)
+                            wordBookModel?.updateWordBookCount(wordBookIdForAddOrEdit)
+                            getSortWhen(sortId)
+                        }
+                        CANCEL_CODE -> {
+                        }
+                    }
                 }
             }
-        }
     }
     override fun onFavoriteButtonClicked(v: View, adapterPosition: Int) {
        /* val elapsedTime = currentShowSnackBarTime - mLastClickTime
@@ -402,16 +599,31 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 word.bookMarkCheck = 0
             }
             updateFavorite(word)
-//        }
     }
     private fun updateFavorite(word: Word) {
         wordModel?.updateFavoriteChecked(word)
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     override fun onPopupMenuWordClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int) {
         Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
         val currentValue = viewRecyclerAdapter.getItem()[adapterPosition]
-        popup.inflate(R.menu.view_word_menu)
+        popup.inflate(R.menu.main_item_menu)
         popup.setOnMenuItemClickListener(
             PopupMenu.OnMenuItemClickListener {
                 when (it.itemId) {
@@ -460,8 +672,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                                 if (wordDialogEditText.text!!.trim()
                                         .isEmpty() || meanDialogEditText.text!!.trim().isEmpty()
                                 ) {
-                                    Toast.makeText(this, "단어, 뜻을 정확히 입력해주세요", Toast.LENGTH_SHORT)
-                                        .show()
+                                    Toast.makeText(this, "단어, 뜻을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
 //                        TODO 특문제외
                                 } else {
                                     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
@@ -495,34 +706,33 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             })
         popup.show()
     }
-    override fun onUpdateButtonClicked(view: View, word: Word) {
-        if (view.bsd_input_word.text!!.trim().isEmpty() || view.bsd_input_mean.text!!.trim().isEmpty()) {
-            Toast.makeText(this, "단어, 뜻을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
+    override fun onUpdateButtonClicked(view: View, word: Word, isUpdated: Boolean) : Boolean {
 //                        TODO 특문제외
+        var _isUpdated = isUpdated
+        if (view.bsd_input_word.text!!.trim().isNotEmpty() && view.bsd_input_mean.text!!.trim().isNotEmpty()) {
+            if (!(word.word!!).equals(view.bsd_input_word.text!!) && !(word.mean!!).equals(view.bsd_input_mean.text!!)) {
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                word.word = view.bsd_input_word.text.toString()
+                word.mean = view.bsd_input_mean.text.toString()
+                wordModel?.update(word)
+                _isUpdated = true
+            }
         } else {
-            imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-            word.word = view.bsd_input_word.text.toString()
-            word.mean = view.bsd_input_mean.text.toString()
-            Log.d("     TAG", "===== ViewWordActivity - 편집하기 - else문 $word")
-            Log.d(TAG, "onUpdateButtonClicked: $sortId")
-            Log.d(TAG, "onUpdateButtonClicked: $wordList")
-            wordModel?.update(word)
+            Toast.makeText(this, "단어, 뜻을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
+            _isUpdated = false
         }
-
+        return _isUpdated
     }
     override fun onDeleteButtonClicked(word: Word, position: Int) {
 /*        val mDeletedPosition = position
         val mDeletedWord = viewRecyclerAdapter.getItem()[position]
         viewRecyclerAdapter.getItem().removeAt(position)
         viewRecyclerAdapter.notifyItemRemoved(position)
-        binding.currentCount.text = "단어 개수 : " + (viewRecyclerAdapter.itemCount).toString()
+        binding.currentCount.text = "입력한 단어  " + (viewRecyclerAdapter.itemCount).toString()
         showActionSnackBar(word, mDeletedWord, mDeletedPosition)*/
 
         wordModel?.delete(word)
         getSortWhen(sortId)
-        Log.d(TAG, "onDeleteButtonClicked: $sortId")
-        Log.d(TAG, "onDeleteButtonClicked: $wordList")
-//        updateWordList(wordList!!, sortId, wordList!!)
         showActionSnackBar(word)
     }
 //    private fun showActionSnackBar(word: Word, mDeletedWord: Word, mDeletedPosition: Int) {
@@ -535,7 +745,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         actionSnackbar.setAction("취소") {
 /*            viewRecyclerAdapter.getItem().add(mDeletedPosition, mDeletedWord)
             viewRecyclerAdapter.notifyItemInserted(mDeletedPosition)
-            binding.currentCount.text = "단어 개수 : " + (viewRecyclerAdapter.itemCount).toString()*/
+            binding.currentCount.text = "입력한 단어  " + (viewRecyclerAdapter.itemCount).toString()*/
             wordModel?.insert(word)
             getSortWhen(sortId)
         }
@@ -548,43 +758,51 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         })*/
         actionSnackbar.show()
     }
-
-    private fun getSortWhen(sortId : Int) {
+    private fun getSortWhen(sortId: Int) {
         when (sortId) {
-            0 -> { getRecentOrder() } // 최신순
-            1 -> { getWordFavorite() } // 별표순
-            2 -> { getWordAscendingOrder() } // 단어순 ▲
-            3 -> { getWordDescendingOrder() } // 단어순 ▼
-            4 -> { getMeanAscendingOrder() } // 뜻 ▲
-            5 -> { getMeanDescendingOrder() } // 뜻 ▼
-            6 -> { } // 랜덤
+            0 -> {
+                getRecentOrder()
+            } // 최신순
+            1 -> {
+                getWordFavoriteOrder()
+            } // 별표순
+            2 -> {
+                getWordAscendingOrder()
+            } // 단어순 ▲
+            3 -> {
+                getWordDescendingOrder()
+            } // 단어순 ▼
+            4 -> {
+                getMeanAscendingOrder()
+            } // 뜻 ▲
+            5 -> {
+                getMeanDescendingOrder()
+            } // 뜻 ▼
+            6 -> {
+                getRandomOrder()
+            } // 랜덤
         }
     }
-
     private fun getRecentOrder() {
         sortId = 0
         wordList = wordModel?.getWordFromWordBookForAddAndEdit(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
-
-    private fun getWordFavorite() {
+    private fun getWordFavoriteOrder() {
         sortId = 1
-        wordList = wordModel?.getWordFavorite(wordBookIdForView)
+        wordList = wordModel?.getWordFavoriteOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
-
     private fun getWordAscendingOrder() {
         sortId = 2
         wordList = wordModel?.getWordAscendingOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
-
     private fun getWordDescendingOrder() {
         sortId = 3
         wordList = wordModel?.getWordDescendingOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
-
     private fun getMeanAscendingOrder() {
         sortId = 4
         wordList = wordModel?.getMeanAscendingOrder(wordBookIdForView)
@@ -593,6 +811,11 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     private fun getMeanDescendingOrder() {
         sortId = 5
         wordList = wordModel?.getMeanDescendingOrder(wordBookIdForView)
+        updateWordList(wordList!!, sortId, wordList!!)
+    }
+    private fun getRandomOrder() {
+        sortId = 6
+        wordList = wordModel?.getRandomOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
 }

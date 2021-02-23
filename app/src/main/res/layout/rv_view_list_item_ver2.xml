@@ -18,22 +18,23 @@
             android:layout_marginBottom="5dp"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/view_my_star2"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+            <CheckBox
+                android:id="@+id/view_check"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
-                android:layout_marginLeft="8dp"
-                android:background="@drawable/btn_star"
-                android:layout_marginStart="8dp" />
+                android:checked="false"
+                android:button="@drawable/checkbox_custom"
+                android:layout_marginStart="6dp"
+                android:layout_marginLeft="6dp" />
+
             <TextView
-                android:id="@+id/view_my_word"
+                android:id="@+id/view_word"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:text="단어 1"
                 android:layout_marginLeft="5dp"
-                android:textSize="19sp"
                 android:textStyle="bold"
                 android:layout_marginStart="5dp" />
 
@@ -43,16 +44,26 @@
                 android:layout_weight="1"/>
 
             <TextView
-                android:id="@+id/view_my_mean"
+                android:id="@+id/view_mean"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:textSize="19sp"
                 android:paddingRight="20dp"
                 android:text="뜻1"
                 android:paddingEnd="20dp"
                 tools:ignore="RtlSymmetry" />
 
+            <ToggleButton
+                android:id="@+id/view_star"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:textOn=""
+                android:textOff=""
+                android:stateListAnimator="@null"
+                android:background="@drawable/aaaafavorite_custom2"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp" />
 
         </LinearLayout>
 

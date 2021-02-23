@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.DialogFragment
 import com.example.kokako.model.Word
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.modal_bottom_sheet.*
@@ -16,13 +14,15 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
     lateinit var  bottomSheetInterface: BottomSheetInterface
     private var word : Word = wordForBottomSheet
     private var position : Int = adapterPosition
+    private var isUpdated : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogStyle)
+        setStyle(STYLE_NORMAL, R.style.BottomSheetDialogTheme)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+//        dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return inflater.inflate(R.layout.modal_bottom_sheet, container, false)
     }
 
@@ -38,11 +38,15 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
             }
         }
         view.bsd_btn_move_left.setOnClickListener{ view.bsd_input_word.requestFocus() }
-        view.bsd_btn_move_right.setOnClickListener{ view.bsd_input_mean.requestFocus() }
+        view.bsd_btn_move_right.setOnClickListener{
+            view.bsd_input_mean.requestFocus()
+            view.bsd_input_word.setSelection(word.mean!!.length)
+        }
 
         view.bsd_input_word.setText(word.word)
         view.bsd_input_word.setSelection(word.word!!.length)
         view.bsd_input_mean.setText(word.mean)
+
     }
 
     override fun onAttach(context: Context) {
@@ -55,8 +59,9 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         bsd_btn_update_word.setOnClickListener {
-            bottomSheetInterface.onUpdateButtonClicked(view!!, word)
-            dismiss()
+            isUpdated = bottomSheetInterface.onUpdateButtonClicked(view!!, word, isUpdated)
+            if(isUpdated)
+                dismiss()
         }
         bsd_delete_btn.setOnClickListener{
             bottomSheetInterface.onDeleteButtonClicked(word, position)
@@ -66,7 +71,7 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
 
 
     interface BottomSheetInterface{
-        fun onUpdateButtonClicked(view: View, wordList: Word)
+        fun onUpdateButtonClicked(view: View, wordList: Word, isUpdated: Boolean) : Boolean
         fun onDeleteButtonClicked(wordList: Word, position: Int)
     }
 }

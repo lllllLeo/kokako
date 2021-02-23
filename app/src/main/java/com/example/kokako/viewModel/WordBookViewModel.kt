@@ -17,6 +17,9 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     private var wordBookDao: WordBookDAO
     var recentInsertedWordBookId : Long = 0
 
+    companion object {
+        const val TAG = "TAG WordBookViewModel"
+    }
     init {
         val db: WordDatabase =
             Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
@@ -36,14 +39,39 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     fun deleteWordBookById(wordBookIdForView: Long) {
         DeleteWordBookByIdAsyncTask().execute(wordBookIdForView)
     }
+    fun getMaxOrder() : Int{
+        return GetMaxOrderAsyncTask().execute().get()
+    }
 
 //    타이틀 업뎃
     fun update(wordBook: WordBook) {
         UpdateWordBookAsyncTask().execute(wordBook)
     }
 
+    fun updateAll(wordbook : ArrayList<WordBook>) {
+        Log.d(TAG, "updateAll: called")
+        Log.d(TAG, "updateAll: wordbook $wordbook")
+        UpdateAllAsyncTask().execute(wordbook)
+    }
+
     fun updateWordBookCount(updateWordBookMain: Long) {
         UpdateWordBookCountAsyncTask().execute(updateWordBookMain)
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetMaxOrderAsyncTask() : AsyncTask<Void, Void, Int>() {
+        override fun doInBackground(vararg params: Void?): Int {
+            return wordBookDao.getMaxOrder()
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class UpdateAllAsyncTask() : AsyncTask<ArrayList<WordBook>, Void, Void>() {
+        override fun doInBackground(vararg wordbook: ArrayList<WordBook>): Void? {
+            Log.d("     TAG", "===== WordBookViewModel UpdateWordBookCountAsyncTask : ${wordbook[0]}")
+            wordBookDao.updateAll(wordbook[0])
+            return null
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -54,7 +82,6 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
             return null
         }
     }
-
 //    타이틀
     @SuppressLint("StaticFieldLeak")
     private inner class UpdateWordBookAsyncTask(): AsyncTask<WordBook, Void, Void>() {
@@ -65,8 +92,9 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     }
     @SuppressLint("StaticFieldLeak")
     private inner class InsertWordBookAsyncTask() : AsyncTask<WordBook, Long, Long>() {
-        override fun doInBackground(vararg wordBook: WordBook?): Long? {
-            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!)
+        override fun doInBackground(vararg wordBook: WordBook?): Long {
+//            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!)
+            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!.title, wordBook[0]!!.count, wordBook[0]!!.itemOrder)
             return recentInsertedWordBookId
         }
     }
@@ -78,7 +106,6 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
             return null
         }
     }
-
     @SuppressLint("StaticFieldLeak")
     private inner class DeleteWordBookByIdAsyncTask(): AsyncTask<Long, Void, Void>() {
         override fun doInBackground(vararg wordBookIdForView: Long?): Void? {

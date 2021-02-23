@@ -24,7 +24,7 @@
             android:orientation="horizontal">
 
             <CheckBox
-                android:id="@+id/view_my_check"
+                android:id="@+id/view_check"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -33,14 +33,14 @@
                 android:layout_marginLeft="6dp" />
 
             <ToggleButton
-                android:id="@+id/view_my_star"
+                android:id="@+id/view_star"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:layout_gravity="center"
                 android:textOn=""
                 android:textOff=""
                 android:stateListAnimator="@null"
-                android:background="@drawable/star_invisible"
+                android:background="@drawable/favorite_custom"
                 android:layout_marginStart="6dp"
                 android:layout_marginLeft="6dp" />
 
@@ -59,7 +59,7 @@
                     android:layout_weight="1"
                     android:weightSum="1">
                 <TextView
-                    android:id="@+id/view_my_word"
+                    android:id="@+id/view_word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
@@ -71,7 +71,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/view_my_mean"
+                    android:id="@+id/view_mean"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.5"

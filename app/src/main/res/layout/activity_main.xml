@@ -17,7 +17,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:headerLayout="@layout/header"
-        app:menu="@menu/main_menu" />
+        app:menu="@menu/main_navi_menu" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -45,7 +45,7 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_word_book"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     />
                 <!--        tools:listitem="@layout/rv_my_word_list"-->
@@ -66,7 +66,7 @@
                 android:textStyle="bold"
                 app:iconTint="@color/colorWhite"
                 app:iconPadding="0dp"
-                app:icon="@drawable/ic_baseline_add_white_24"
+                app:icon="@drawable/ic_baseline_add_24"
                 />
         </RelativeLayout>
 

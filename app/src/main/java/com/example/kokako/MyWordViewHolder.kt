@@ -3,9 +3,9 @@ package com.example.kokako
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordBook
-import kotlinx.android.synthetic.main.rv_my_word_list.view.*
+import kotlinx.android.synthetic.main.rv_wordbook_list.view.*
 
-class MyWordViewHolder(itemView: View, myWordListRecyclerViewInterface: MyWordListRecyclerViewInterface): RecyclerView.ViewHolder(itemView), View.OnLongClickListener, View.OnClickListener {
+class MyWordViewHolder(itemView: View, myWordListRecyclerViewInterface: MyWordListRecyclerViewInterface): RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
     private val myWordMainTitle = itemView.my_word_main_title
     private val myWordMainCount = itemView.my_word_main_count
@@ -15,7 +15,7 @@ class MyWordViewHolder(itemView: View, myWordListRecyclerViewInterface: MyWordLi
     private var myWordListRecyclerViewInterface : MyWordListRecyclerViewInterface? = null
 
     init {
-        myWordBookList.setOnLongClickListener(this)
+//        myWordBookList.setOnLongClickListener(this)
         myWordBookList.setOnClickListener(this)
         myWordBtnViewOption.setOnClickListener(this)
         this.myWordListRecyclerViewInterface = myWordListRecyclerViewInterface
@@ -25,10 +25,10 @@ class MyWordViewHolder(itemView: View, myWordListRecyclerViewInterface: MyWordLi
         myWordMainCount.text = wordBook.count.toString()
     }
 
-    override fun onLongClick(v: View?): Boolean {
+/*    override fun onLongClick(v: View?): Boolean {
         this.myWordListRecyclerViewInterface?.onRemoveClicked(v!!, adapterPosition)
         return true
-    }
+    }*/
 
     override fun onClick(v: View?) {
         when (v!!.id) {

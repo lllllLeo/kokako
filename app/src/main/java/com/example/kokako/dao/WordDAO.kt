@@ -46,8 +46,11 @@ interface WordDAO {
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ")
     fun getWordFromWordBookAddAndEdit(wordBookIdForView: Array<out Long?>): List<Word>
 
+//    @Query("SELECT word, mean, option FROM tb_word WHERE wordBookId = :wordBookIdForView ")
+//    fun getWordForCSV(wordBookIdForView: Array<out Long?>): List<Word>
+
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView AND bookMarkCheck = 1")
-    fun getWordFavorite(wordBookIdForView: Array<out Long?>): List<Word>
+    fun getWordFavoriteOrder(wordBookIdForView: Array<out Long?>): List<Word>
 
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY word ASC")
     fun getWordAscendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
@@ -61,6 +64,8 @@ interface WordDAO {
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY mean DESC")
     fun getMeanDescendingOrder(wordBookIdForView: Array<out Long?>): List<Word>
 
+    @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ORDER BY RANDOM() LIMIT (SELECT count(word) FROM tb_word)")
+    fun getRandomOrder(wordBookIdForView: Array<out Long?>): List<Word>
 }
 
 /*

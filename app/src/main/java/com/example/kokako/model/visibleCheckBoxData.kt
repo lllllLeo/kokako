@@ -1,6 +1,6 @@
 package com.example.kokako.model
 
-class CheckBoxData (
+class VisibleCheckBoxData (
     var id: Long,
     var checked: Boolean
 )
