@@ -2,7 +2,6 @@ package com.example.kokako
 
 import android.util.Log
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.ViewWordActivity.Companion.checkboxList
 import com.example.kokako.ViewWordActivity.Companion.visibleCheckboxList
@@ -15,12 +14,10 @@ import kotlin.collections.ArrayList
 class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWordRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
     private var starButton = itemView.view_star
     private var wordTextView = itemView.view_word
-    private var wordLayout = itemView.view_word_layout
     private var meanTextView = itemView.view_mean
-    private var meanLayout = itemView.view_mean_layout
     private var wordCheckBox = itemView.view_check
     private var wordMeanLayout = itemView.view_word_book_list
-//    private var wordOptionsButton = itemView.word_options
+    private var listenButton = itemView.view_listen
     private var visibleCheckBox = itemView.visible_check
     private var after_visibilityOptions = 0
     private var current_visibilityOptions = 0
@@ -31,11 +28,11 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     }
     init {
         starButton.setOnClickListener(this)
-//        wordOptionsButton.setOnClickListener(this)
         visibleCheckBox.setOnClickListener(this)
         wordMeanLayout.setOnLongClickListener(this)
         wordMeanLayout.setOnClickListener(this)
         wordCheckBox.setOnClickListener(this)
+        listenButton.setOnClickListener(this)
         this.viewWordRecyclerViewInterface = viewWordRecyclerViewInterface
     }
 
@@ -58,13 +55,22 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         wordMeanLayout.isSelected = checkboxList[position].checked
 
         visibleCheckBox.isChecked = visibleCheckboxList[position].checked
-        Log.d(TAG, "bind:                  0 ${visibleCheckBox.isChecked} = ${visibleCheckboxList[position].checked}")
         if (_visibilityOptions == 1) {
-            wordLayout.isSelected = visibleCheckboxList[position].checked
-            Log.d(TAG, "bind: _visibilityOptions 1 ${wordLayout.isSelected} = ${visibleCheckboxList[position].checked}")
+            if (visibleCheckboxList[position].checked) {
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.VISIBLE
+            } else {
+                wordTextView.visibility = View.INVISIBLE
+                meanTextView.visibility = View.VISIBLE
+            }
         } else if (_visibilityOptions == 2){
-            Log.d(TAG, "bind: _visibilityOptions 2 ${meanLayout.isSelected} = ${visibleCheckboxList[position].checked}")
-            meanLayout.isSelected = visibleCheckboxList[position].checked
+            if (visibleCheckboxList[position].checked) {
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.VISIBLE
+            } else {
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.INVISIBLE
+            }
         }
     }
 
@@ -73,11 +79,11 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         if (deleteMode == 1) {
             wordCheckBox.visibility = View.VISIBLE
             starButton.visibility = View.GONE
-    //            this.wordOptionsButton.visibility = View.GONE
+            listenButton.visibility = View.GONE
         } else {
             wordCheckBox.visibility = View.GONE
             starButton.visibility = View.VISIBLE
-    //            this.wordOptionsButton.visibility = View.VISIBLE
+            listenButton.visibility = View.VISIBLE
 
             // FIXME: 2021-02-21 이거 빼기
             if (wordDatas[position].bookMarkCheck == 1) {
@@ -90,7 +96,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     private fun setCheckedByLongClicked(position: Int,currentLongClickPosition: Int?,wordDatas: ArrayList<Word>,) {
         if (position == currentLongClickPosition) {
             checkboxList[currentLongClickPosition] = CheckBoxData(wordDatas[position].id, true)
-
     //            itemView.view_word_book_list.setBackgroundColor(ContextCompat.getColor(itemView.context,R.color.colorSelectItem))
         }
     }
@@ -104,50 +109,41 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         when (showAndHideNumber) {
             0 -> {
                 visibleCheckBox.visibility = View.GONE
-//                wordTextView.visibility = View.VISIBLE
-//                meanTextView.visibility = View.VISIBLE
-                val sdk: Int = android.os.Build.VERSION.SDK_INT;
-                if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    wordLayout.setBackgroundDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.item_selector))
-                    meanLayout.setBackgroundDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.item_selector))
-                } else {
-                    wordLayout.background = ContextCompat.getDrawable(itemView.context, R.drawable.item_selector)
-                    meanLayout.background = ContextCompat.getDrawable(itemView.context, R.drawable.item_selector)
-                }
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.VISIBLE
             }
             1 -> {
-//                isVisibilityUnCheckedMode(0)
                 visibleCheckBox.visibility = View.VISIBLE
-//                wordTextView.visibility = View.INVISIBLE
-//                meanTextView.visibility = View.VISIBLE
-                val sdk: Int = android.os.Build.VERSION.SDK_INT;
-                if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    meanLayout.setBackgroundDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.item_selector))
-                    wordLayout.setBackgroundDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.word_selector))
+                wordTextView.visibility = View.INVISIBLE
+                meanTextView.visibility = View.VISIBLE
+
+                if (visibleCheckboxList[position].checked) {
+                    wordTextView.visibility = View.VISIBLE
+                    meanTextView.visibility = View.VISIBLE
                 } else {
-                    meanLayout.background = ContextCompat.getDrawable(itemView.context, R.drawable.item_selector)
-                    wordLayout.background = ContextCompat.getDrawable(itemView.context, R.drawable.word_selector)
+                    wordTextView.visibility = View.INVISIBLE
+                    meanTextView.visibility = View.VISIBLE
                 }
-                wordLayout.isSelected = visibleCheckboxList[position].checked
-//                current_visibilityOptions = 1
             }
             2 -> {
                 visibleCheckBox.visibility = View.VISIBLE
-//                wordTextView.visibility = View.VISIBLE
-//                meanTextView.visibility = View.INVISIBLE
-                val sdk: Int = android.os.Build.VERSION.SDK_INT;
-                if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
-                    wordLayout.setBackgroundDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.item_selector))
-                    meanLayout.setBackgroundDrawable(ContextCompat.getDrawable(itemView.context,R.drawable.mean_selector))
+                wordTextView.visibility = View.VISIBLE
+                meanTextView.visibility = View.INVISIBLE
+
+                if (visibleCheckboxList[position].checked) {
+                    wordTextView.visibility = View.VISIBLE
+                    meanTextView.visibility = View.VISIBLE
                 } else {
-                    wordLayout.background = ContextCompat.getDrawable(itemView.context, R.drawable.item_selector)
-                    meanLayout.background = ContextCompat.getDrawable(itemView.context, R.drawable.mean_selector)
+                    wordTextView.visibility = View.VISIBLE
+                    meanTextView.visibility = View.INVISIBLE
                 }
-                meanLayout.isSelected = visibleCheckboxList[position].checked
+
+//                meanLayout.isSelected = visibleCheckboxList[position].checked
 //                current_visibilityOptions = 2
             }
+            // FIXME: 2021-02-24 랜덤하기
             3 -> {
-//                visibleCheckBox.visibility = View.VISIBLE
+                visibleCheckBox.visibility = View.VISIBLE
                 val random = (1..10).shuffled().first()
                 Log.d(TAG, "bind: random 은 $random")
                 if (random % 2 == 0) {
@@ -169,9 +165,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                 if (checkboxList[i].checked) {
                     checkboxList[i].checked = false
                     wordMeanLayout.isSelected = checkboxList[i].checked // view selected false로 만들어서 색깔을 화이트로
-                    Log.d(TAG, "isUnCheckedMode: i : $i")
-                    Log.d(TAG, "isUnCheckedMode: wordLayout.isSelected ${wordLayout.isSelected}")
-                    Log.d(TAG, "isUnCheckedMode: checkboxList[i].checked ${checkboxList[i].checked}")
 //                    itemView.view_word_book_list.setBackgroundColor(ContextCompat.getColor(itemView.context,R.color.colorWhite))
                 }
             }
@@ -182,8 +175,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
             for (i in 0 until visibleCheckboxList.size) {
                 if (visibleCheckboxList[i].checked) {
                     visibleCheckboxList[i].checked = false
-                    wordLayout.isSelected = visibleCheckboxList[i].checked
-                    meanLayout.isSelected = visibleCheckboxList[i].checked
                 }
             }
         }
@@ -193,10 +184,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
 
     override fun onClick(v: View?) {
         when(v!!.id) {
-            /*R.id.word_show_and_hide -> {
-                this.viewWordRecyclerViewInterface?.onPopupMenuWordClicked(v,
-                    this.wordOptionsButton, adapterPosition)
-            }*/
             R.id.visible_check -> {
 //                if (visibleCheckList[adapterPosition].checked) {
 //                    Log.d(TAG, "onClick: if문")
@@ -205,7 +192,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
 //                    Log.d(TAG, "onClick: else문")
 //                    wordTextView.visibility = View.INVISIBLE
 //                }
-                this.viewWordRecyclerViewInterface?.onVisibilityCheckboxClicked(v, _visibilityOptions, wordLayout, meanLayout, adapterPosition)
+                this.viewWordRecyclerViewInterface?.onVisibilityCheckboxClicked(v, _visibilityOptions, wordTextView, meanTextView, adapterPosition)
             }
             R.id.view_star -> {
                 this.viewWordRecyclerViewInterface?.onFavoriteButtonClicked(v, adapterPosition)

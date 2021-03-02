@@ -46,7 +46,6 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
         view.bsd_input_word.setText(word.word)
         view.bsd_input_word.setSelection(word.word!!.length)
         view.bsd_input_mean.setText(word.mean)
-
     }
 
     override fun onAttach(context: Context) {

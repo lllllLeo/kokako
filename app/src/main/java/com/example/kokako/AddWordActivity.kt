@@ -1,5 +1,6 @@
 package com.example.kokako
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
@@ -93,11 +94,11 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             }}).get(WordViewModel::class.java)
 
         addRecyclerAdapter = AddRecyclerAdapter(this)
-        word            = model?.getWordFromWordBookForAddAndEdit(wordBookIdForAddOrEdit)!!
+        word            = model?.getRecentOrder(wordBookIdForAddOrEdit)!!
         addRecyclerAdapter.submitDataList(word)
 
         rv_list_item.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
             // TODO: 2021-01-31 위에 reverseLayout이랑 밑에꺼 같이하더라 일단 추가
             (layoutManager as LinearLayoutManager).stackFromEnd = true
             if (checkActivity){
@@ -196,13 +197,14 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         btn_add_word.setOnClickListener(btnListener)
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getCurrentCount(AddOrRemove : String) {
         when (AddOrRemove) {
             "init" -> { currentCount = addRecyclerAdapter.itemCount }
             "add" -> { currentCount += 1 }
             "remove" -> { currentCount -= 1 }
         }
-        binding.wordCount.text = "입력한 단어 " + currentCount
+        binding.wordCount.text = currentCount.toString() + "개"
     }
     /*
 * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다

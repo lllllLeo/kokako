@@ -56,9 +56,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : ${wordList.value}")
         return wordList
     }
-    fun getWordFromWordBookForAddAndEdit(wordBookIdForView: Long): ArrayList<Word> {
+    fun getRecentOrder(wordBookIdForView: Long): ArrayList<Word> {
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordBookIdForView 값은 : $wordBookIdForView")
-        wordArrayList = GetWordFromWordBookForAddAndEditAsyncTask().execute(wordBookIdForView).get()
+        wordArrayList = GetWordRecentOrderAsyncTask().execute(wordBookIdForView).get()
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordArrayList 값은 : $wordArrayList")
         return wordArrayList as ArrayList<Word>
     }
@@ -158,9 +158,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     }
 
     @SuppressLint("StaticFieldLeak")
-    private inner class GetWordFromWordBookForAddAndEditAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+    private inner class GetWordRecentOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
         override fun doInBackground(vararg wordBookIdForView: Long?): List<Word> {
-            return wordDao.getWordFromWordBookAddAndEdit(wordBookIdForView)
+            return wordDao.getWordRecentOrder(wordBookIdForView)
         }
     }
 

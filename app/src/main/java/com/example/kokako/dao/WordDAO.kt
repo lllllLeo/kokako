@@ -44,7 +44,7 @@ interface WordDAO {
 
 
     @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView ")
-    fun getWordFromWordBookAddAndEdit(wordBookIdForView: Array<out Long?>): List<Word>
+    fun getWordRecentOrder(wordBookIdForView: Array<out Long?>): List<Word>
 
 //    @Query("SELECT word, mean, option FROM tb_word WHERE wordBookId = :wordBookIdForView ")
 //    fun getWordForCSV(wordBookIdForView: Array<out Long?>): List<Word>

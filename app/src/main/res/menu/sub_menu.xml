@@ -4,10 +4,10 @@
     <!--<item
         android:id="@+id/menu_import"
         android:title="단어장 가져오기"
-        />
+        /> -->
     <item
         android:id="@+id/menu_sort"
-        android:title="정렬"/>-->
+        android:title="정렬"/>
 
     <item
         android:id="@+id/menu_excel"

@@ -42,6 +42,7 @@ class ViewWordRecyclerAdapter(viewWordRecyclerViewInterface: ViewWordRecyclerVie
         currentLongClickPosition = adapterPosition
     }
 
+    // TODO: 2021-02-24 여기랑  activity showandhide 모여잇는데서 비포 현재 해서 하면될듯
     fun showAndHide(i: Int) {
         this.visibilityOptions = i
         notifyDataSetChanged()

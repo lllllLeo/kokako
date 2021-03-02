@@ -2,30 +2,36 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.kokako">
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:requestLegacyExternalStorage="true"
         android:label="@string/app_name"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".TestActivity"></activity>
         <activity android:name=".ToolbarActivity" />
         <activity android:name=".ImportActivity" />
-        <activity android:name=".ViewWordActivity"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-        <activity android:name=".AddWordActivity"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".ViewWordActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name=".AddWordActivity"
+            android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name=".MainActivity"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
