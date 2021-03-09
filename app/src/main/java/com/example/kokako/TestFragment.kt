@@ -1,57 +1,55 @@
 package com.example.kokako
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Application
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.kokako.databinding.ActivityTestBinding
+import com.example.kokako.databinding.FragmentTestBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
-import kotlinx.android.synthetic.main.activity_test.*
+import kotlinx.android.synthetic.main.fragment_test.*
 import java.lang.NullPointerException
 
-class TestActivity : AppCompatActivity() {
-//    private lateinit var toolbarBinding: ActivityToolbarBinding
-    private var _binding : ActivityTestBinding? = null
-    private val binding get() = _binding!!
+class TestFragment : Fragment() {
+    private var                     _binding : FragmentTestBinding? = null
+    private val                     binding get() = _binding!!
     private var                     model : WordViewModel? = null
-    private var wordBookIdForTest : Long = 0
+    private var                     wordBookIdForTest : Long = 0
     private var                     wordList : ArrayList<Word>? = null
-    private var currentCount = 1
-    private var index = 0
-    private var testScope : String? = null
-    private var testCategory : String? = null
-    private var testSort : String? = null
+    private var                     currentCount = 1
+    private var                     index = 0
+    private var                     testScope : String? = null
+    private var                     testCategory : String? = null
+    private var                     testSort : String? = null
     companion object {
-        val TAG = "TAG TestActivity"
+        const val TAG = "TAG TestFragment"
     }
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        _binding = ActivityTestBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-//        toolbarBinding = binding.includeToolbar
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
+    ): View {
+        _binding = FragmentTestBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val bundle : Bundle? = arguments
+
+        wordBookIdForTest = bundle!!.getLong("wordBookIdForTest", 0)
+        testScope = bundle!!.getString("testScope")
+        testCategory = bundle!!.getString("testCategory")
+        testSort = bundle!! .getString("testSort")
 
 
-        wordBookIdForTest = intent.getLongExtra("wordBookIdForTest", 0)
-        testScope = intent.getStringExtra("scope")
-        testCategory = intent.getStringExtra("category")
-        testSort = intent.getStringExtra("sort")
 
-
-        val testFragment = TestFragment()
-        val bundle = Bundle()
-        bundle.putLong("wordBookIdForTest", wordBookIdForTest)
-        bundle.putString("testScope", testScope)
-        bundle.putString("testCategory", testCategory)
-        bundle.putString("testSort", testSort)
-        testFragment.arguments = bundle
-        val ft = supportFragmentManager.beginTransaction()
-        ft.replace(R.id.test_frameLayout, testFragment).commit()
-
-/*        Log.d(TAG, "onCreate: $testScope / $testCategory / $testSort / $wordBookIdForTest")
+        Log.d(TAG, "onCreate: $testScope / $testCategory / $testSort / $wordBookIdForTest")
 
         testScope = when {
             testScope!!.contains("모") -> { "2" }
@@ -66,7 +64,6 @@ class TestActivity : AppCompatActivity() {
 
         Log.d(TAG, "onCreate22: $testScope / $testCategory / $testSort / $wordBookIdForTest")
 
-        */
         /**
          * 문제 범위 : 모든 단어            (값x)
          *            북마크한 단어        (WHERE bookMarkCheck = 1)
@@ -82,30 +79,30 @@ class TestActivity : AppCompatActivity() {
          *
          * 북마크o 버전
          *  @Query("SELECT * FROM tb_word WHERE wordBookId = :wordBookIdForView AND bookmarkCheck = :scope ORDER BY word | id | random")
-         *//*
+         */
 // FIXME: 2021-03-08 뒤로가기 버튼 삽입하기
-        *//*---- Tool Bar ----*//*
-   *//*     setSupportActionBar(toolbarBinding.toolbar)
-        supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
-        supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
-        toolbarBinding.toolbarTitle.gravity = Gravity.LEFT
-        toolbarBinding.toolbarTitle.text = "testest"*//*
+        /*---- Tool Bar ----*/
+        /*     setSupportActionBar(toolbarBinding.toolbar)
+             supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
+             supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
+             supportActionBar?.setDisplayHomeAsUpEnabled(true)
+             supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
+             toolbarBinding.toolbarTitle.gravity = Gravity.LEFT
+             toolbarBinding.toolbarTitle.text = "testest"*/
 
         model = ViewModelProvider(this, object : ViewModelProvider.Factory{
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return WordViewModel(application, wordBookIdForTest) as T
+                return WordViewModel(activity!!.application, wordBookIdForTest) as T
             }}).get(WordViewModel::class.java)
 
-        if(testScope!! == "2") { // 모든 단어
-            wordList = when {
+        wordList = if(testScope!! == "2") { // 모든 단어
+            when {
                 testSort!! == "id" -> { model?.getTestAllWord(wordBookIdForTest) }
                 testSort!! == "word" -> { model?.getTestAllWordWordAscOrder(wordBookIdForTest) }
                 else -> { model?.getTestAllWordRandomOrder(wordBookIdForTest) }
             }
         } else {    // 북마크 안/한 단어
-            wordList = when {
+            when {
                 testSort!! == "id" -> { model?.getTestBookmarkAllWordRecentOrder(wordBookIdForTest, testScope!!) }
                 testSort!! == "word" -> { model?.getTestBookmarkAllWordWordAscOrder(wordBookIdForTest, testScope!!) }
                 else -> { model?.getTestBookmarkAllWordRandomOrder(wordBookIdForTest, testScope!!) }
@@ -118,6 +115,7 @@ class TestActivity : AppCompatActivity() {
 
         setTestCount(currentCount, allCount)
         setTestCategory(index)
+        btn_previous.isEnabled = false
 
         if(wordList!![index].bookMarkCheck == 0){
             binding.btnFavorite.setImageResource(R.drawable.favorite_normal_background)
@@ -134,10 +132,13 @@ class TestActivity : AppCompatActivity() {
 
 
         val btnListener = View.OnClickListener { view ->
+            val ft = (activity as TestActivity).supportFragmentManager.beginTransaction()
             try {
                 when (view.id) {
                     R.id.btn_previous -> {
+                        Log.d(TAG, "onViewCreated: 이외 들어옴")
                         currentCount -= 1
+                        btn_previous.isEnabled = currentCount != 1
                         index -= 1
                         setTestCount(currentCount, allCount)
                         setTestCategory(index)
@@ -147,25 +148,30 @@ class TestActivity : AppCompatActivity() {
                     R.id.btn_false -> {
                         currentCount += 1
                         index += 1
+                        btn_previous.isEnabled = true
                         if (index == allCount.toInt()) {
+                            ft.replace(R.id.test_frameLayout, TestResultFragment()).commit()
                             // TODO: 2021-02-27 결과화면 프래그먼트, 라이브데이터 업뎃
+                        } else {
+                            setTestCount(currentCount, allCount)
+                            setTestCategory(index)
+                            setBookmarked(index)
+                            setAnswerInvisible()
                         }
-                        setTestCount(currentCount, allCount)
-                        setTestCategory(index)
-                        setBookmarked(index)
-                        setAnswerInvisible()
                     }
                     R.id.btn_true -> {
                         currentCount += 1
                         index += 1
+                        btn_previous.isEnabled = true
                         if (index == allCount.toInt()) {
+                            ft.replace(R.id.test_frameLayout, TestResultFragment()).commit()
                             // TODO: 2021-02-27 결과화면 프래그먼트, 라이브데이터 업뎃
-
+                        } else {
+                            setTestCount(currentCount, allCount)
+                            setTestCategory(index)
+                            setBookmarked(index)
+                            setAnswerInvisible()
                         }
-                        setTestCount(currentCount, allCount)
-                        setTestCategory(index)
-                        setBookmarked(index)
-                        setAnswerInvisible()
                     }
                     R.id.btn_favorite -> {
                         if (wordList!![index].bookMarkCheck == 0) {
@@ -195,11 +201,6 @@ class TestActivity : AppCompatActivity() {
         answer_layout.setOnClickListener(btnListener)
     }
 
-
-
-
-
-
     private fun setTestCount(currentCount: Int, allCount: String) {
         binding.countTest.text = "${currentCount}/$allCount"
     }
@@ -224,6 +225,6 @@ class TestActivity : AppCompatActivity() {
             binding.questionTest.text = wordList!![index].mean.toString()
             binding.answerTest.text = wordList!![index].word.toString()
         }
-    }*/
     }
 }
+

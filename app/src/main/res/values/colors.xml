@@ -5,12 +5,13 @@
     <color name="colorPrimaryLight">#62a3ff</color>
     <color name="colorSelectItem">#D0E4FF</color>
     <color name="colorAccent">#1675d1</color>
-<!--    <color name="colorPrimary">#FAA21A</color>-->
-<!--    <color name="colorPrimaryDark">#FFAF39</color>-->
-<!--    <color name="colorAccent">#FFAF39</color>-->
+    <!--    <color name="colorPrimary">#FAA21A</color>-->
+    <!--    <color name="colorPrimaryDark">#FFAF39</color>-->
+    <!--    <color name="colorAccent">#FFAF39</color>-->
     <color name="colorControlNormal">#101010</color>
     <color name="colorBlack">#000000</color>
-    <color name="colorGray">#EFEFEF</color>
+    <color name="colorLightGray">#EFEFEF</color>
+    <color name="colorGray">#C8C8C8</color>
     <color name="colorDarkGray">#535353</color>
     <color name="colorDivision">#e0e0e0</color>
     <color name="colorTouch">#e0e0e0</color>
@@ -21,4 +22,8 @@
     <color name="colorDarkBackground">#4A4A4A</color>
     <color name="colorDarkText">#BDBDBD</color>
     <color name="colorFavorite">#FFD600</color>
+    <color name="light_blue_50">#FFE1F5FE</color>
+    <color name="light_blue_200">#FF81D4FA</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
 </resources>

@@ -7,44 +7,44 @@
     >
 
     <LinearLayout
+        android:id="@+id/view_word_book_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="50dp"
         android:weightSum="1"
+        android:background="@drawable/item_selector"
         android:gravity="center"
         >
 <!--        android:background="?attr/selectableItemBackground"-->
 
         <LinearLayout
-            android:id="@+id/view_word_book_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="1dp"
             android:gravity="center"
             android:layout_weight="0.9"
-            android:background="@drawable/item_selector"
             android:orientation="horizontal">
 
             <CheckBox
                 android:id="@+id/view_check"
-                android:layout_width="17dp"
-                android:layout_height="17dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:checked="false"
                 android:button="@drawable/checkbox_custom"
-                android:layout_marginStart="6dp"
-                android:layout_marginLeft="6dp" />
+                android:layout_marginStart="9dp"
+                android:layout_marginLeft="9dp" />
 
             <ToggleButton
                 android:id="@+id/view_star"
-                android:layout_width="17dp"
-                android:layout_height="17dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_gravity="center"
                 android:textOn=""
                 android:textOff=""
                 android:stateListAnimator="@null"
                 android:background="@drawable/favorite_custom"
-                android:layout_marginStart="7dp"
-                android:layout_marginLeft="7dp" />
+                android:layout_marginStart="9dp"
+                android:layout_marginLeft="9dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

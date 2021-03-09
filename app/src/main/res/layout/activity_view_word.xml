@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbar_view"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorPrimary"
@@ -94,7 +94,7 @@
         android:weightSum="1"
         android:gravity="center"
         android:orientation="horizontal"
-        android:background="@color/colorGray"
+        android:background="@color/colorLightGray"
         >
 <!--        android:overlapAnchor="false"   -->
         <LinearLayout
@@ -161,8 +161,7 @@
             android:spinnerMode="dialog"
             android:layout_marginEnd="20dp"
             android:gravity="center"
-            android:background="@drawable/ic_baseline_sync_alt_24"
-            android:rotation="90"
+            android:background="@drawable/ic_baseline_sort_24"
             android:drawSelectorOnTop="true"
             android:layout_marginRight="20dp" />
         <Spinner
@@ -210,8 +209,7 @@
     <FrameLayout
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
         <View
             android:layout_width="match_parent"
             android:layout_height="0.8dp"
@@ -224,7 +222,6 @@
             android:id="@+id/rv_list_word_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="5dp"
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
             app:fastScrollEnabled="true"

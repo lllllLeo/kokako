@@ -206,10 +206,10 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                     itemView.view_word_book_list.setBackgroundColor(ContextCompat.getColor(itemView.context,
                         R.color.colorWhite))
                 }*/
-                this.viewWordRecyclerViewInterface?.onCheckboxClicked(v, adapterPosition)
+                this.viewWordRecyclerViewInterface?.onCheckboxClicked(v, wordMeanLayout, adapterPosition)
             }
             R.id.view_word_book_list -> {
-                this.viewWordRecyclerViewInterface?.onViewClicked(v, adapterPosition)
+                this.viewWordRecyclerViewInterface?.onViewClicked(v, wordMeanLayout, adapterPosition)
             }
         }
     }

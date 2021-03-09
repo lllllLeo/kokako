@@ -9,7 +9,7 @@ interface ViewWordRecyclerViewInterface {
     fun onFavoriteButtonClicked(v: View, adapterPosition: Int)
 //    fun onPopupMenuWordClicked(v: View, myWordBtnViewOption: Button, adapterPosition: Int)
     fun onWordLongClicked(v: View, adapterPosition: Int)
-    fun onCheckboxClicked(v: View, adapterPosition: Int)
-    fun onViewClicked(v: View, adapterPosition: Int)
+    fun onCheckboxClicked(v: View, wordMeanLayout: LinearLayout, adapterPosition: Int)
+    fun onViewClicked(v: View, wordMeanLayout: LinearLayout, adapterPosition: Int)
     fun onVisibilityCheckboxClicked(v: View, _visibilityOptions : Int, wordTextView : TextView, meanTextView : TextView, adapterPosition: Int)
 }

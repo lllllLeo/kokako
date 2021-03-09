@@ -102,6 +102,108 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         return wordArrayList as ArrayList<Word>
     }
 
+
+
+
+
+
+    fun getTestAllWord(wordBookIdForTest: Long): ArrayList<Word>{
+        wordArrayList = GetTestAllWordAsyncTask().execute(wordBookIdForTest).get()
+        return wordArrayList as ArrayList<Word>
+    }
+    fun getTestAllWordWordAscOrder(wordBookIdForTest: Long): ArrayList<Word> {
+        wordArrayList = GetTestAllWordWordAscOrderAsyncTask().execute(wordBookIdForTest).get()
+        return wordArrayList as ArrayList<Word>
+    }
+
+    fun getTestAllWordRandomOrder(wordBookIdForTest: Long): ArrayList<Word> {
+        wordArrayList = GetTestAllWordRandomOrderAsyncTask().execute(wordBookIdForTest).get()
+        return wordArrayList as ArrayList<Word>
+    }
+
+
+
+    fun getTestBookmarkAllWordRecentOrder(wordBookIdForTest: Long, testScope: String): ArrayList<Word>{
+        val data = ArrayList<String>()
+        data.add(wordBookIdForTest.toString())
+        data.add(testScope)
+        Log.d(TAG, "getTestAllWord: ${data[0]}")
+        Log.d(TAG, "getTestAllWord: ${data[1]}")
+        wordArrayList = GetTestBookmarkAllWordRecentOrderAsyncTask().execute(data).get()
+        return wordArrayList as ArrayList<Word>
+    }
+    fun getTestBookmarkAllWordWordAscOrder(wordBookIdForTest: Long, testScope: String): ArrayList<Word> {
+        val data = ArrayList<String>()
+        data.add(wordBookIdForTest.toString())
+        data.add(testScope)
+        Log.d(TAG, "getTestAllWord: ${data[0]}")
+        Log.d(TAG, "getTestAllWord: ${data[1]}")
+        wordArrayList = GetTestBookmarkAllWordWordAscOrderAsyncTask().execute(data).get()
+        return wordArrayList as ArrayList<Word>
+    }
+    fun getTestBookmarkAllWordRandomOrder(wordBookIdForTest: Long, testScope: String): ArrayList<Word> {
+        val data = ArrayList<String>()
+        data.add(wordBookIdForTest.toString())
+        data.add(testScope)
+        Log.d(TAG, "getTestAllWord: ${data[0]}")
+        Log.d(TAG, "getTestAllWord: ${data[1]}")
+        wordArrayList = GetTestBookmarkAllWordRandomOrderAsyncTask().execute(data).get()
+        return wordArrayList as ArrayList<Word>
+    }
+
+
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetTestAllWordAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForTest: Long?): List<Word> {
+            return wordDao.getTestAllWord(wordBookIdForTest[0]!!)
+        }
+    }
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetTestAllWordWordAscOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForTest: Long?): List<Word> {
+            return wordDao.getTestAllWordWordAscOrder(wordBookIdForTest[0]!!)
+        }
+    }
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetTestAllWordRandomOrderAsyncTask : AsyncTask<Long, Void, List<Word>>(){
+        override fun doInBackground(vararg wordBookIdForTest: Long?): List<Word> {
+            return wordDao.getTestAllWordRandomOrder(wordBookIdForTest[0]!!)
+        }
+    }
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetTestBookmarkAllWordRecentOrderAsyncTask : AsyncTask<ArrayList<String>, Void, List<Word>>(){
+        override fun doInBackground(vararg data: ArrayList<String>?): List<Word> {
+            val wordBookId : Long = data[0]!![0].toLong()
+            val testScope : Long = data[0]!![1].toLong()
+            Log.d(TAG, "doInBackground: $wordBookId / $testScope")
+            return wordDao.getBookmarkAllWordRecentOrder(wordBookId, testScope)
+        }
+    }
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetTestBookmarkAllWordWordAscOrderAsyncTask : AsyncTask<ArrayList<String>, Void, List<Word>>(){
+        override fun doInBackground(vararg data: ArrayList<String>?): List<Word> {
+            val wordBookId : Long = data[0]!![0].toLong()
+            val testScope : Long = data[0]!![1].toLong()
+            Log.d(TAG, "doInBackground: $wordBookId / $testScope")
+            return wordDao.getBookmarkAllWordWordAscOrder(wordBookId, testScope)
+        }
+    }
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetTestBookmarkAllWordRandomOrderAsyncTask : AsyncTask<ArrayList<String>, Void, List<Word>>(){
+        override fun doInBackground(vararg data: ArrayList<String>?): List<Word> {
+            val wordBookId : Long = data[0]!![0].toLong()
+            val testScope : Long = data[0]!![1].toLong()
+            Log.d(TAG, "doInBackground: $wordBookId / $testScope")
+            return wordDao.getBookmarkAllWordRandomOrder(wordBookId, testScope)
+        }
+    }
+
+
+
+
+
+
     @SuppressLint("StaticFieldLeak")
     private inner class UpdateWordMeanAsyncTask : AsyncTask<Word, Void, Void>(){
         override fun doInBackground(vararg word: Word?): Void? {
