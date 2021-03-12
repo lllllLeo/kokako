@@ -2,6 +2,7 @@ package com.example.kokako.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 
 
@@ -32,6 +33,18 @@ interface WordBookDAO {
 
     @Query("SELECT * FROM tb_word_book ORDER BY itemOrder ASC")
     fun getAll(): LiveData<List<WordBook>>
+
+    @Query("SELECT * FROM tb_word_book ORDER BY itemOrder ASC")
+    fun getRecentOrder(): List<WordBook>
+
+
+
+
+
+
+
+
+
 
     @Query("SELECT MAX(itemOrder) FROM tb_word_book")
     fun getMaxOrder(): Int

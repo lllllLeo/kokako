@@ -27,6 +27,7 @@ data class Word(
     var mean: String?,
     var option: String?,
     var bookMarkCheck: Int,
+    var testCheck : Int,
     var wordBookId: Long
 ) : Parcelable
 

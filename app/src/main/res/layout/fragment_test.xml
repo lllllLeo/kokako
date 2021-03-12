@@ -33,6 +33,16 @@
         android:layout_height="0dp"
         android:orientation="vertical"
         android:layout_weight="1">
+        <TextView
+            android:id="@+id/not_matched_test"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="16sp"
+            android:visibility="gone"
+            >
+        </TextView>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -83,7 +93,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorWhite"
-        android:gravity="bottom"
         android:weightSum="1"
         >
 
@@ -108,9 +117,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
             android:text="못외움"
+            android:textColor="@color/colorRed"
             android:background="#00ff0000"
             android:stateListAnimator="@null"
-            android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
+            android:drawableTint="@color/colorRed"
+            />
+            <!--android:paddingRight="23dp"
+            android:paddingLeft="23dp"
+            android:drawableEnd="@drawable/ic_baseline_cancel_24"
+            android:drawableRight="@drawable/ic_baseline_cancel_24"-->
         <View
             android:layout_width="1dp"
             android:layout_height="30dp"
@@ -121,11 +136,15 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:drawableEnd="@drawable/ic_baseline_check_circle_24"
             android:stateListAnimator="@null"
             android:text="외움"
+            android:textColor="@color/colorPrimary"
             android:background="#00ff0000"
-            android:drawableRight="@drawable/ic_baseline_check_circle_24" />
+            />
+            <!--android:paddingRight="30dp"
+            android:paddingLeft="30dp"
+            android:drawableRight="@drawable/ic_baseline_check_circle_24"
+            android:drawableEnd="@drawable/ic_baseline_check_circle_24"-->
         <View
             android:layout_width="1dp"
             android:layout_height="30dp"

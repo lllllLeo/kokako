@@ -13,7 +13,7 @@ import com.example.kokako.model.Word
 
 //  Log.d("     TAG", "===== WordViewModel")
 class WordViewModel(application: Application, wordBookId: Long) : AndroidViewModel(application) {
-    var wordList : LiveData<List<Word>>
+    var wordListLivedata : LiveData<List<Word>>
     var wordArrayList : List<Word>? = null
     var wordListForCSV: List<Array<String>>? = null
     private var wordDao : WordDAO
@@ -23,12 +23,12 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         val db : WordDatabase = Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
         wordDao = db.getWordDAO()
         if (!wordBookId.equals(-1)) {
-            wordList = wordDao.getWordFromWordBook(arrayOf(wordBookId))
+            wordListLivedata = wordDao.getWordFromWordBook(arrayOf(wordBookId))
             Log.d("     TAG", "===== WordViewModel - init - if ### wordBookId : $wordBookId")
         }else{
-            wordList = wordDao.getAll()
-            Log.d("     TAG", "===== WordViewModel - init - else ### wordBookId : $wordList")
-            Log.d("     TAG", "===== WordViewModel - init - else ### wordBookId : ${wordList.value}")
+            wordListLivedata = wordDao.getAll()
+            Log.d("     TAG", "===== WordViewModel - init - else ### wordBookId : $wordListLivedata")
+            Log.d("     TAG", "===== WordViewModel - init - else ### wordBookId : ${wordListLivedata.value}")
         }
     }
     fun insertAllDatas(word : ArrayList<Word>) {
@@ -51,10 +51,10 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
         DeleteAllWordAsyncTask().execute(wordBookIdForView)
     }
     fun getWordFromWordBook333(wordBookIdForView: Long): LiveData<List<Word>> {
-        wordList = GetWordFromWordBook333AsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : $wordList")
-        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : ${wordList.value}")
-        return wordList
+        wordListLivedata = GetWordFromWordBook333AsyncTask().execute(wordBookIdForView).get()
+        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : $wordListLivedata")
+        Log.d("     TAG", "===== WordViewModel - getWordFromWordBook wordList : ${wordListLivedata.value}")
+        return wordListLivedata
     }
     fun getRecentOrder(wordBookIdForView: Long): ArrayList<Word> {
         Log.d("     TAG", "===== WordViewModel - getWordFromWordBook222 wordBookIdForView 값은 : $wordBookIdForView")
@@ -73,32 +73,32 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
 //    }
     fun getWordFavoriteOrder(wordBookIdForView: Long): ArrayList<Word>{
         wordArrayList = GetWordFavoriteOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordListLivedata")
         return wordArrayList as ArrayList<Word>
     }
     fun getWordAscendingOrder(wordBookIdForView: Long): ArrayList<Word>{
         wordArrayList = GetWordAscendingOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordListLivedata")
         return wordArrayList as ArrayList<Word>
     }
     fun getWordDescendingOrder(wordBookIdForView: Long): ArrayList<Word>{
         wordArrayList = GetWordDescendingOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordListLivedata")
         return wordArrayList as ArrayList<Word>
     }
     fun getMeanAscendingOrder(wordBookIdForView: Long): ArrayList<Word>{
         wordArrayList = GetMeanAscendingOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordListLivedata")
         return wordArrayList as ArrayList<Word>
     }
     fun getMeanDescendingOrder(wordBookIdForView: Long): ArrayList<Word>{
         wordArrayList = GetMeanDescendingOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordListLivedata")
         return wordArrayList as ArrayList<Word>
     }
     fun getRandomOrder(wordBookIdForView: Long): ArrayList<Word>{
         wordArrayList = GetRandomOrderAsyncTask().execute(wordBookIdForView).get()
-        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordList")
+        Log.d("     TAG", "===== WordViewModel - getWordAscendingOrder wordList 값은 : $wordListLivedata")
         return wordArrayList as ArrayList<Word>
     }
 

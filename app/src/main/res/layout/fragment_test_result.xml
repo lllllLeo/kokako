@@ -43,14 +43,14 @@
             >
         </TextView>
         <ImageView
+            android:id="@+id/result_emoji"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
-            android:layout_marginTop="15dp"
-            android:src="@drawable/ic_congratulation">
+            android:layout_marginTop="15dp">
         </ImageView>
         <TextView
-            android:id="@+id/all_word_test"
+            android:id="@+id/all_word_count_test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -61,7 +61,7 @@
             >
         </TextView>
         <TextView
-            android:id="@+id/memorized_test"
+            android:id="@+id/memorized_count_test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -72,7 +72,7 @@
             >
         </TextView>
         <TextView
-            android:id="@+id/not_memorized_test"
+            android:id="@+id/not_memorized_count_test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"

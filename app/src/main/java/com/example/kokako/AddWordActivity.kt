@@ -47,7 +47,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     companion object Constant {
         const val INPUT_WORD_ID : Int = 101101101110.toInt() // input_word.id 은 -1978113994 INPUT_WORD_ID 은 -1978113994
         const val INPUT_MEAN_ID : Int = 10000000001000.toInt() // input_mean.id 은 1316135912 INPUT_MEAN_ID 은 1316135912
-        val TAG = "TAG AddWordActivity"
+        const val TAG = "TAG AddWordActivity"
         const val COMPLETE_CODE = 10
         const val CANCEL_CODE = 11
         const val EDIT_WORD_CODE = 100
@@ -178,6 +178,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                                 input_mean.text.toString(),
                                 "",
                                 0,
+                                9999,
                                 wordBookIdForAddOrEdit))
                             input_word.text.clear()
                             input_mean.text.clear()
@@ -231,13 +232,18 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
             android.R.id.home -> { cancelDialog(mBuilder) }
             R.id.menu_check -> {
                 // FIXME: 2021-01-20 아무값 입력없이 추가 예외처리
                 mBuilder.setTitle("단어장으로 추가")
-                    .setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
+                if (word.size == 0) {
+                    mBuilder.setMessage("작성된 단어가 없습니다. 이대로 단어장을 만드시겠습니까?")
+                } else {
+                    mBuilder.setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
+                }
                     .setNegativeButton("취소", null)
                     .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
                         Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()

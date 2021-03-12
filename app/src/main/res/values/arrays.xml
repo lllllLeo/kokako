@@ -2,7 +2,7 @@
 <resources>
     <string-array name="sort_array">
         <item>최신순</item>
-        <item>별표순</item>
+        <item>북마크순</item>
         <item>단어 ▲</item>
         <item>단어 ▼</item>
         <item>뜻 ▲</item>

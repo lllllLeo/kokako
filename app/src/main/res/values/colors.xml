@@ -10,6 +10,7 @@
     <!--    <color name="colorAccent">#FFAF39</color>-->
     <color name="colorControlNormal">#101010</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorRed">#E40E0E</color>
     <color name="colorLightGray">#EFEFEF</color>
     <color name="colorGray">#C8C8C8</color>
     <color name="colorDarkGray">#535353</color>

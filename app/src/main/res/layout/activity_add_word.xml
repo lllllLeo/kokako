@@ -16,7 +16,7 @@
     <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="40dp"
         android:layout_below="@+id/include_toolbar"
         android:background="@color/colorLightGray"
         android:weightSum="1">

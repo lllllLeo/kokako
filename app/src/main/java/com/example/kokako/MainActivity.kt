@@ -44,10 +44,9 @@ import kotlinx.android.synthetic.main.rv_wordbook_list.view.*
 import java.io.*
 
 
-// TODO: 2021-01-23 스크롤하면 툴바 숨기기?
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
-    //    var backPressedTime: Long = 0
+    private var backPressedTime: Long = 0
     private lateinit var toolbarBinding: ActivityToolbarBinding
     private lateinit var binding: ActivityMainBinding
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
@@ -58,12 +57,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var wordBookIdForAdd: Long? = null
     private var excelWordBookId: Long? = null
 
+    private var folderName = "12121212121212123" // 어플이름 폴더이름
+
     companion object {
         const val TAG = "TAG MainActivity"
         const val ADD_WORDBOOK_CODE = 100
         const val COMPLETE_CODE = 10
         const val CANCEL_CODE = 11
-        const val GET_WORD_VIEW_CODE = 101
+        const val GET_WORD_VIEW_CODE = 105
         const val GET_FILE_CODE = 102
     }
 
@@ -80,6 +81,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         supportActionBar?.setDisplayShowCustomEnabled(true)   //커스터마이징 하기 위해 필요
         supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
         toolbarBinding.toolbarTitle.text = "단어장 목록"
+
+        makeFolder()
+
 
         /*---- Navigation Drawer Menu ----*/
         /*
@@ -103,17 +107,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
 
-        /*rv_word_book.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0 || dy < 0 && fab_add_note.isShown) fab_add_note.hide()
-            }
-            // FIXME: 2021-01-23 스크롤을 올리면 뜨게? 그러면
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) fab_add_note.show()
-                super.onScrollStateChanged(recyclerView, newState)
-            }
-        })*/
-
         wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return WordViewModel(application, -1) as T
@@ -121,7 +114,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }).get(WordViewModel::class.java)
         wordBookModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(
             this.application)).get(WordBookViewModel::class.java)
-        wordBookModel?.wordBookList?.observe(this, { updateWordBookList(it)})
+        wordBookModel?.wordBookListLivedata?.observe(this, { updateWordBookList(it)})
 
 
         myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
@@ -226,6 +219,16 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.d(TAG, "===== MainActivity - updateWordBookList called")
         Log.d(TAG, "===== MainActivity - updateWordBookList wordBook : $wordBook")
         myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
+        if (wordBook.isEmpty()) {
+            Log.d(TAG, "updateWordBookList: isEmpty if문")
+            binding.emptyIcon.visibility = View.VISIBLE
+            binding.emptyWordbook.visibility = View.VISIBLE
+        } else {
+            Log.d(TAG, "updateWordBookList: isEmpty else문")
+            binding.emptyIcon.visibility = View.GONE
+            binding.emptyWordbook.visibility = View.GONE
+        }
+
     }
 
     override fun onViewClicked(v: View, adapterPosition: Int) {
@@ -334,10 +337,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val wordBookIdForCancel = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
                         Log.d(TAG, "onActivityResult: In $wordBookIdForCancel")
                         deleteCanceledWordBook(wordBookIdForCancel)
+                        updateWordBookList(wordBookModel!!.getRecentOrder())
+                        // FIXME: 2021-03-10 여기서 라이브데이터 업뎃시켜주는거 만들어야함 get~~근데 정렬메서드 만들면 해결됨. 일단 등록순으로 뽑는거 해야겠다.
                     }
                 }
             }
-            GET_WORD_VIEW_CODE -> { // 101
+            GET_WORD_VIEW_CODE -> { // 105
                 val wordBookIdForView = data!!.getLongExtra("wordBookIdForView", 0)
                 updateWordBookCount(wordBookIdForView)
             }
@@ -353,14 +358,65 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
+    private fun makeFolder(): File {
+        if (Build.VERSION.SDK_INT > 29) {
+                Log.d(TAG, "makeFolder: 1 나는야 30")
+//            val dir = File(Environment.getExternalStoragePublicDirectory())
+            val dir = applicationContext.getExternalFilesDir(folderName)
+            if (!dir!!.exists()) {
+                Log.d(TAG, "makeFolder: 1 ${dir.absolutePath}")
+                Log.d(TAG, "getSaveFolder:1  폴더 만듬")
+                dir.mkdirs()
+            }
+            Log.d(TAG, "getSaveFolder: 1 dir ${dir.toString()}")
+            return dir
+        } else {
+            val dir = File(Environment.getExternalStorageDirectory()
+                .absolutePath + "/" + folderName)
+            if (!dir.exists()) {
+                Log.d(TAG, "makeFolder: 2 ${dir.absolutePath}")
+                Log.d(TAG, "getSaveFolder: 2 폴더 만듬")
+                dir.mkdirs()
+            }
+            Log.d(TAG, "getSaveFolder: 2 dir ${dir.toString()}")
+            return dir
+        }
 
+    }
 
     private fun readCsvFile(data: Intent?) {
+
         try {
+
+//          폴더 생성
+            /*val dir = File(Environment.getExternalStorageDirectory()
+                .absolutePath + "/" + folderName)
+            if (!dir.exists()) {
+                Log.d(ViewWordActivity.TAG, "getSaveFolder: 폴더 만듬")
+                dir.mkdirs()
+            }
+            return dir*/
+
+//            if(Build.VERSION.SDK_INT <25) {
+//    val folderAndName = "1212121212121212"+
+            /*val importWordList = ArrayList<Word>()
+            val uri: Uri = data!!.data!!
+            Log.d(TAG, "readCsvFile: uri ${uri.path}")
+            val fileName = getFileName(uri)!!.split(".")[0]
+            Log.d(TAG, "readCsvFile: fileName $fileName")
+            val folderAndName = uri.path!!.split(":")[1]
+            Log.d(TAG, "readCsvFile: folderAndName $folderAndName")*/
+            // TODO: 2021-03-11 뒤로가기해서 파일노선택이면 에러뜸
             val importWordList = ArrayList<Word>()
             val uri: Uri = data!!.data!!
+            Log.d(TAG, "readCsvFile: uri ${uri.path}")
             val fileName = getFileName(uri)!!.split(".")[0]
-            val folderAndName = uri.path!!.split(":")[1]
+            val fileNameFilenameExtension = getFileName(uri)!!.split(".")[0] + ".csv"
+            Log.d(TAG, "readCsvFile: fileName $fileName")
+            // TODO: 2021-03-11 단어장 이름 어플 정해서 폴더가 없으면 이걸로 만들어 놓기. 그리고 여기서만 내보내기 ㄱㄴ,
+            // TODO: 2021-03-12 도움말에 가져오기 할 때 ~~폴더를 만들고 구글스프레드시트에서 만든 .csv 파일을 넣어주세요
+            val folderAndName = "$folderName/$fileNameFilenameExtension"
+
             val reader =
                 CSVReaderBuilder(FileReader(getExternalPath(folderAndName))).withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
                     .build()
@@ -368,7 +424,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 excelWordBookId = addWordBook(fileName)
                 for (cell in reader.iterator()) {
                     if (cell[0].isNotEmpty() && cell[1].isNotEmpty()) {
-                        val word = Word(0, "default word", "default mean", "",0, excelWordBookId!!)
+                        val word = Word(0, "default word", "default mean", "",0, 9999, excelWordBookId!!)
                         word.word = cell[0]
                         word.mean = cell[1]
                         importWordList.add(word)
@@ -413,21 +469,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        /*if (System.currentTimeMillis() - backPressedTime > 2000) {
+        if (System.currentTimeMillis() - backPressedTime > 2000) {
             Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
             return
-        }else if(System.currentTimeMillis() - backPressedTime <2000){
+        }else if(System.currentTimeMillis() - backPressedTime < 2000){
             finish()
         }
-        backPressedTime = System.currentTimeMillis()*/
+        backPressedTime = System.currentTimeMillis()
 
         /*---- When ESC is pressed in a NavigationDrawer ----*/
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+       /* if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             Log.v("", "네비게이션ESC")
             binding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed()
-        }
+        }*/
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
@@ -467,7 +523,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //            val file = File("$path/number.txt")
 //            val pln = file.readText()
 //            plnText.text = pln
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
+//            val intent = Intent(Intent.ACTION_GET_CONTENT)
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "text/*"
             startActivityForResult(Intent.createChooser(intent, "Open CSV"), GET_FILE_CODE)
@@ -476,25 +533,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 101)
         }
     }
-
-/*    override fun onRemoveClicked(view: View, position: Int) {
-        Log.d("     TAG",
-            "===== MainActivity - onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[position].toString())
-        val mBuilder = AlertDialog.Builder(view.context)
-        mBuilder.setTitle("삭제")
-            .setMessage(myWordRecyclerAdapter.getItem()[position].title.toString() + " 단어장을 삭제하시겠습니까?")
-            .setPositiveButton("확인",
-                DialogInterface.OnClickListener { _, _ ->
-                    deleteWordBook(position)
-                    Log.d("TAG",
-                        "MainActivity onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[position].toString() + " 삭제완료")
-                })
-            .setNegativeButton("취소",
-                DialogInterface.OnClickListener { dialog, _ ->
-                    dialog.cancel()
-                })
-        mBuilder.show()
-    }*/
 
     override fun onDestroy() {
         super.onDestroy()

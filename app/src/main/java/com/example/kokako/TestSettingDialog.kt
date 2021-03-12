@@ -88,7 +88,7 @@ class TestSettingDialog : DialogFragment() {
             }
             val filter2: List<Int> = binding.chipgroup2.checkedChipIds
             for (id in filter2) {
-                 val chip: Chip = binding.chipgroup2.findViewById(id)
+                val chip: Chip = binding.chipgroup2.findViewById(id)
                 if (chip.isChecked){
                     chipList.add(chip.text as String)
                 }

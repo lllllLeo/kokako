@@ -51,6 +51,28 @@
                     android:layout_height="match_parent"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center"
+                    >
+                    <ImageView
+                        android:id="@+id/empty_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_baseline_error_outline_24"
+                        />
+                    <TextView
+                        android:id="@+id/empty_wordbook"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="작성된 단어장이 없습니다.\n새로운 단어장을 추가해보세요"
+                        />
+                </LinearLayout>
                 <!--        tools:listitem="@layout/rv_my_word_list"-->
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fab_add_note"

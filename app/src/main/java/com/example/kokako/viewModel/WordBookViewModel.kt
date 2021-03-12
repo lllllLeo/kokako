@@ -9,11 +9,13 @@ import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.example.kokako.dao.WordBookDAO
 import com.example.kokako.database.WordDatabase
+import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 
 //  Log.d("     TAG", "===== WordBookViewModel")
 class WordBookViewModel(application: Application) : AndroidViewModel(application) {
-    var wordBookList: LiveData<List<WordBook>>
+    var wordBookListLivedata: LiveData<List<WordBook>>
+    var wordBookArrayList: List<WordBook>? = null
     private var wordBookDao: WordBookDAO
     var recentInsertedWordBookId : Long = 0
 
@@ -24,9 +26,17 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
         val db: WordDatabase =
             Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
         wordBookDao = db.getWordBookDAO()
-        wordBookList = wordBookDao.getAll()
-        Log.d("     TAG", "===== WordBookViewModel wordBookList.value : ${wordBookList.value}")
+        wordBookListLivedata = wordBookDao.getAll()
+        Log.d("     TAG", "===== WordBookViewModel wordBookList.value : ${wordBookListLivedata.value}")
     }
+
+    fun getRecentOrder(): List<WordBook>? {
+        wordBookArrayList = GetRecentOrderAsyncTask().execute().get()
+        Log.d(TAG, "getRecentOrder: $wordBookArrayList")
+        return wordBookArrayList
+    }
+
+
 
     fun insert(wordBook: WordBook):Long? {
         return InsertWordBookAsyncTask().execute(wordBook).get()
@@ -56,6 +66,14 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
 
     fun updateWordBookCount(updateWordBookMain: Long) {
         UpdateWordBookCountAsyncTask().execute(updateWordBookMain)
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetRecentOrderAsyncTask(): AsyncTask<Void, Void, List<WordBook>>() {
+        override fun doInBackground(vararg params: Void?): List<WordBook> {
+            return wordBookDao.getRecentOrder()
+        }
+
     }
 
     @SuppressLint("StaticFieldLeak")
