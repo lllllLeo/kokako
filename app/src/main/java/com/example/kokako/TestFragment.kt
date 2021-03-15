@@ -1,5 +1,6 @@
 package com.example.kokako
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -37,6 +38,7 @@ class TestFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("ResourceAsColor")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -115,11 +117,15 @@ class TestFragment : Fragment() {
         } else {
             binding.notMatchedTest.visibility = View.VISIBLE
             binding.notMatchedTest.text = "설정된 단어가 없습니다.\n북마크를 추가/해제 해주세요."
-            count_test.visibility = View.INVISIBLE
-            btn_previous.isEnabled = false
-            btn_false.isEnabled = false
-            btn_true.isEnabled = false
-            btn_favorite.isEnabled = false
+            binding.countTest.visibility = View.INVISIBLE
+            binding.btnPrevious.isEnabled = false
+            binding.btnFalse.isEnabled = false
+            binding.btnFalse.setTextColor(R.color.colorDarkGray)
+            binding.btnTrue.isEnabled = false
+            binding.btnTrue.setTextColor(R.color.colorDarkGray)
+            binding.btnFavorite.isEnabled = false
+            binding.btnFavorite.visibility = View.INVISIBLE     // 이거만 또 없으니까 이상하노
+
         }
 
 

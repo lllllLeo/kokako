@@ -93,18 +93,37 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-            <ImageView
-                android:id="@+id/view_listen"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+            <LinearLayout
+                android:id="@+id/view_listen_layout"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:gravity="center"
                 android:layout_marginEnd="12dp"
                 android:layout_marginRight="12dp"
-                android:backgroundTint="#858486"
-                android:background="@drawable/ic_baseline_volume_up_24"/>
+                android:background="@drawable/button_border">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/view_listen_imageview"
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:layout_gravity="center"
+                    android:backgroundTint="#858486"
+                    android:background="@drawable/ic_baseline_volume_up_24"/>
+            </LinearLayout>
+<!--            <CheckBox
+                android:id="@+id/view_listen_layout"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:checked="false"
+                android:button="@drawable/visiblity_custom"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp" />-->
             <CheckBox
                 android:id="@+id/visible_check"
-                android:layout_width="23dp"
-                android:layout_height="23dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_gravity="center"
                 android:checked="false"
                 android:button="@drawable/visiblity_custom"

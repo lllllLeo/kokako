@@ -22,11 +22,47 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <include
-            android:id="@+id/include_toolbar"
-            layout="@layout/activity_toolbar"
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_main"
             android:layout_width="match_parent"
-            android:layout_height="50dp"/>
+            android:layout_height="50dp"
+            android:background="@color/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            tools:ignore="MissingConstraints">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="#ffffff"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+                <!--<ImageView
+                    android:id="@+id/view_add_or_edit_btn"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_baseline_edit_24"
+                    />-->
+                <ImageView
+                    android:id="@+id/pop_up_menu"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_baseline_more_vert_24"
+                    />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
          <!-- android:theme="?attr/actionBarTheme" 지우고 저거로 대체하니까 흰색됨-->
 
         <!-- fixme 마진고치기 -->
@@ -58,13 +94,6 @@
                     android:gravity="center_vertical"
                     android:layout_gravity="center"
                     >
-                    <ImageView
-                        android:id="@+id/empty_icon"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_baseline_error_outline_24"
-                        />
                     <TextView
                         android:id="@+id/empty_wordbook"
                         android:layout_width="match_parent"

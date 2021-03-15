@@ -13,6 +13,7 @@
     <color name="colorRed">#E40E0E</color>
     <color name="colorLightGray">#EFEFEF</color>
     <color name="colorGray">#C8C8C8</color>
+    <color name="colorButtonGray">#858486</color>
     <color name="colorDarkGray">#535353</color>
     <color name="colorDivision">#e0e0e0</color>
     <color name="colorTouch">#e0e0e0</color>

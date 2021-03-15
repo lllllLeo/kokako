@@ -25,6 +25,7 @@ import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.activity_add_word.*
+import kotlinx.android.synthetic.main.activity_view_word.view.*
 import kotlin.NullPointerException
 
 //  Log.d("     TAG", "===== AddWordActivity")
@@ -62,7 +63,6 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         wordBookIdForAddOrEdit = intent.getLongExtra("wordBookIdForAddOrEdit",0)
         Log.d("     TAG", "===== AddWordActivity getLongExtra() wordBookIdForAdd 값은 : $wordBookIdForAddOrEdit ")
         checkActivity = intent.getBooleanExtra("checkActivity",false)
-        toolbarBinding = binding.includeToolbar
 
         Log.d("     TAG", "===== AddWordActivity input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 $INPUT_WORD_ID \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
 
@@ -70,19 +70,11 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 //        rv_list_item.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
         rv_list_item.isFocusable = false
 
-
-
-        /*---- Tool Bar ----*/
-        setSupportActionBar(toolbarBinding.toolbar)
-        supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
-        supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
-        toolbarBinding.toolbarTitle.gravity = Gravity.LEFT
-        toolbarBinding.toolbarTitle.text = if(checkActivity) {"단어장 편집"} else {"단어장 추가"}
+        binding.toolbarTitle.gravity = Gravity.LEFT
+        binding.toolbarTitle.text = if(checkActivity) {"단어장 편집"} else {"단어장 추가"}
 
         // Forcing the Soft Keyboard open
-/*        imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+/*      imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)*/
 
 // TODO: 2021-01-27 19:21분 데이터로 고치기
@@ -121,6 +113,37 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             try {
                 val currentFocusId = currentFocus!!.id
                 when (view.id) {
+                    R.id.btn_add_word_back_btn -> {
+                        val mBuilder = AlertDialog.Builder(this)
+                        cancelDialog(mBuilder)
+                    }
+                    R.id.btn_add_finish_check -> {
+                        // FIXME: 2021-01-20 아무값 입력없이 추가 예외처리
+                        val mBuilder = AlertDialog.Builder(this)
+                        mBuilder.setTitle("단어장으로 추가")
+                        if (word.size == 0) {
+                            mBuilder.setMessage("작성된 단어가 없습니다. 이대로 단어장을 만드시겠습니까?")
+                        } else {
+                            mBuilder.setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
+                        }
+                            .setNegativeButton("취소", null)
+                            .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
+                                Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
+                                // TODO: 2021-01-27 잠시 키보드 넣음
+//                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                                val intent = Intent()
+                                intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
+                                if (!checkActivity) {
+                                    model?.insertAllDatas(word)
+                                } else {
+                                    intent.putParcelableArrayListExtra("word", word)
+                                }
+                                setResult(COMPLETE_CODE, intent)
+                                dialog.dismiss()
+                                finish()
+                            })
+                        mBuilder.create().show()
+                    }
                     R.id.delete_all -> {
                         input_word.text.clear()
                         input_mean.text.clear()
@@ -191,6 +214,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 e.printStackTrace()
             }
         }
+        btn_add_finish_check.setOnClickListener(btnListener)
+        btn_add_word_back_btn.setOnClickListener(btnListener)
         delete_all.setOnClickListener(btnListener)
         btn_remove_text.setOnClickListener(btnListener)
         btn_move_left.setOnClickListener(btnListener)
@@ -226,12 +251,12 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 })
         mBuilder.show()
     }
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+/*    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_check, menu)
         return true
-    }
+    }*/
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+/*    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         val mBuilder = AlertDialog.Builder(this)
         when(item.itemId) {
@@ -264,7 +289,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             }
         }
         return true
-    }
+    }*/
     override fun onBackPressed() {
         cancelDialog(mBuilder = AlertDialog.Builder(this))
     }

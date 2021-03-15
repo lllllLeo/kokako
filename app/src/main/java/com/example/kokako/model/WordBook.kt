@@ -14,7 +14,8 @@ data class WordBook(
     var count : Int,
     @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
     var addTime : Long,
-    var itemOrder : Int
+    var itemOrder : Int,
+    var language : Int
 ) : Comparable<WordBook> {
     override fun compareTo(other: WordBook): Int {  // 리스트 정렬을 위함
         return this.itemOrder.compareTo(other.itemOrder)

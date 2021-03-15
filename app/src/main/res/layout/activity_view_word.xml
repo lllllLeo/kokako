@@ -98,14 +98,15 @@
         >
 <!--        android:overlapAnchor="false"   -->
         <LinearLayout
-            android:id="@+id/view_all_listen"
+            android:id="@+id/view_all_listen_layout"
             android:layout_width="40dp"
             android:layout_height="25dp"
             android:layout_marginLeft="10dp"
             android:layout_marginStart="10dp"
             android:gravity="center"
-            android:background="@drawable/button_round">
-            <ImageView
+            android:background="@drawable/button_border"
+            android:backgroundTint="@color/colorButtonGray">
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:background="@drawable/ic_baseline_volume_up_24"/>

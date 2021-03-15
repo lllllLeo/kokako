@@ -12,11 +12,10 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -29,7 +28,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityMainBinding
-import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
@@ -47,15 +45,14 @@ import java.io.*
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
     private var backPressedTime: Long = 0
-    private lateinit var toolbarBinding: ActivityToolbarBinding
     private lateinit var binding: ActivityMainBinding
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
     private lateinit var imm: InputMethodManager
     private var wordBookModel: WordBookViewModel? = null
     private var wordModel: WordViewModel? = null
-    private var wordBookDatas: ArrayList<WordBook>? = null
     private var wordBookIdForAdd: Long? = null
     private var excelWordBookId: Long? = null
+    private var language = 0
 
     private var folderName = "12121212121212123" // 어플이름 폴더이름
 
@@ -68,6 +65,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         const val GET_FILE_CODE = 102
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -75,15 +73,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         setContentView(view)
 //        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler())  // DefaultHandler 지정
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        toolbarBinding = binding.includeToolbar
+
+
         /*---- Tool Bar ----*/
-        setSupportActionBar(toolbarBinding.toolbar)
-        supportActionBar?.setDisplayShowCustomEnabled(true)   //커스터마이징 하기 위해 필요
-        supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
-        toolbarBinding.toolbarTitle.text = "단어장 목록"
+        binding.toolbarTitle.text = "단어장 목록"
+        binding.toolbarTitle.gravity = Gravity.LEFT
 
         makeFolder()
-
 
         /*---- Navigation Drawer Menu ----*/
         /*
@@ -97,7 +93,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.bringToFront()  // Bring view in front of everything
         val toggle = ActionBarDrawerToggle(this,
             binding.drawerLayout,
-            toolbarBinding.toolbar,
+            binding.toolbarMain,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close)
         binding.drawerLayout.addDrawerListener(toggle)
@@ -151,30 +147,77 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             adapter = myWordRecyclerAdapter
         }
 
+        binding.popUpMenu.setOnClickListener { view ->
+            when (view.id) {
+                R.id.pop_up_menu -> {
+                    onSubMenuPopupClicked(view)
+                }
+            }
+        }
+        /*val btnListener = View.OnClickListener { view ->
+            when (view.id) {
+                R.id.pop_up_menu -> {
+                    onSubMenuPopupClicked(view)
+                }
+            }
+        }
+        binding.popUpMenu.setOnClickListener(btnListener)*/
+
 
 
         fab_add_note.setOnClickListener { view ->
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
             val container = LinearLayout(this)
             container.orientation = LinearLayout.VERTICAL
+            val editTextLp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
+            editTextLp.setMargins(50, 20, 50, 0) // editText Margin
             val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT)
             lp.setMargins(50, 0, 50, 0) // editText Margin
 
             val dialogEditText = EditText(this)
+            dialogEditText.requestFocus()
             dialogEditText.maxLines = 1
             dialogEditText.setLines(1)
-            container.addView(dialogEditText, lp)
+
+            val languageItems = resources.getStringArray(R.array.language_array)
+//            val languageArray = ArrayList<String>()
+            val dialogSpinner = Spinner(this)
+            val languageArrayAdapter = ArrayAdapter<String>(this, R.layout.language_spinner, R.id.language_item_spinner)
+            languageArrayAdapter.addAll(languageItems.toMutableList())
+            dialogSpinner.adapter = languageArrayAdapter
+            dialogSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    language = position
+                    Log.d(TAG, "onItemSelected: language / position $language / $position")
+                    /*
+                    영어 0
+                    일본어 1
+                    중국어 2
+                    */
+                }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+//            dialogSpinner.setSelection(0)
+
+
+            container.addView(dialogEditText, editTextLp)
+            container.addView(dialogSpinner, lp)
             val mBuilder = AlertDialog.Builder(view.context)
-//                .setTitle("단어장 이름 추가")
                 .setMessage("작성할 단어장 이름을 입력해주세요.")
                 .setView(container)
                 .setNegativeButton("취소", null)
                 .setPositiveButton("확인", null)
                 .create()
             mBuilder.setOnShowListener {
-                val b: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
-                b.setOnClickListener(View.OnClickListener {
+                val positiveBtn: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
+                val negativeBtn: Button = mBuilder.getButton(AlertDialog.BUTTON_NEGATIVE)
+                negativeBtn.setOnClickListener(View.OnClickListener {
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                    mBuilder.dismiss()
+                })
+                positiveBtn.setOnClickListener(View.OnClickListener {
                     if (dialogEditText.text!!.trim().isEmpty()) {
                         Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
 //                        특문제외
@@ -202,9 +245,28 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //        wordBookModel?.updateAll(myWordRecyclerAdapter.getItem())
 //    }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    private fun onSubMenuPopupClicked(view: View) {
+        val popup: PopupMenu = PopupMenu(this, view)
+        menuInflater.inflate(R.menu.sub_menu, popup.menu)
+        popup.setOnMenuItemClickListener(
+            PopupMenu.OnMenuItemClickListener {
+                Log.d(ViewWordActivity.TAG, "onExportPopupClicked: ${it.itemId}")
+                when (it.itemId) {
+                    R.id.menu_sort -> {
+                    Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
+                }
+                    R.id.menu_excel -> {
+                        setupPermissions()
+                    }
+                }
+                true
+            })
+        popup.show()
+    }
+
     private fun addWordBook(wordBookName: String): Long {
-//        TODO wordBook에 Date 형식으로 추가하기
-        val wordBook = WordBook(0, wordBookName, 0, 0, (wordBookModel?.getMaxOrder()!! + 1))
+        val wordBook = WordBook(0, wordBookName, 0, 0, (wordBookModel?.getMaxOrder()!! + 1), language)
         val recentInsertedWordBookId: Long = wordBookModel?.insert(wordBook)!!
         Log.d("     TAG",
             "===== MainActivity - addWordBook - recentInsertedWordBookId 값은 : $recentInsertedWordBookId")
@@ -220,12 +282,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         Log.d(TAG, "===== MainActivity - updateWordBookList wordBook : $wordBook")
         myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
         if (wordBook.isEmpty()) {
-            Log.d(TAG, "updateWordBookList: isEmpty if문")
-            binding.emptyIcon.visibility = View.VISIBLE
             binding.emptyWordbook.visibility = View.VISIBLE
         } else {
-            Log.d(TAG, "updateWordBookList: isEmpty else문")
-            binding.emptyIcon.visibility = View.GONE
             binding.emptyWordbook.visibility = View.GONE
         }
 
@@ -250,19 +308,46 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     R.id.menu_edit -> {
                         val container = LinearLayout(this)
                         container.orientation = LinearLayout.VERTICAL
+                        val editTextLp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT)
+                        editTextLp.setMargins(50, 20, 50, 0) // editText Margin
                         val lp = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT)
-                        lp.setMargins(50, 0, 50, 0) // editText Margin
-
+                        lp.setMargins(50, 0, 50, 0)
                         val dialogEditText = EditText(this)
+
                         dialogEditText.maxLines = 1
                         dialogEditText.setText(myWordRecyclerAdapter.getItem()[adapterPosition].title.toString())
                         dialogEditText.setSelection(myWordRecyclerAdapter.getItem()[adapterPosition].title!!.length)
                         dialogEditText.setLines(1)
-                        container.addView(dialogEditText, lp)
+                        dialogEditText.requestFocus()
+
+                        val languageItems = resources.getStringArray(R.array.language_array)
+//            val languageArray = ArrayList<String>()
+                        val dialogSpinner = Spinner(this)
+                        val languageArrayAdapter =
+                            ArrayAdapter<String>(this, R.layout.language_spinner, R.id.language_item_spinner)
+                        languageArrayAdapter.addAll(languageItems.toMutableList())
+                        dialogSpinner.adapter = languageArrayAdapter
+                        dialogSpinner.setSelection(myWordRecyclerAdapter.getItem()[adapterPosition].language)
+                        dialogSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                language = position
+                                Log.d(TAG, "onItemSelected: language / position $language / $position")
+                                /*
+                                영어 0
+                                일본어 1
+                                중국어 2
+                                */
+                            }
+
+                            override fun onNothingSelected(parent: AdapterView<*>?) {}
+                        }
+                        container.addView(dialogEditText, editTextLp)
+                        container.addView(dialogSpinner, lp)
                         val mBuilder = AlertDialog.Builder(this)
-//                .setTitle("단어장 이름 변경")
-                            .setMessage("변경할 단어장 이름을 입력해주세요.")
+                            .setTitle("단어장 수정")
+//                            .setMessage("변경할 단어장 이름을 입력해주세요.")
                             .setView(container)
                             .setNegativeButton("취소", null)
                             .setPositiveButton("확인", null)
@@ -278,9 +363,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                                     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                                     myWordRecyclerAdapter.getItem()[adapterPosition].title =
                                         dialogEditText.text.toString()
+                                    myWordRecyclerAdapter.getItem()[adapterPosition].language = dialogSpinner.selectedItemPosition
                                     Log.d("     TAG",
                                         "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
-                                    updateWordBookTitle(myWordRecyclerAdapter.getItem()[adapterPosition])
+                                    updateWordBook(myWordRecyclerAdapter.getItem()[adapterPosition])
+                                    Log.d(TAG,
+                                        "onPopupMenuWordBookClicked: ${myWordRecyclerAdapter.getItem()[adapterPosition]}")
                                     mBuilder.dismiss()
                                 }
                             })
@@ -311,7 +399,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         popup.show()
     }
 
-    private fun updateWordBookTitle(wordBook: WordBook) {
+    private fun updateWordBook(wordBook: WordBook) {
         wordBookModel?.update(wordBook)
     }
 
@@ -348,8 +436,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
             GET_FILE_CODE -> { // 102
                 try {
-                    readCsvFile(data)
-                    Toast.makeText(this, "단어장 가져오기 완료", Toast.LENGTH_SHORT).show()
+                    if (data != null) {
+                        readCsvFile(data)
+                        Toast.makeText(this, "단어장 가져오기 완료", Toast.LENGTH_SHORT).show()
+                    }
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 }
@@ -369,6 +459,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 dir.mkdirs()
             }
             Log.d(TAG, "getSaveFolder: 1 dir ${dir.toString()}")
+//            /storage/emulated/0/Android/data/com.example.kokako/files/12121212121212123
             return dir
         } else {
             val dir = File(Environment.getExternalStorageDirectory()
@@ -385,18 +476,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun readCsvFile(data: Intent?) {
-
         try {
-
-//          폴더 생성
-            /*val dir = File(Environment.getExternalStorageDirectory()
-                .absolutePath + "/" + folderName)
-            if (!dir.exists()) {
-                Log.d(ViewWordActivity.TAG, "getSaveFolder: 폴더 만듬")
-                dir.mkdirs()
-            }
-            return dir*/
-
 //            if(Build.VERSION.SDK_INT <25) {
 //    val folderAndName = "1212121212121212"+
             /*val importWordList = ArrayList<Word>()
@@ -469,13 +549,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onBackPressed() {
-        if (System.currentTimeMillis() - backPressedTime > 2000) {
-            Toast.makeText(this, "'뒤로' 버튼을 한번 더 누르시면 앱이 종료됩니다.", Toast.LENGTH_SHORT).show()
-            return
-        }else if(System.currentTimeMillis() - backPressedTime < 2000){
-            finish()
+        val curTime : Long = System.currentTimeMillis();
+        val gapTime : Long = curTime - backPressedTime;
+
+        if(0 <= gapTime && 2000 >= gapTime) { super.onBackPressed(); }
+        else {
+            backPressedTime = curTime;
+            Toast.makeText(this, "한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
         }
-        backPressedTime = System.currentTimeMillis()
+
 
         /*---- When ESC is pressed in a NavigationDrawer ----*/
        /* if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
@@ -494,41 +576,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true // 네이게이션 아이템이 선택되면 true
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.sub_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-//            R.id.menu_import -> {
-//                val intent = Intent(this, ImportActivity::class.java)
-//                startActivity(intent)
-//            }
-            R.id.menu_sort -> {
-                Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
-            }
-            R.id.menu_excel -> {
-                setupPermissions()
-
-            }
-        }
-        return true
-    }
-    // TODO: 2021-02-11 권한요청
     private fun setupPermissions() {
         val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
         if (permission == PackageManager.PERMISSION_GRANTED) {
-//            val path = "/storage/emulated/0"
-//            val file = File("$path/number.txt")
-//            val pln = file.readText()
-//            plnText.text = pln
-//            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            val intent = Intent(Intent.ACTION_GET_CONTENT)
+//            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             intent.addCategory(Intent.CATEGORY_OPENABLE)
             intent.type = "text/*"
             startActivityForResult(Intent.createChooser(intent, "Open CSV"), GET_FILE_CODE)
-            Log.d(TAG, "setupPermissions: 왜 바로 안들어오나")
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 101)
         }

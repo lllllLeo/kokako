@@ -1,18 +1,15 @@
 package com.example.kokako
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.os.Environment.DIRECTORY_DOWNLOADS
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -25,10 +22,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
@@ -36,21 +30,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityViewWordBinding
 import com.example.kokako.model.CheckBoxData
+import com.example.kokako.model.TtsCheckBoxData
 import com.example.kokako.model.VisibleCheckBoxData
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import com.google.android.material.snackbar.Snackbar
-import com.opencsv.CSVWriter
 import kotlinx.android.synthetic.main.activity_view_word.*
-import kotlinx.android.synthetic.main.activity_view_word.view.*
 import kotlinx.android.synthetic.main.modal_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.rv_word_list.view.*
-import java.io.File
-import java.io.FileWriter
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.List
+import kotlin.collections.drop
+import kotlin.collections.hashMapOf
+import kotlin.collections.isNotEmpty
+import kotlin.collections.set
+import kotlin.collections.toMutableList
 
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, BottomSheetDialog.BottomSheetInterface, TestSettingDialog.OnDataPass {
     //    private lateinit var            toolbarBinding: ActivityToolbarBinding
@@ -73,15 +69,20 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     private var                     sortSelectedIndex = 0
     private var                     hideSelectedIndex = 0
     private var                     testValue : ArrayList<String>? = null
-
+    private var                     isInvisibleItem : String? = null
+    private var                     language = 0
+    private var                     ttsResult : Int = 0
+    private var                     tts : TextToSpeech? = null
+    private var                     ttsArrayList = ArrayList<LinearLayout>()
     private var                     itemToHide : MenuItem? = null
     /*private var                     currentShowSnackBarTime : Long = 0
     private var                     mLastClickTime : Long = 0L*/
     companion object {
 //        const val                     MIN_CLICK_INTERVAL = 600
-        const val                         TAG = "TAG ViewWordActivity"
+const val                           TAG = "TAG ViewWordActivity"
         var                         checkboxList = ArrayList<CheckBoxData>()
         var                         visibleCheckboxList = ArrayList<VisibleCheckBoxData>()
+        var                         ttsCheckboxList = ArrayList<TtsCheckBoxData>()
         const val                   EDIT_WORD_CODE = 100
         const val                   GET_WORD_VIEW_CODE = 105
         const val                   COMPLETE_CODE = 10
@@ -100,12 +101,10 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         wordBookNameForView = intent.getStringExtra("wordBookNameForView")
         val sortItems = resources.getStringArray(R.array.sort_array)
         val hideItems = resources.getStringArray(R.array.hide_array) // 발음 가리기 (3 items)
-        toolbar = findViewById<Toolbar>(R.id.toolbar_view)
-        /*---- Tool Bar ----*/
-        setSupportActionBar(toolbar!!.toolbar_view)
 
-        toolbar!!.toolbar_title.gravity = Gravity.LEFT
-        toolbar!!.toolbar_title.text = wordBookNameForView
+        /*---- Tool Bar ----*/
+        binding.toolbarTitle.gravity = Gravity.LEFT
+        binding.toolbarTitle.text = wordBookNameForView
 
 
         ViewCompat.setOnApplyWindowInsetsListener(view) { view, insets ->
@@ -114,12 +113,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             }
         }
 
-        supportActionBar?.setDisplayShowCustomEnabled(false)   //커스터마이징 하기 위해 필요
-        supportActionBar?.setDisplayShowTitleEnabled(false)   // 액션바에 표시되는 제목의 표시 유무
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_baseline_arrow_back_24)
         viewRecyclerAdapter = ViewWordRecyclerAdapter(this)
-
         checkboxList.clear()
         isDeleteMode(0, -2)
 
@@ -133,6 +127,11 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             }
         }).get(WordViewModel::class.java)
 
+        language = wordBookModel?.getLanguageCode(wordBookIdForView)!!
+        textToSpeechInit(language)  // tts 초기 셋팅
+        Log.d(TAG, "onCreate: 12121 $tts")
+//        tts!!.setOnUtteranceProgressListener(TtsUtteranceListener())
+        Log.d(TAG, "onCreate: 22222 $tts")
         wordList = wordModel?.getRecentOrder(wordBookIdForView)
 
 
@@ -146,9 +145,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             adapter = viewRecyclerAdapter
         }
 
-
-//        wordList = viewRecyclerAdapter.getItem()
-        Log.d(TAG, "onCreate: $wordList")
 
 
         val btnListener = View.OnClickListener { view ->
@@ -171,6 +167,16 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 R.id.view_export_btn -> {
                     onExportPopupClicked(view)
                 }
+                R.id.view_all_listen_layout -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (tts != null) {
+                            Log.d(TAG, "onCreate: tts가 널이 아님")
+                            textToSpeechAllWord()
+                        }
+                    } else {
+                        Toast.makeText(this, "안드로이드 버전이 낮아서 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 
@@ -179,6 +185,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         view_add_or_edit_btn.setOnClickListener(btnListener)
         view_delete_btn.setOnClickListener(btnListener)
         view_export_btn.setOnClickListener(btnListener)
+        view_all_listen_layout.setOnClickListener(btnListener)
 
         val sortArrayAdapter = object : ArrayAdapter<String>(this, R.layout.sort_spinner, R.id.sort_item_spinner) {
             @SuppressLint("UseCompatLoadingForDrawables")
@@ -199,7 +206,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         }
         sortArrayAdapter.addAll(sortItems.toMutableList())
         sort_spinner.adapter = sortArrayAdapter
-//        sort_spinner.setSelection(sortArrayAdapter.count)
         sort_spinner.setSelection(0)
         sort_spinner.dropDownVerticalOffset = dipToPixels(42f).toInt()
         sort_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -261,6 +267,178 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             }
         }
     }
+
+    private fun textToSpeechInit(language: Int) {
+        tts = TextToSpeech(this, TextToSpeech.OnInitListener {
+            when (language) {
+                0 -> { // 영어
+                    ttsResult = tts?.setLanguage(Locale.ENGLISH)!!
+                }
+                1 -> { // 일본어
+                    ttsResult = tts?.setLanguage(Locale.JAPANESE)!!
+                }
+                2 -> { // 중국어
+                    ttsResult = tts?.setLanguage(Locale.CHINESE)!!
+                }
+            }
+            if (it == TextToSpeech.SUCCESS) {
+                when (ttsResult) {
+                    TextToSpeech.LANG_MISSING_DATA -> {
+                        Toast.makeText(this, "해당 언어의 음성 데이터가 없습니다. 음성 데이터를 설치해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                    TextToSpeech.LANG_NOT_SUPPORTED -> {
+                        Toast.makeText(this, "지원하지 않는 언어입니다", Toast.LENGTH_SHORT).show()
+                        return@OnInitListener
+                    }
+                    else -> {
+                        /*val speechListener = object : UtteranceProgressListener() {
+                            override fun onStart(utteranceId: String?) {
+                                Log.d(TAG, "onStart: IN")
+                                *//*v.view_listen_layout.setBackgroundResource(R.drawable.button_round)
+                                v.view_listen_imageview.setColorFilter(ContextCompat.getColor(v.context,
+                                    R.color.colorBlack))*//*
+                            }
+
+                            override fun onDone(utteranceId: String?) {
+                                Log.d(TAG, "onDone: IN")
+                                *//*v.view_listen_layout.setBackgroundResource(R.drawable.button_border)
+                                v.view_listen_imageview.setColorFilter(ContextCompat.getColor(v.context,
+                                    R.color.colorButtonGray))*//*
+                            }
+
+                            override fun onError(utteranceId: String?) {
+                                TODO("Not yet implemented")
+                            }
+                        }*/
+
+                    }
+                }
+            }
+        })
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun textToSpeechAllWord() {
+        if (tts!!.isSpeaking) {  // 전체 듣기로 실행중일때 끄고 실행
+            tts!!.stop()
+        }
+        tts!!.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) {
+                binding.viewAllListenLayout.backgroundTintList = ContextCompat.getColorStateList(this@ViewWordActivity,
+                    R.color.colorPrimary)
+                Log.d(TAG, "onStart: start with $utteranceId")
+            }
+
+            override fun onDone(utteranceId: String?) {
+                binding.viewAllListenLayout.backgroundTintList = ContextCompat.getColorStateList(this@ViewWordActivity,
+                    R.color.colorButtonGray)
+                Log.d(TAG, "onDone: done with $utteranceId")
+            }
+
+            //  API 21 기준으로는 onError(utteranceId: String?, errorCode: Int) 가 필요하고 그 미만으로는 onError(utteranceId: String?) 가 필요하다.
+            override fun onError(utteranceId: String?, errorCode: Int) {
+                super.onError(utteranceId, errorCode)
+
+                Log.d(TAG, "onError: error with $utteranceId - code $errorCode")
+            }
+
+            override fun onError(utteranceId: String?) {
+                Log.d(TAG, "onError: error with $utteranceId")
+            }
+
+        })
+        if (wordList != null) {
+            val utteranceId = UUID.randomUUID().toString()
+            val map = hashMapOf<String, String>()
+            map[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = utteranceId
+            for(word in wordList!!) {
+                if (Build.VERSION.SDK_INT >= 21) {
+                    tts?.speak(word.word, TextToSpeech.QUEUE_ADD, null, utteranceId)
+                    tts?.playSilentUtterance(500, TextToSpeech.QUEUE_ADD, null) // 지정한 시간만큼 무음을 추가
+                } else {
+                    tts?.speak(word.word, TextToSpeech.QUEUE_ADD, map)
+                    tts?.playSilentUtterance(500, TextToSpeech.QUEUE_ADD, null) // 지정한 시간만큼 무음을 추가
+                }
+            }
+        }
+    }
+
+    // FIXME: 2021-03-14 언어 설정 변경 ㄱㄱ / 중복클릭 / 전체듣기 일시정지
+
+    @SuppressLint("ResourceAsColor", "RestrictedApi")
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun ontextToSpeechSpeakButtonClicked(v: View, adapterPosition: Int) {
+        if (tts!!.isSpeaking) {  // 전체 듣기로 실행중일때 끄고 실행
+            tts!!.stop()
+        }
+        // TODO: 2021-03-15 1. speak끝날때까지 클릭해도 안되게 하기 2. 뷰 바꾸지 않기
+        tts!!.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+            @SuppressLint("RestrictedApi")
+            override fun onStart(utteranceId: String?) {
+                Log.d(TAG, "onStart: start with $utteranceId")
+                if (!ttsArrayList.contains(v.view_listen_layout)) {
+                    Log.d(TAG, "onStart: 존재하지 않는다면 추가")
+                    ttsArrayList.add(v.view_listen_layout)
+                }
+                runOnUiThread { // Main Thread 외의 새로 생성한 Thread를 이용하여 임의로 UI를 변경시키려고 했기 때문
+                    v.view_listen_layout.setBackgroundResource(R.drawable.button_round)
+                    v.view_listen_imageview.supportBackgroundTintList =
+                        ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorWhite)
+                }
+            }
+
+            @SuppressLint("RestrictedApi")
+            override fun onDone(utteranceId: String?) {
+                Log.d(TAG, "onDone: done with $utteranceId")
+                runOnUiThread {
+                    for (i in ttsArrayList) {
+                        Log.d(TAG, "onDone: 제발시발")
+                        i.view_listen_layout.setBackgroundResource(R.drawable.button_border)
+                        i.view_listen_imageview.supportBackgroundTintList =
+                            ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorButtonGray)
+                    }
+                }
+            }
+
+            //                            API 21 기준으로는 onError(utteranceId: String?, errorCode: Int) 가 필요하고 그 미만으로는 onError(utteranceId: String?) 가 필요하다.
+            override fun onError(utteranceId: String?, errorCode: Int) {
+                super.onError(utteranceId, errorCode)
+                Log.d(TAG, "onError: error with $utteranceId - code $errorCode")
+            }
+
+            override fun onError(utteranceId: String?) {
+                Log.d(TAG, "onError: error with $utteranceId")
+            }
+
+        })
+        val utteranceId = UUID.randomUUID().toString()
+        val map = hashMapOf<String, String>()
+        map[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = utteranceId
+        if (Build.VERSION.SDK_INT >= 21) {
+            tts?.speak(wordList!![adapterPosition].word, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
+        } else {
+            tts?.speak(wordList!![adapterPosition].word, TextToSpeech.QUEUE_FLUSH, map)
+        }
+//        tts?.speak(wordList!![adapterPosition].word, TextToSpeech.QUEUE_ADD, null, null)
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        // TTS 객체가 남아있다면 실행을 중지하고 메모리에서 제거한다.
+        if (tts != null) {
+            tts!!.stop()
+            tts!!.shutdown()
+            tts = null
+        }
+    }
+
+
+
+
+
+
+
+
 
     private fun exportDialog() {
         val bundle = Bundle()
@@ -443,9 +621,27 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 wordTextView.visibility = View.VISIBLE
                 meanTextView.visibility = View.INVISIBLE
             }
+        } else if (_visibilityOptions == 3) {
+            if (visibleCheckboxList[adapterPosition].checked) {
+                if(wordTextView.visibility == View.INVISIBLE) {
+                    wordTextView.visibility = View.VISIBLE
+                    isInvisibleItem = "word"
+                } else if (meanTextView.visibility == View.INVISIBLE) {
+                    meanTextView.visibility = View.VISIBLE
+                    isInvisibleItem = "mean"
+                }
+            } else {
+                if (isInvisibleItem.equals("word")) { 
+                    wordTextView.visibility = View.INVISIBLE
+                } else {
+                    meanTextView.visibility = View.INVISIBLE
+                }
+            }
         }
         // FIXME: 2021-02-24 랜덤
     }
+
+
     @SuppressLint("SetTextI18n")
     private fun isDeleteMode(num: Int, adapterPosition: Int) {
         viewRecyclerAdapter.updateCheckbox(num, adapterPosition) // 처음 LongClick하면 들어옴
@@ -465,7 +661,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             binding.sortSpinner.visibility = View.INVISIBLE
             binding.currentCount.visibility = View.GONE
             binding.currentCount2.visibility = View.GONE
-            binding.viewAllListen.visibility = View.GONE
+            binding.viewAllListenLayout.visibility = View.GONE
             binding.fabTestWord.visibility = View.GONE
         } else {
             isDelete = false
@@ -483,7 +679,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             binding.sortSpinner.visibility = View.VISIBLE
             binding.currentCount.visibility = View.VISIBLE
             binding.currentCount2.visibility = View.VISIBLE
-            binding.viewAllListen.visibility = View.VISIBLE
+            binding.viewAllListenLayout.visibility = View.VISIBLE
             binding.fabTestWord.visibility = View.VISIBLE
         }
         viewRecyclerAdapter.notifyDataSetChanged()

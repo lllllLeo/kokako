@@ -59,8 +59,7 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
         super.onActivityCreated(savedInstanceState)
         bsd_btn_update_word.setOnClickListener {
             isUpdated = bottomSheetInterface.onUpdateButtonClicked(view!!, word, isUpdated)
-            if(isUpdated)
-                dismiss()
+            if(isUpdated) { dismiss() }
         }
         bsd_delete_btn.setOnClickListener{
             bottomSheetInterface.onDeleteButtonClicked(word, position)

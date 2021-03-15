@@ -27,7 +27,6 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
             Room.databaseBuilder(application, WordDatabase::class.java, "word").build()
         wordBookDao = db.getWordBookDAO()
         wordBookListLivedata = wordBookDao.getAll()
-        Log.d("     TAG", "===== WordBookViewModel wordBookList.value : ${wordBookListLivedata.value}")
     }
 
     fun getRecentOrder(): List<WordBook>? {
@@ -66,6 +65,18 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
 
     fun updateWordBookCount(updateWordBookMain: Long) {
         UpdateWordBookCountAsyncTask().execute(updateWordBookMain)
+    }
+
+    fun getLanguageCode(wordBookIdForView: Long) : Int {
+        return GetLanguageCodeAsyncTask().execute(wordBookIdForView).get()
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetLanguageCodeAsyncTask(): AsyncTask<Long, Void, Int>() {
+        override fun doInBackground(vararg wordBookIdForView: Long?): Int {
+            return wordBookDao.getLanguageCode(wordBookIdForView)
+        }
+
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -112,7 +123,7 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     private inner class InsertWordBookAsyncTask() : AsyncTask<WordBook, Long, Long>() {
         override fun doInBackground(vararg wordBook: WordBook?): Long {
 //            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!)
-            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!.title, wordBook[0]!!.count, wordBook[0]!!.itemOrder)
+            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!.title, wordBook[0]!!.count, wordBook[0]!!.itemOrder, wordBook[0]!!.language)
             return recentInsertedWordBookId
         }
     }

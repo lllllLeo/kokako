@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -80,7 +81,6 @@ class ExportDialog : DialogFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = ExportDialogBinding.inflate(inflater, container, false)
         val view = binding.root
-        toolbar = binding.toolbarDialog
         return view
     }
 
@@ -88,10 +88,10 @@ class ExportDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            toolbar!!.setNavigationOnClickListener { v -> dismiss() }
-            toolbar!!.title = "내보내기"
-            toolbar!!.setTitleTextColor(Color.WHITE)
-            toolbar!!.setOnMenuItemClickListener { item ->
+            binding.toolbarTitle.text = "내보내기"
+            binding.toolbarTitle.gravity = Gravity.LEFT
+            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
+            binding.toolbarDialog.setOnMenuItemClickListener { item ->
                 dismiss()
                 true
             }
@@ -112,7 +112,9 @@ class ExportDialog : DialogFragment() {
                     if (Build.VERSION.SDK_INT < 30) {
                         setupPermissions()
                     } else {
-                        Toast.makeText(context, "현재 안드로이드 버전에서는 지원하지 않습니다. 파일로 공유하기를 이용해주세요.", Toast.LENGTH_SHORT)
+                        Toast.makeText(context,
+                            "현재 안드로이드 버전에서는 지원하지 않습니다. 파일로 공유하기를 이용해주세요.",
+                            Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -268,6 +270,7 @@ class ExportDialog : DialogFragment() {
 
 //                                sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(exportCSVName))
         sharingIntent.putExtra(Intent.EXTRA_STREAM, csvUri)
+//        sharingIntent.putExtra(Intent.EXTRA_EMAIL, "")
 //            sharingIntent.setPackage("com.kakao.talk")
 //            sharingIntent.setPackage("com.google.android.gm")
 //            sharingIntent.setPackage("org.telegram.messenger")

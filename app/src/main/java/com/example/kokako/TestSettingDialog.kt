@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,22 +53,17 @@ class TestSettingDialog : DialogFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = TestSettingDialogBinding.inflate(inflater, container, false)
-//        super.onCreateView(inflater, container, savedInstanceState)
-//        val view: View = inflater.inflate(R.layout.test_setting_dialog, container, false)
         val view = binding.root
-//        toolbar = view.findViewById(R.id.toolbar_dialog)
-        toolbar = binding.toolbarDialog
         return view
-//        return _binding
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            toolbar!!.setNavigationOnClickListener { v -> dismiss() }
-            toolbar!!.title = "테스트 설정"
-            toolbar!!.setTitleTextColor(Color.WHITE)
-            toolbar!!.setOnMenuItemClickListener { item ->
+            binding.toolbarTitle.text = "테스트 설정"
+            binding.toolbarTitle.gravity = Gravity.LEFT
+            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
+            binding.toolbarDialog.setOnMenuItemClickListener { item ->
                 dismiss()
                 true
             }

@@ -4,8 +4,10 @@ import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.ViewWordActivity.Companion.checkboxList
+import com.example.kokako.ViewWordActivity.Companion.ttsCheckboxList
 import com.example.kokako.ViewWordActivity.Companion.visibleCheckboxList
 import com.example.kokako.model.CheckBoxData
+import com.example.kokako.model.TtsCheckBoxData
 import com.example.kokako.model.VisibleCheckBoxData
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_word_list.view.*
@@ -17,7 +19,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     private var meanTextView = itemView.view_mean
     private var wordCheckBox = itemView.view_check
     private var wordMeanLayout = itemView.view_word_book_list
-    private var listenButton = itemView.view_listen
+    private var listenButton = itemView.view_listen_layout
     private var visibleCheckBox = itemView.visible_check
     private var after_visibilityOptions = 0
     private var current_visibilityOptions = 0
@@ -40,6 +42,8 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         _visibilityOptions = visibilityOptions
         wordTextView.text = wordDatas[position].word
         meanTextView.text = wordDatas[position].mean
+
+        listenButton.tag = position
 
         isDeleteMode(deleteMode, wordDatas, position)
         setInitializeUnCheckedList(position, wordDatas)     // 처음 들어올 때 체크박스 전부 false
@@ -72,6 +76,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                 meanTextView.visibility = View.INVISIBLE
             }
         }
+        listenButton.isSelected = ttsCheckboxList[position].checked
     }
 
     // TODO: 2021-02-21 이거처럼 해야할듯 가리기버튼도
@@ -103,6 +108,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         if (position >= checkboxList.size) {
             checkboxList.add(position, CheckBoxData(wordDatas[position].id, false))
             visibleCheckboxList.add(position, VisibleCheckBoxData(wordDatas[position].id, false))
+            ttsCheckboxList.add(position, TtsCheckBoxData(wordDatas[position].id, false))
         }
     }
     private fun visibilityMode(showAndHideNumber: Int, position: Int) {
@@ -210,6 +216,9 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
             }
             R.id.view_word_book_list -> {
                 this.viewWordRecyclerViewInterface?.onViewClicked(v, wordMeanLayout, adapterPosition)
+            }
+            R.id.view_listen_layout -> {
+                this.viewWordRecyclerViewInterface?.ontextToSpeechSpeakButtonClicked(v, adapterPosition)
             }
         }
     }

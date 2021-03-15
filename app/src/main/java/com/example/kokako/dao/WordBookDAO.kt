@@ -19,8 +19,8 @@ interface WordBookDAO {
 //    @Insert
 //    fun insert(wordBook: WordBook):Long
 
-    @Query("INSERT INTO tb_word_book (title, count, itemOrder)VALUES (:title, :count, :itemOrder)")
-    fun insert(title: String?, count: Int, itemOrder: Int):Long
+    @Query("INSERT INTO tb_word_book (title, count, itemOrder, language)VALUES (:title, :count, :itemOrder, :language)")
+    fun insert(title: String?, count: Int, itemOrder: Int, language: Int):Long
 
     @Update
     fun update(wordBook: Array<out WordBook?>)
@@ -54,6 +54,9 @@ interface WordBookDAO {
 
     @Query("UPDATE tb_word_book SET count = (SELECT count(word) FROM tb_word WHERE wordBookId = :updateWordBookMain) WHERE id = :updateWordBookMain")
     fun updateWordBookCount(updateWordBookMain: Array<out Long?>)
+
+    @Query("SELECT language FROM tb_word_book WHERE id = :wordBookIdForView")
+    fun getLanguageCode(wordBookIdForView: Array<out Long?>): Int
 
 }
 
