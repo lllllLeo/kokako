@@ -253,7 +253,6 @@ class ExportDialog : DialogFragment() {
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun shareCsvFile() {
-        Log.d(TAG, "shareCsvFile: INININININ")
         exportCSVName = writeCsvFile("$wordBookNameForView.csv", 0)
 //        /storage/emulated/0/Android/data/com.example.kokako/files/Download/내보내기_2021-03-12 22:23_단어장.csv
         Log.d(TAG, "onExportPopupClicked: $exportCSVName")
@@ -269,8 +268,8 @@ class ExportDialog : DialogFragment() {
             BuildConfig.APPLICATION_ID + ".fileprovider", File(exportCSVName));
 
 //                                sharingIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(exportCSVName))
-        sharingIntent.putExtra(Intent.EXTRA_STREAM, csvUri)
 //        sharingIntent.putExtra(Intent.EXTRA_EMAIL, "")
+        sharingIntent.putExtra(Intent.EXTRA_STREAM, csvUri)
 //            sharingIntent.setPackage("com.kakao.talk")
 //            sharingIntent.setPackage("com.google.android.gm")
 //            sharingIntent.setPackage("org.telegram.messenger")

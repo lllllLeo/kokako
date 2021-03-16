@@ -2,6 +2,9 @@ package com.example.kokako
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.Selection
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +18,9 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
     private var word : Word = wordForBottomSheet
     private var position : Int = adapterPosition
     private var isUpdated : Boolean = false
+    companion object {
+        const val TAG = "TAG BottomSheetDialog"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,6 +34,8 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        var editableWord : Editable? = null
+        var editableMean :Editable? = null
         view.bsd_cancel_btn.setOnClickListener{ dismiss() }
 
         view.bsd_btn_remove_text.setOnClickListener{
@@ -40,12 +48,14 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
         view.bsd_btn_move_left.setOnClickListener{ view.bsd_input_word.requestFocus() }
         view.bsd_btn_move_right.setOnClickListener{
             view.bsd_input_mean.requestFocus()
-            view.bsd_input_word.setSelection(word.mean!!.length)
         }
-
         view.bsd_input_word.setText(word.word)
-        view.bsd_input_word.setSelection(word.word!!.length)
         view.bsd_input_mean.setText(word.mean)
+        editableWord = view.bsd_input_word.text
+        editableMean = view.bsd_input_mean.text
+        Selection.setSelection(editableWord, editableWord.length)
+        Selection.setSelection(editableMean, editableMean!!.length)
+//      java.lang.indexoutofboundsexception setspan ends beyond length떠서 위 코드 작성
     }
 
     override fun onAttach(context: Context) {

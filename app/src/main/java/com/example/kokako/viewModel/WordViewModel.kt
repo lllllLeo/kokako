@@ -207,9 +207,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     @SuppressLint("StaticFieldLeak")
     private inner class UpdateWordMeanAsyncTask : AsyncTask<Word, Void, Void>(){
         override fun doInBackground(vararg word: Word?): Void? {
-            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - doInBackground called")
+//            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - doInBackground called")
             wordDao.update(word[0]!!)
-            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - word[0]!! ${word[0]!!}")
+//            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - word[0]!! ${word[0]!!}")
             return null
         }
     }
@@ -217,9 +217,9 @@ class WordViewModel(application: Application, wordBookId: Long) : AndroidViewMod
     @SuppressLint("StaticFieldLeak")
     private inner class UpdateFavoriteCheckedAsyncTask : AsyncTask<Word, Void, Void>(){
         override fun doInBackground(vararg word: Word?): Void? {
-            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - doInBackground called")
+//            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - doInBackground called")
             wordDao.update(word[0]!!)
-            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - word[0]!! ${word[0]!!}")
+//            Log.d("     TAG", "===== WordViewModel - UpdateStarCheckedAsyncTask - word[0]!! ${word[0]!!}")
             return null
         }
     }

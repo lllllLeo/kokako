@@ -1,16 +1,11 @@
 package com.example.kokako
 
-import android.Manifest
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.database.Cursor
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.provider.OpenableColumns
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -19,31 +14,29 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.databinding.ActivityMainBinding
-import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
 import com.google.android.material.navigation.NavigationView
-import com.opencsv.CSVReaderBuilder
-import com.opencsv.enums.CSVReaderNullFieldIndicator
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.activity_view_word.*
 import kotlinx.android.synthetic.main.modal_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.rv_wordbook_list.view.*
 import java.io.*
 
 
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface, ImportDialog.OnDataPass {
     private var backPressedTime: Long = 0
     private lateinit var binding: ActivityMainBinding
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
@@ -51,7 +44,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var wordBookModel: WordBookViewModel? = null
     private var wordModel: WordViewModel? = null
     private var wordBookIdForAdd: Long? = null
-    private var excelWordBookId: Long? = null
+    private var getExcelWordBookId: Long? = null
+    private var menu : Menu? = null
+
     private var language = 0
 
     private var folderName = "12121212121212123" // 어플이름 폴더이름
@@ -154,14 +149,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
             }
         }
-        /*val btnListener = View.OnClickListener { view ->
-            when (view.id) {
-                R.id.pop_up_menu -> {
-                    onSubMenuPopupClicked(view)
-                }
-            }
-        }
-        binding.popUpMenu.setOnClickListener(btnListener)*/
 
 
 
@@ -238,6 +225,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }
     }
 
+    private fun addWordBook(wordBookName: String): Long {
+        val wordBook = WordBook(0, wordBookName, 0, 0, (wordBookModel?.getMaxOrder()!! + 1), language)
+        val recentInsertedWordBookId: Long = wordBookModel?.insert(wordBook)!!
+        Log.d("     TAG",
+            "===== MainActivity - addWordBook - recentInsertedWordBookId 값은 : $recentInsertedWordBookId")
+        return recentInsertedWordBookId
+    }
+
 //    override fun onPause() {
 //        super.onPause()
 //        Log.d(TAG, "onPause: called")
@@ -254,10 +249,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 Log.d(ViewWordActivity.TAG, "onExportPopupClicked: ${it.itemId}")
                 when (it.itemId) {
                     R.id.menu_sort -> {
-                    Toast.makeText(this, "정렬하기", Toast.LENGTH_SHORT).show()
-                }
+                        /*val menuItem: MenuItem = menu!!.findItem(R.id.menu_sort)
+                        if (it.title == "등록순 정렬") {
+                            getWordbookNameAscendingOrder()
+                            menuItem.title = "이름순 정렬"
+                            Log.d(TAG, "onSubMenuPopupClicked: ${menuItem.title}")
+                            Log.d(TAG, "onSubMenuPopupClicked: 이름순 정렬")
+                        } else {
+                            getRecentOrder()
+                            menuItem.title = "등록순 정렬"
+                            Log.d(TAG, "onSubMenuPopupClicked: ${menuItem.title}")
+                            Log.d(TAG, "onSubMenuPopupClicked: 등록순 정렬")
+                        }*/
+                    }
                     R.id.menu_excel -> {
-                        setupPermissions()
+                        importDialog()
+                        getRecentOrder() // 이걸로 먼저 정렬하고 내보내기전에 어댑터에서 순서(값)저장해서 넣어놧다가 할까
+                        Log.d(TAG, "onSubMenuPopupClicked: 되나")
                     }
                 }
                 true
@@ -265,12 +273,18 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         popup.show()
     }
 
-    private fun addWordBook(wordBookName: String): Long {
-        val wordBook = WordBook(0, wordBookName, 0, 0, (wordBookModel?.getMaxOrder()!! + 1), language)
-        val recentInsertedWordBookId: Long = wordBookModel?.insert(wordBook)!!
-        Log.d("     TAG",
-            "===== MainActivity - addWordBook - recentInsertedWordBookId 값은 : $recentInsertedWordBookId")
-        return recentInsertedWordBookId
+    private fun getRecentOrder() {
+        updateWordBookList(wordBookModel?.getRecentOrder())
+    }
+
+    private fun getWordbookNameAscendingOrder() {
+        updateWordBookList(wordBookModel?.getWordbookNameAscendingOrder())
+    }
+
+    private fun importDialog() {
+        val importDialog = ImportDialog()
+        val fragmentManager : FragmentManager = supportFragmentManager
+        importDialog.show(fragmentManager, "ImportDialog")
     }
 
     private fun deleteSelectedWordBook(position: Int) {
@@ -278,8 +292,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     private fun updateWordBookList(wordBook: List<WordBook>?) {
-        Log.d(TAG, "===== MainActivity - updateWordBookList called")
-        Log.d(TAG, "===== MainActivity - updateWordBookList wordBook : $wordBook")
+        Log.d(TAG, "updateWordBookList called !!!!!!!!!!!!!!!!")
+        Log.d(TAG, "updateWordBookList wordBook : $wordBook")
         myWordRecyclerAdapter.submitList(wordBook as ArrayList<WordBook>)
         if (wordBook.isEmpty()) {
             binding.emptyWordbook.visibility = View.VISIBLE
@@ -290,7 +304,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onViewClicked(v: View, adapterPosition: Int) {
-        Log.d(TAG, "===== MainActivity - onViewClicked 값은 : " + myWordRecyclerAdapter.getItem()[adapterPosition].id)
+        Log.d(TAG, "onViewClicked 값은 : " + myWordRecyclerAdapter.getItem()[adapterPosition].id)
         val intent = Intent(this, ViewWordActivity::class.java)
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
         intent.putExtra("wordBookNameForView",
@@ -299,7 +313,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onPopupMenuWordBookClicked(v: View,myWordBtnViewOption: Button,adapterPosition: Int,) {
-        Log.d("     TAG", "===== MainActivity - onPopupMenuClicked called")
+        Log.d("     TAG", "onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
         popup.inflate(R.menu.main_item_menu)
         popup.setOnMenuItemClickListener(
@@ -425,7 +439,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                         val wordBookIdForCancel = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
                         Log.d(TAG, "onActivityResult: In $wordBookIdForCancel")
                         deleteCanceledWordBook(wordBookIdForCancel)
-                        updateWordBookList(wordBookModel!!.getRecentOrder())
+//                        updateWordBookList(wordBookModel!!.getRecentOrder())
+                        getRecentOrder()
                         // FIXME: 2021-03-10 여기서 라이브데이터 업뎃시켜주는거 만들어야함 get~~근데 정렬메서드 만들면 해결됨. 일단 등록순으로 뽑는거 해야겠다.
                     }
                 }
@@ -434,7 +449,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 val wordBookIdForView = data!!.getLongExtra("wordBookIdForView", 0)
                 updateWordBookCount(wordBookIdForView)
             }
-            GET_FILE_CODE -> { // 102
+            /*GET_FILE_CODE -> { // 102
                 try {
                     if (data != null) {
                         readCsvFile(data)
@@ -443,7 +458,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 }
-            }
+            }*/
         }
     }
 
@@ -475,97 +490,22 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     }
 
-    private fun readCsvFile(data: Intent?) {
-        try {
-//            if(Build.VERSION.SDK_INT <25) {
-//    val folderAndName = "1212121212121212"+
-            /*val importWordList = ArrayList<Word>()
-            val uri: Uri = data!!.data!!
-            Log.d(TAG, "readCsvFile: uri ${uri.path}")
-            val fileName = getFileName(uri)!!.split(".")[0]
-            Log.d(TAG, "readCsvFile: fileName $fileName")
-            val folderAndName = uri.path!!.split(":")[1]
-            Log.d(TAG, "readCsvFile: folderAndName $folderAndName")*/
-            // TODO: 2021-03-11 뒤로가기해서 파일노선택이면 에러뜸
-            val importWordList = ArrayList<Word>()
-            val uri: Uri = data!!.data!!
-            Log.d(TAG, "readCsvFile: uri ${uri.path}")
-            val fileName = getFileName(uri)!!.split(".")[0]
-            val fileNameFilenameExtension = getFileName(uri)!!.split(".")[0] + ".csv"
-            Log.d(TAG, "readCsvFile: fileName $fileName")
-            // TODO: 2021-03-11 단어장 이름 어플 정해서 폴더가 없으면 이걸로 만들어 놓기. 그리고 여기서만 내보내기 ㄱㄴ,
-            // TODO: 2021-03-12 도움말에 가져오기 할 때 ~~폴더를 만들고 구글스프레드시트에서 만든 .csv 파일을 넣어주세요
-            val folderAndName = "$folderName/$fileNameFilenameExtension"
 
-            val reader =
-                CSVReaderBuilder(FileReader(getExternalPath(folderAndName))).withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)
-                    .build()
-            if (reader != null) {
-                excelWordBookId = addWordBook(fileName)
-                for (cell in reader.iterator()) {
-                    if (cell[0].isNotEmpty() && cell[1].isNotEmpty()) {
-                        val word = Word(0, "default word", "default mean", "",0, 9999, excelWordBookId!!)
-                        word.word = cell[0]
-                        word.mean = cell[1]
-                        importWordList.add(word)
-                    }
-                }
-                wordModel?.insertAllDatas(importWordList)
-                updateWordBookCount(excelWordBookId!!)
-//                Toast.makeText(this, "$fileName 가져오기 완료", Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: FileNotFoundException) {
-            Toast.makeText(this, "예상치 못한 오류로 종료되었습니다.", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
-        }
-    }
-
-    private fun getFileName(uri: Uri): String? {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            val cursor: Cursor? =
-                applicationContext?.contentResolver?.query(uri,
-                    null,
-                    null,
-                    null,
-                    null)
-            try {
-                if (cursor != null && cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(
-                        OpenableColumns.DISPLAY_NAME))
-                }
-            } finally {
-                cursor?.close()
-            }
-        }
-        if (result == null) {
-            result = uri.path
-            val cut = result!!.lastIndexOf('/')
-            if (cut != -1) {
-                result = result.substring(cut + 1)
-            }
-        }
-        return result
-    }
 
     override fun onBackPressed() {
         val curTime : Long = System.currentTimeMillis();
         val gapTime : Long = curTime - backPressedTime;
-
-        if(0 <= gapTime && 2000 >= gapTime) { super.onBackPressed(); }
-        else {
-            backPressedTime = curTime;
-            Toast.makeText(this, "한번 더 누르면 종료됩니다.",Toast.LENGTH_SHORT).show();
-        }
-
-
-        /*---- When ESC is pressed in a NavigationDrawer ----*/
-       /* if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            Log.v("", "네비게이션ESC")
+//        ---- When ESC is pressed in a NavigationDrawer ----
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed()
-        }*/
+//            super.onBackPressed()
+            if(0 <= gapTime && 2000 >= gapTime) { super.onBackPressed(); }
+            else {
+                backPressedTime = curTime;
+                Toast.makeText(this, "'뒤로'버튼을 한번만 더 누르시면 종료됩니다.",Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
@@ -576,18 +516,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true // 네이게이션 아이템이 선택되면 true
     }
 
-    private fun setupPermissions() {
-        val permission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-        if (permission == PackageManager.PERMISSION_GRANTED) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-//            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
-            intent.type = "text/*"
-            startActivityForResult(Intent.createChooser(intent, "Open CSV"), GET_FILE_CODE)
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 101)
-        }
-    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -606,16 +534,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 //ignored }}
     }
 
-    private fun getExternalPath(folderName: String): String? {
-        var sdPath = ""
-        val ext = Environment.getExternalStorageState()
-        sdPath = if (ext == Environment.MEDIA_MOUNTED) {
-            Environment.getExternalStorageDirectory().absolutePath + "/" + folderName
-        } else {
-            "$filesDir/$folderName"
-        }
-        return sdPath
+    override fun onDataPass(data: Long) {
+        getExcelWordBookId = data
+        updateWordBookCount(getExcelWordBookId!!)
+        Log.d(TAG, "onDataPass: In")
     }
+
 
 //    inner class ExceptionHandler : Thread.UncaughtExceptionHandler {
 //        override fun uncaughtException(t: Thread?, e: Throwable?) {

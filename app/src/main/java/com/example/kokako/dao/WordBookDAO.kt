@@ -37,6 +37,9 @@ interface WordBookDAO {
     @Query("SELECT * FROM tb_word_book ORDER BY itemOrder ASC")
     fun getRecentOrder(): List<WordBook>
 
+    @Query("SELECT * FROM tb_word_book ORDER BY title ASC")
+    fun getWordbookNameAscendingOrder(): List<WordBook>
+
 
 
 

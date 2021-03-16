@@ -35,7 +35,11 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
         return wordBookArrayList
     }
 
-
+    fun getWordbookNameAscendingOrder(): List<WordBook>? {
+        wordBookArrayList = GetWordbookNameAscendingOrderAsyncTask().execute().get()
+        Log.d(TAG, "getWordAscendingOrder: $wordBookArrayList")
+        return wordBookArrayList
+    }
 
     fun insert(wordBook: WordBook):Long? {
         return InsertWordBookAsyncTask().execute(wordBook).get()
@@ -84,7 +88,13 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
         override fun doInBackground(vararg params: Void?): List<WordBook> {
             return wordBookDao.getRecentOrder()
         }
+    }
 
+    @SuppressLint("StaticFieldLeak")
+    private inner class GetWordbookNameAscendingOrderAsyncTask(): AsyncTask<Void, Void, List<WordBook>>() {
+        override fun doInBackground(vararg params: Void?): List<WordBook> {
+            return wordBookDao.getWordbookNameAscendingOrder()
+        }
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -122,7 +132,6 @@ class WordBookViewModel(application: Application) : AndroidViewModel(application
     @SuppressLint("StaticFieldLeak")
     private inner class InsertWordBookAsyncTask() : AsyncTask<WordBook, Long, Long>() {
         override fun doInBackground(vararg wordBook: WordBook?): Long {
-//            recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!)
             recentInsertedWordBookId = wordBookDao.insert(wordBook[0]!!.title, wordBook[0]!!.count, wordBook[0]!!.itemOrder, wordBook[0]!!.language)
             return recentInsertedWordBookId
         }
