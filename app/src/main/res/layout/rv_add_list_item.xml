@@ -6,12 +6,10 @@
             android:id="@+id/swipe_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="1dp"
-            android:layout_marginRight="1dp"
             android:layout_marginBottom="1dp"
             android:orientation="horizontal"
             android:weightSum="1"
-            android:background="@drawable/layout_background">
+            android:background="@color/colorWhite">
                 <EditText
                     android:id="@+id/rv_word"
                     android:nextFocusDown="@+id/rv_mean"
@@ -19,11 +17,14 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:hint="  Word"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginLeft="15dp"
+                    android:hint="단어"
                     android:textSize="15sp"
                     android:inputType="text"
                     android:singleLine="true"
-                    android:privateImeOptions="defaultInputMode=english" />
+                    android:privateImeOptions="defaultInputMode=english"
+                    />
 
                 <EditText
                     android:id="@+id/rv_mean"
@@ -32,19 +33,21 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="0.5"
-                    android:hint="  뜻"
+                    android:hint="뜻"
                     android:textSize="15sp"
                     android:inputType="text"
                     android:singleLine="true"
                     android:privateImeOptions="defaultInputMode=korean" />
 
-                <Button
+                <ImageView
                     android:id="@+id/rv_remove_word"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginEnd="15dp"
                     android:layout_gravity="center"
-                    android:background="@drawable/ic_baseline_remove_circle_outline_24" />
-                <!-- 삭제하시겠습니까 dialog 넣을까-->
+                    android:background="@drawable/ic_baseline_remove_circle_outline_24"
+                    />
         </LinearLayout>
 </FrameLayout>
 

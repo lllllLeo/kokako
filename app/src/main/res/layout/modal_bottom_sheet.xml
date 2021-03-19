@@ -16,13 +16,14 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="14dp"
-            android:layout_marginTop="15dp"
+            android:layout_gravity="center_vertical"
             android:text="단어 수정"
             android:textSize="15sp"
             android:textStyle="bold"
+            android:textColor="@color/colorDarkGray"
             android:layout_marginLeft="15dp" />
 
         <ImageView
@@ -52,9 +53,8 @@
         android:id="@+id/bsd_input_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginVertical="10dp"
         android:background="@color/colorWhite"
         android:gravity="center"
         android:weightSum="1">
@@ -65,13 +65,13 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:layout_gravity="center"
-            android:hint="  Word"
+            android:hint="단어"
             android:textSize="15sp"
             android:inputType="text"
             android:privateImeOptions="defaultInputmode=english"
+            android:backgroundTint="@color/colorBlack"
             android:imeOptions="actionNext"
             android:nextFocusDown="@id/bsd_input_mean"
-            android:backgroundTint="@color/colorPrimary"
             android:singleLine="true">
             <requestFocus/>
         </EditText>
@@ -81,13 +81,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:hint="  뜻"
+            android:hint="뜻"
             android:textSize="15sp"
             android:inputType="text"
             android:nextFocusDown="@id/bsd_input_word"
             android:singleLine="true"
-            android:backgroundTint="@color/colorPrimary"
             android:privateImeOptions="defaultInputmode=korean"
+            android:backgroundTint="@color/colorBlack"
             android:imeOptions="actionNext"
             />
     </LinearLayout>
@@ -106,7 +106,9 @@
             android:layout_height="wrap_content"
             android:stateListAnimator="@null"
             android:text="지우기"
-            android:theme="@style/ButtonTheme"/>
+            android:textColor="@color/colorBlack"
+            android:backgroundTint="@color/colorWhite"
+            style="@style/Widget.MaterialComponents.Button"/>
         <View
             android:layout_width="1dp"
             android:layout_height="30dp"
@@ -146,7 +148,9 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:text="수정"
-            android:theme="@style/ButtonTheme"
-            android:stateListAnimator="@null"/>
+            android:stateListAnimator="@null"
+            android:textColor="@color/colorBlack"
+            android:backgroundTint="@color/colorWhite"
+            style="@style/Widget.MaterialComponents.Button"/>
     </LinearLayout>
 </LinearLayout>

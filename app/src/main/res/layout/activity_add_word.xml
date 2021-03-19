@@ -5,19 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorBackground"
+    android:background="@color/colorWhite"
     tools:context=".MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar_add"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorWhite"
         android:minHeight="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:popupTheme="@style/Theme.AppCompat.Light.DarkActionBar"
         app:contentInsetStart="0dp"
         >
+<!--        android:background="@color/colorBlue"-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -36,38 +37,54 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#ffffff"
-                android:textSize="16sp"
+                android:layout_gravity="center"
+                android:textColor="#000000"
+                android:textSize="17sp"
                 android:textStyle="bold" />
             <ImageView
                 android:id="@+id/btn_add_finish_check"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:scaleType="center"
-                android:src="@drawable/ic_baseline_check_24"
+                android:src="@drawable/ic_baseline_check_24_black"
                 />
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
     <LinearLayout
+        android:id="@+id/black_line"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/toolbar_add"
+        android:background="@color/colorBlack"
+        android:orientation="horizontal" />
+    <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_below="@+id/toolbar_add"
+        android:layout_below="@+id/black_line"
         android:background="@color/colorLightGray"
-        android:weightSum="1">
+        android:gravity="center"
+        android:orientation="horizontal">
+<!--        android:layout_below="@+id/blue_line"-->
 
         <TextView
-            android:id="@+id/word_count"
-            android:layout_width="match_parent"
+            android:id="@+id/current_count"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center|left"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textSize="18sp"
+            android:textColor="@android:color/black"
+            />
+        <TextView
+            android:id="@+id/current_count2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:textSize="13sp"
             android:textColor="@android:color/black"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="0.6"
-            />
+        />
 
         <!--<LinearLayout
             android:layout_width="match_parent"
@@ -119,13 +136,12 @@
     <LinearLayout
         android:id="@+id/input_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_below="@id/info"
-        android:layout_marginTop="5dp"
-        android:layout_marginBottom="7dp"
-        android:layout_marginHorizontal="3dp"
+        android:background="@color/colorWhite"
         android:gravity="center"
-        android:weightSum="1">
+        android:weightSum="1"
+        >
 
         <EditText
             android:id="@+id/input_word"
@@ -133,13 +149,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:layout_gravity="center"
-            android:hint="  Word"
+            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
+            android:hint="단어"
             android:textSize="15sp"
             android:inputType="text"
-            android:privateImeOptions="defaultInputmode=english"
+            android:privateImeOptions="defaultInputmode=japanese"
             android:imeOptions="actionNext"
             android:nextFocusDown="@id/input_mean"
-            android:singleLine="true">
+            android:singleLine="true"
+            >
             <requestFocus/>
         </EditText>
 
@@ -161,7 +180,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:hint="  뜻"
+            android:hint="뜻"
             android:textSize="15sp"
             android:inputType="text"
             android:nextFocusDown="@id/input_word"
@@ -169,22 +188,23 @@
             android:privateImeOptions="defaultInputmode=korean"
             android:imeOptions="actionNext"
             />
-        <Button
+        <ImageView
             android:id="@+id/delete_all"
-            android:layout_width="23dp"
-            android:layout_height="23dp"
-            android:layout_marginRight="1dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp"
             android:background="@drawable/ic_baseline_cancel_24"
-            android:layout_marginEnd="1dp" />
+            />
     </LinearLayout>
 
-<!--    <LinearLayout
+    <LinearLayout
         android:id="@+id/input_division"
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.8dp"
         android:layout_below="@+id/input_layout"
         android:background="@color/colorDivision"
-        android:orientation="horizontal" />-->
+        android:orientation="horizontal" />
 
     <FrameLayout
         android:id="@+id/list_view"
@@ -199,18 +219,18 @@
 <!--            android:background="@color/colorDivision"-->
 <!--            android:orientation="horizontal"-->
 <!--            />-->
-        <View
+<!--        <View
             android:layout_width="match_parent"
-            android:layout_height="0.8dp"
+            android:layout_height="10dp"
             android:layout_below="@id/info"
-            android:background="@color/colorDivision"/>
+            android:background="@color/colorDivision"/>-->
+<!--            android:layout_height="0.8dp"-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list_item"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="5dp"
-            android:layout_marginHorizontal="3dp"
+            android:layout_marginTop="2dp"
             android:focusableInTouchMode="true"
             android:descendantFocusability="beforeDescendants"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -225,13 +245,16 @@
         android:layout_alignParentBottom="true"
         android:weightSum="1">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_remove_text"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:stateListAnimator="@null"
             android:text="지우기"
-            android:theme="@style/ButtonTheme" />
+            android:textColor="@color/colorBlack"
+            style="@style/Widget.MaterialComponents.Button"
+            android:backgroundTint="@color/colorWhite"
+            />
 
         <ImageButton
             android:id="@+id/btn_move_left"
@@ -258,8 +281,11 @@
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:text="추가"
-            android:theme="@style/ButtonTheme"
-            android:stateListAnimator="@null"/>
+            android:textColor="@color/colorBlack"
+            android:stateListAnimator="@null"
+            style="@style/Widget.MaterialComponents.Button"
+            android:backgroundTint="@color/colorWhite"
+            />
     </LinearLayout>
 </RelativeLayout>
 

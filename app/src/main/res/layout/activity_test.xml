@@ -4,6 +4,6 @@
     android:id="@+id/test_frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradiation"
+    android:background="@color/colorWhite"
     >
 </FrameLayout>

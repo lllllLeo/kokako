@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TestActivity"
-    android:background="@drawable/gradiation"
+    android:background="@color/colorWhite"
     android:orientation="vertical">
     <!--    android:background="@color/colorPrimaryLight"-->
 
@@ -18,7 +19,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-
+        android:background="@color/colorWhite"
         >
         <ImageView
             android:id="@+id/test_back_btn"
@@ -27,6 +28,26 @@
             android:scaleType="center"
             android:src="@drawable/ic_baseline_arrow_back_24"
             />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            >
+        </View>
+        <LinearLayout
+            android:id="@+id/test_listen_layout"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            >
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/test_listen_imageview"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/colorButtonGray"
+                android:background="@drawable/ic_baseline_volume_up_24"/>
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:textColor="@color/colorWhite"
+            android:textColor="@color/colorBlack"
             android:textSize="16sp"
             android:visibility="gone"
             >
@@ -47,7 +68,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            android:layout_weight="0.5">
+            android:layout_weight="0.5"
+            >
             <TextView
                 android:id="@+id/count_test"
                 android:layout_width="wrap_content"
@@ -56,7 +78,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:text="1/20"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorBlack"
                 />
             <TextView
                 android:id="@+id/question_test"
@@ -64,9 +86,11 @@
                 android:layout_height="wrap_content"
                 android:textSize="30sp"
                 android:layout_gravity="center"
-                android:layout_marginTop="70dp"
+                android:layout_marginTop="55dp"
+                android:layout_marginHorizontal="20dp"
                 android:text="Question"
-                android:textColor="@color/colorWhite"
+                android:textStyle="bold"
+                android:textColor="@color/colorBlack"
                 />
         </LinearLayout>
         <LinearLayout
@@ -82,9 +106,11 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="60dp"
                 android:textSize="30sp"
+                android:layout_marginHorizontal="20dp"
                 android:text="answer"
+                android:textStyle="bold"
                 android:visibility="invisible"
-                android:textColor="@color/colorWhite"
+                android:textColor="@color/colorBlack"
                 />
         </LinearLayout>
     </LinearLayout>
@@ -121,6 +147,7 @@
             android:background="#00ff0000"
             android:stateListAnimator="@null"
             android:drawableTint="@color/colorRed"
+            android:backgroundTint="@color/colorWhite"
             />
             <!--android:paddingRight="23dp"
             android:paddingLeft="23dp"
@@ -138,8 +165,9 @@
             android:layout_weight="0.3"
             android:stateListAnimator="@null"
             android:text="외움"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/colorBlue"
             android:background="#00ff0000"
+            android:backgroundTint="@color/colorWhite"
             />
             <!--android:paddingRight="30dp"
             android:paddingLeft="30dp"

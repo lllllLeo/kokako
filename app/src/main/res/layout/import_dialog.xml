@@ -13,22 +13,29 @@
             android:id="@+id/toolbar_dialog"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@color/colorBlack"
             app:contentInsetStartWithNavigation="0dp"
             app:contentInsetStart="0dp"
-            app:navigationIcon="@drawable/ic_baseline_clear_24"
             >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+                <ImageView
+                    android:id="@+id/import_close_btn"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_baseline_clear_24"
+                    app:tint="@color/colorWhite" />
                 <TextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="#ffffff"
+                    android:layout_gravity="center"
+                    android:textColor="@color/colorWhite"
                     android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -36,10 +43,15 @@
     </com.google.android.material.appbar.AppBarLayout>
 
     <FrameLayout
+        android:id="@+id/import_framelayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivision"
+            android:orientation="horizontal" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -51,9 +63,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginHorizontal="15dp"
+                android:layout_marginHorizontal="20dp"
                 android:text="▪ 휴대폰 저장소에 [   ] 폴더를 만든 후 단어를 작성한 .csv 파일을 넣어주세요."
                 android:textSize="13sp"
+                android:layout_marginBottom="18dp"
+                >
+            </TextView>
+            <TextView
+                android:id="@+id/tv2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginHorizontal="20dp"
+                android:text="▪ 아래 예시 화면처럼 A열에는 단어, B열에는 뜻을 입력해 주세요."
+                android:textSize="13sp"
+                android:bufferType="spannable"
                 android:layout_marginBottom="18dp"
                 >
             </TextView>
@@ -61,27 +85,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginHorizontal="15dp"
-                android:text="▪ .csv 파일 작성 예시"
+                android:layout_marginHorizontal="20dp"
+                android:text="[ .csv 파일 작성 예시 ]"
                 android:textSize="13sp"
-                >
-            </TextView>
-            <TextView
-                android:id="@+id/tv3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:layout_marginHorizontal="15dp"
-                android:text="아래 예시 화면처럼 A열에는 단어, B열에는 뜻을 입력해 주세요."
-                android:bufferType="spannable"
-                android:textSize="13sp"
+                android:layout_marginBottom="5dp"
                 >
             </TextView>
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="left"
-                android:layout_marginHorizontal="15dp"
+                android:layout_marginHorizontal="20dp"
                 android:src="@drawable/csv_file_example"
                 >
             </ImageView>
@@ -89,7 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginHorizontal="15dp"
+                android:layout_marginHorizontal="20dp"
                 android:text="구글 스프레드시트에서 작성 후 .csv 파일로 저장하시는 것을 추천드립니다."
                 android:textSize="13sp"
                 >
@@ -98,7 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginHorizontal="15dp"
+                android:layout_marginHorizontal="20dp"
                 android:text="구글 스프레드시트에서 작성 -> 파일 -> 다운로드 -> 쉼표로 구분된 값(.csv, 현재 시트)"
                 android:textSize="13sp"
                 >
@@ -114,7 +128,7 @@
             android:layout_height="60dp"
             android:text=".csv 파일 가져오기"
             android:layout_marginBottom="25dp"
-            android:layout_marginHorizontal="15dp"
+            android:layout_marginHorizontal="20dp"
             style="@style/ButtonTheme"
             >
         </Button>

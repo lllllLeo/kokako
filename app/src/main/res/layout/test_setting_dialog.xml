@@ -13,22 +13,31 @@
             android:id="@+id/toolbar_dialog"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:background="@color/colorBlack"
             app:contentInsetStartWithNavigation="0dp"
             app:contentInsetStart="0dp"
-            app:navigationIcon="@drawable/ic_baseline_clear_24"
             >
+<!--            app:navigationIcon="@drawable/ic_baseline_clear_24"-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/test_setting_close_btn"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_baseline_clear_24"
+                    app:tint="@color/colorWhite" />
                 <TextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:textColor="#ffffff"
+                    android:textColor="@color/colorWhite"
                     android:textSize="16sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -41,7 +50,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorDivision"
+            android:orientation="horizontal" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -53,10 +66,13 @@
                 android:layout_height="20dp"
                 android:text="문제 범위"
                 android:textColor="@color/colorBlack"
-                android:layout_margin="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="10dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="20dp">
             </TextView>
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipgroup"
@@ -104,10 +120,13 @@
                 android:layout_height="20dp"
                 android:text="문제 유형"
                 android:textColor="@color/colorBlack"
-                android:layout_margin="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="10dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="20dp">
             </TextView>
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipgroup2"
@@ -145,10 +164,13 @@
                 android:layout_height="20dp"
                 android:text="정렬"
                 android:textColor="@color/colorBlack"
-                android:layout_margin="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginBottom="10dp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginLeft="20dp">
             </TextView>
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipgroup3"
@@ -202,6 +224,7 @@
             android:text="테스트 하기"
             android:layout_marginHorizontal="15dp"
             android:layout_marginBottom="100dp"
+            android:backgroundTint="@color/colorBlue"
             style="@style/ButtonTheme"
             >
         </Button>
