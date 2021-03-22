@@ -32,6 +32,9 @@ import com.example.kokako.model.Word
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.opencsv.CSVReaderBuilder
 import com.opencsv.enums.CSVReaderNullFieldIndicator
 import java.io.FileNotFoundException
@@ -40,6 +43,7 @@ import java.util.*
 
 
 class ImportDialog : DialogFragment() {
+    private var adView : AdView? = null
     private var                     _binding : ImportDialogBinding? = null
     private val                     binding get() = _binding!!
     private var                     folderName = "1212121212121212"// 어플이름 폴더이름
@@ -86,12 +90,19 @@ class ImportDialog : DialogFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             binding.toolbarTitle.text = "가져오기"
             binding.toolbarTitle.gravity = Gravity.LEFT
-            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
-            binding.toolbarDialog.setOnMenuItemClickListener { item ->
-                dismiss()
-                true
-            }
+//            binding.toolbarTitle.gravity = Gravity.CENTER
+//            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
+//            binding.toolbarDialog.setOnMenuItemClickListener { item ->
+//                dismiss()
+//                true
+//            }
         }
+
+        MobileAds.initialize(requireActivity().application, getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)
+
 
         wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -99,15 +110,15 @@ class ImportDialog : DialogFragment() {
             }
         }).get(WordViewModel::class.java)
         wordBookModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(
-            activity!!.application)).get(WordBookViewModel::class.java)
+            requireActivity().application)).get(WordBookViewModel::class.java)
 
-//        아래 예시화면처럼 A열에는 단어, B열에는 뜻을 입력해주세요.
-        val span : Spannable = binding.tv3.text as Spannable
-        span.setSpan(StyleSpan(Typeface.BOLD), 10,12, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        span.setSpan(StyleSpan(Typeface.BOLD), 15,17, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        span.setSpan(StyleSpan(Typeface.BOLD), 19,21, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        span.setSpan(StyleSpan(Typeface.BOLD), 24,25, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val span : Spannable = binding.tv2.text as Spannable
+        span.setSpan(StyleSpan(Typeface.BOLD), 11,13, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        span.setSpan(StyleSpan(Typeface.BOLD), 16,18, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        span.setSpan(StyleSpan(Typeface.BOLD), 20,22, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        span.setSpan(StyleSpan(Typeface.BOLD), 25,26, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
+        binding.importCloseBtn.setOnClickListener { dismiss() }
         binding.importFile.setOnClickListener{
             setupPermissions()
         }
@@ -134,7 +145,8 @@ class ImportDialog : DialogFragment() {
                     if (data != null) {
                         readCsvFile(data)
                         dismiss()
-                        Toast.makeText(context, "단어장 가져오기를 완료하였습니다.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "단어장 가져오기를 완료하였습니다.\n가져온 단어장의 언어 설정을 변경해주세요.", Toast.LENGTH_SHORT).show()
+//                        Snackbar.make(binding.importFramelayout, "단어장 추가 완료", Snackbar.LENGTH_LONG).show()
                     }
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
@@ -202,7 +214,7 @@ class ImportDialog : DialogFragment() {
         var result: String? = null
         if (uri.scheme == "content") {
             val cursor: Cursor? =
-                activity!!.application?.contentResolver?.query(uri,
+                requireActivity().application?.contentResolver?.query(uri,
                     null,
                     null,
                     null,
@@ -232,7 +244,7 @@ class ImportDialog : DialogFragment() {
         sdPath = if (ext == Environment.MEDIA_MOUNTED) {
             Environment.getExternalStorageDirectory().absolutePath + "/" + folderName
         } else {
-            "${context!!.filesDir}/${folderName}"
+            "${requireContext().filesDir}/${folderName}"
         }
         return sdPath
     }

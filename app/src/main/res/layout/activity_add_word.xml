@@ -211,7 +211,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/input_layout"
-        android:layout_above="@id/btn_bottom">
+        android:layout_above="@id/layout_bottom">
 <!--        <LinearLayout-->
 <!--            android:layout_width="match_parent"-->
 <!--            android:layout_height="0.5dp"-->
@@ -235,57 +235,92 @@
             android:descendantFocusability="beforeDescendants"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:listitem="@layout/rv_add_list_item"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            >
+            <TextView
+                android:id="@+id/empty_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:visibility="gone"
+                android:text="추가된 단어가 없습니다."
+                />
+        </LinearLayout>
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/btn_bottom"
+        android:id="@+id/layout_bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true"
-        android:weightSum="1">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_remove_text"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:stateListAnimator="@null"
-            android:text="지우기"
-            android:textColor="@color/colorBlack"
-            style="@style/Widget.MaterialComponents.Button"
-            android:backgroundTint="@color/colorWhite"
-            />
-
-        <ImageButton
-            android:id="@+id/btn_move_left"
+        >
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:theme="@style/ButtonTheme"
-            android:stateListAnimator="@null"
-            android:imeOptions="actionPrevious"
-            android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
-
-        <ImageButton
-            android:id="@+id/btn_move_right"
-            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
+            ads:adSize="SMART_BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id_for_test">
+        </com.google.android.gms.ads.AdView>
+        <LinearLayout
+            android:id="@+id/btn_bottom"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:theme="@style/ButtonTheme"
-            android:stateListAnimator="@null"
-            android:imeOptions="actionNext"
-            android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
+            android:gravity="bottom"
+            android:weightSum="1">
 
-        <Button
-            android:id="@+id/btn_add_word"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="추가"
-            android:textColor="@color/colorBlack"
-            android:stateListAnimator="@null"
-            style="@style/Widget.MaterialComponents.Button"
-            android:backgroundTint="@color/colorWhite"
-            />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_remove_text"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:stateListAnimator="@null"
+                android:text="지우기"
+                android:textColor="@color/colorBlack"
+                style="@style/Widget.MaterialComponents.Button"
+                android:backgroundTint="@color/colorWhite"
+                />
+
+            <ImageButton
+                android:id="@+id/btn_move_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:theme="@style/ButtonTheme"
+                android:stateListAnimator="@null"
+                android:imeOptions="actionPrevious"
+                android:src="@drawable/ic_baseline_keyboard_arrow_left_24"/>
+
+            <ImageButton
+                android:id="@+id/btn_move_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:theme="@style/ButtonTheme"
+                android:stateListAnimator="@null"
+                android:imeOptions="actionNext"
+                android:src="@drawable/ic_baseline_keyboard_arrow_right_24"/>
+
+            <Button
+                android:id="@+id/btn_add_word"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:text="추가"
+                android:textColor="@color/colorBlack"
+                android:stateListAnimator="@null"
+                style="@style/Widget.MaterialComponents.Button"
+                android:backgroundTint="@color/colorWhite"
+                />
+        </LinearLayout>
+
     </LinearLayout>
 </RelativeLayout>
 

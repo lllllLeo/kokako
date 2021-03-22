@@ -6,41 +6,40 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
+import android.text.Selection
 import android.util.Log
 import android.view.Gravity
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityAddWordBinding
-import com.example.kokako.databinding.ActivityToolbarBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import kotlinx.android.synthetic.main.activity_add_word.*
 import kotlinx.android.synthetic.main.activity_view_word.view.*
-import kotlin.NullPointerException
 
 //  Log.d("     TAG", "===== AddWordActivity")
 // TODO: 2021-01-27 키보드를 아예 보이지말까
 // TODO: 2021-02-02 추가하면 스크롤 위로안감
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
-    private lateinit var            toolbarBinding: ActivityToolbarBinding
+    private var adView : AdView? = null
     private var                     _binding : ActivityAddWordBinding? = null
     private val                     binding get() = _binding!!
     private lateinit var            addRecyclerAdapter: AddRecyclerAdapter
     private var                     model : WordViewModel? = null
-    var                             currentWordCount: Int = 0
     private var                     currentCount: Int = 0
-    var                             countString: String? = null
-    private var                     tvWordCount: TextView? = null
     private lateinit var            imm : InputMethodManager
     private var                     word = ArrayList<Word>()
     var                             wordBookIdForAddOrEdit : Long = 0
@@ -53,6 +52,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         const val CANCEL_CODE = 11
         const val EDIT_WORD_CODE = 100
     }
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityAddWordBinding.inflate(layoutInflater)
@@ -61,17 +61,25 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         input_word.id =             INPUT_WORD_ID
         input_mean.id =             INPUT_MEAN_ID
         wordBookIdForAddOrEdit = intent.getLongExtra("wordBookIdForAddOrEdit",0)
-        Log.d("     TAG", "===== AddWordActivity getLongExtra() wordBookIdForAdd 값은 : $wordBookIdForAddOrEdit ")
         checkActivity = intent.getBooleanExtra("checkActivity",false)
 
-        Log.d("     TAG", "===== AddWordActivity input_word.id 은 ${input_word.id} INPUT_WORD_ID 은 $INPUT_WORD_ID \n input_mean.id 은 ${input_mean.id} INPUT_MEAN_ID 은 ${INPUT_MEAN_ID} ")
 
-        //        add Divider in RecyclerView
-//        rv_list_item.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
+        MobileAds.initialize(this, getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)
+
+
+
+
+
         rv_list_item.isFocusable = false
 
-        binding.toolbarTitle.gravity = Gravity.LEFT
-        binding.toolbarTitle.text = if(checkActivity) {"단어장 편집"} else {"단어장 추가"}
+        binding.toolbarTitle.gravity = Gravity.CENTER
+        binding.inputWord.privateImeOptions = "defaultInputmode=english"
+
+
+
 
         // Forcing the Soft Keyboard open
 /*      imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -86,8 +94,35 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             }}).get(WordViewModel::class.java)
 
         addRecyclerAdapter = AddRecyclerAdapter(this)
-        word            = model?.getRecentOrder(wordBookIdForAddOrEdit)!!
+        word            = model?.getLatestOrder(wordBookIdForAddOrEdit)!!
         addRecyclerAdapter.submitDataList(word)
+
+        if(checkActivity) {
+            binding.toolbarTitle.text = "[ 단어장 수정 ]"
+            binding.emptyText.visibility = View.GONE
+            if (word.size == 0) {
+                binding.btnAddFinishCheck.isEnabled = false // 편집으로 들어올때 0개로 들어올 수 있으니 0개면 버튼 비활성화
+                binding.btnAddFinishCheck.imageTintList =
+                    ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
+                binding.emptyText.visibility = View.VISIBLE
+            }
+        } else {
+            binding.toolbarTitle.text = "[ 단어장 추가 ]"
+            binding.btnAddFinishCheck.isEnabled = false // 처음 단어장 추가로 들어오면 단어가 없을테니까 버튼을 비활성화 초기설정
+            binding.btnAddFinishCheck.imageTintList =
+                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
+            binding.emptyText.visibility = View.VISIBLE
+        }
+
+
+
+
+
+
+
+
+
+
 
         rv_list_item.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
@@ -120,22 +155,22 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     R.id.btn_add_finish_check -> {
                         // FIXME: 2021-01-20 아무값 입력없이 추가 예외처리
                         val mBuilder = AlertDialog.Builder(this)
-                        mBuilder.setTitle("단어장으로 추가")
-                        if (word.size == 0) {
-                            mBuilder.setMessage("작성된 단어가 없습니다. 이대로 단어장을 만드시겠습니까?")
+                        // FIXME: 2021-03-21 단어, 뜻 전부 지우고 체크 누르려고하면 addviewholder에서 position별로 체크해서 리스트만들고 입력하고 이게 하나라도 둘다 null이면 체크버튼은 회색으로
+                        if (checkActivity) {
+                            mBuilder.setTitle("단어장 수정")
+                            mBuilder.setMessage("입력한 단어로 단어장을 수정하시겠습니까?")
                         } else {
+                            mBuilder.setTitle("단어장 추가")
                             mBuilder.setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
                         }
                             .setNegativeButton("취소", null)
                             .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-                                Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
                                 // TODO: 2021-01-27 잠시 키보드 넣음
-//                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                                 val intent = Intent()
                                 intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
-                                if (!checkActivity) {
+                                if (!checkActivity) { // 수정
                                     model?.insertAllDatas(word)
-                                } else {
+                                } else { // 추가
                                     intent.putParcelableArrayListExtra("word", word)
                                 }
                                 setResult(COMPLETE_CODE, intent)
@@ -152,13 +187,18 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     R.id.btn_remove_text -> {
                         if (input_word.isFocused) {
                             input_word.text.clear()
-                        } else if (input_mean.isFocused)
+                        } else if (input_mean.isFocused) {
                             input_mean.text.clear()
+                        } else if (findViewById<EditText>(currentFocusId) != null ) {
+                            findViewById<EditText>(currentFocusId).text.clear()
+                        }
                     }
                     R.id.btn_move_left -> {
                         when {
                             findViewById<EditText>(currentFocusId + 1) != null -> {
                                 findViewById<EditText>(currentFocusId + 1).requestFocus()
+                                val editableText = findViewById<EditText>(currentFocusId + 1).text
+                                Selection.setSelection(editableText, editableText.length)
                             }
                             currentFocus!!.id == INPUT_MEAN_ID -> {
                                 input_word.requestFocus()
@@ -178,21 +218,27 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                         } else if (currentFocus!!.id == INPUT_MEAN_ID && addRecyclerAdapter.itemCount != 0) {
                             try {
                                 findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).requestFocus()
+                                val editableText = findViewById<EditText>(((addRecyclerAdapter.itemCount - 1) * 2) + 1).text
+                                Selection.setSelection(editableText, editableText.length)
                             } catch (e: NullPointerException) {
                                 return@OnClickListener
                             }
                         } else if (findViewById<EditText>(currentFocusId - 1) != null) {
                             Log.d("     TAG", "===== AddWordActivity btn_move_right else if문 2")
                             findViewById<EditText>(currentFocusId - 1).requestFocus()
+                            val editableText = findViewById<EditText>(currentFocusId - 1).text
+                            Selection.setSelection(editableText, editableText.length)
                         }
                     }
 // data없으면  무시하기 -> textViewLayout?
                     R.id.btn_add_word -> {
+                        // TODO: 2021-03-21 추가하면 애니메이션으로 fade out?
                         input_word.text.toString().trim()
                         input_mean.text.toString().trim()
-//                    if (input_word.text.equals("") || input_mean.text.equals("")) {
-                        if (input_mean.text.toString().trim().isEmpty() || input_word.text.toString().trim().isEmpty()) {
-                            Toast.makeText(this, "데이터를 올바르게 입력", Toast.LENGTH_SHORT).show()
+                        if (input_mean.text.toString().trim().isEmpty() && input_word.text.toString().trim()
+                                .isEmpty()
+                        ) {
+                            Toast.makeText(this, "단어나 뜻을 입력해주세요.", Toast.LENGTH_SHORT).show()
                         } else {
 //                        이제 word에 추가가되네 add로
                             addRecyclerAdapter.addItem(Word
@@ -207,7 +253,26 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                             input_mean.text.clear()
                             input_word.requestFocus()
                             getCurrentCount("add")
+                            if (checkActivity) { // 수정
+                                if (word.size != 0) {
+                                    binding.btnAddFinishCheck.isEnabled = true
+                                    binding.btnAddFinishCheck.imageTintList =
+                                        ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
+                                    binding.emptyText.visibility = View.GONE
+                                    Log.d(TAG, "gone")
+                                }
+                            } else {
+                                if (addRecyclerAdapter.itemCount != 0) {
+                                    Log.d(TAG, "onCreate: ${addRecyclerAdapter.itemCount}")
+                                    binding.btnAddFinishCheck.isEnabled = true
+                                    binding.btnAddFinishCheck.imageTintList =
+                                        ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
+                                    binding.emptyText.visibility = View.GONE
+                                    Log.d(TAG, "gone")
+                                }
+                            }
                         }
+
                     }
                 }
             } catch (e: NullPointerException) {
@@ -230,13 +295,14 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             "add" -> { currentCount += 1 }
             "remove" -> { currentCount -= 1 }
         }
-        binding.wordCount.text = currentCount.toString() + "개"
+        binding.currentCount.text = currentCount.toString()
+        binding.currentCount2.text = "개"
     }
     /*
 * 이 액티비티에서 뷰홀더에서 onClick()된걸 아니까 이 액티비티에서 클릭처리를 할 수 있다
 * */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onRemoveClicked(view: View, position: Int) {
-        Log.d("     TAG","===== AddWordActivity onRemoveClicked position $position")
         val mBuilder = AlertDialog.Builder(view.context)
         mBuilder.setTitle("삭제")
             .setMessage("단어 : " + addRecyclerAdapter.getItem()[position].word.toString() + "\n뜻 : " + addRecyclerAdapter.getItem()[position].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
@@ -244,56 +310,49 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                 DialogInterface.OnClickListener { _, _ ->
                     addRecyclerAdapter.removeItem(position)
                     getCurrentCount("remove")
+                    if (checkActivity) {    // 수정
+                        if (word.size != 0) {
+                            binding.btnAddFinishCheck.isEnabled = true
+                            binding.btnAddFinishCheck.imageTintList =
+                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
+                            binding.emptyText.visibility = View.GONE
+                            Log.d(TAG, "gone")
+                        } else {
+                            binding.btnAddFinishCheck.isEnabled = false
+                            binding.btnAddFinishCheck.imageTintList =
+                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
+                            binding.emptyText.visibility = View.VISIBLE
+                            Log.d(TAG, "visi2 수정")
+                        }
+                    } else {
+                        Log.d(TAG, "onCreate: 단어장추가로들어옴")
+                        if (addRecyclerAdapter.itemCount != 0) {
+                            Log.d(TAG, "onCreate: ${addRecyclerAdapter.itemCount}")
+                            binding.btnAddFinishCheck.isEnabled = true
+                            binding.btnAddFinishCheck.imageTintList =
+                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
+                            binding.emptyText.visibility = View.GONE
+                            Log.d(TAG, "gone")
+                        } else {
+                            binding.btnAddFinishCheck.isEnabled = false
+                            binding.btnAddFinishCheck.imageTintList =
+                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
+                            binding.emptyText.visibility = View.VISIBLE
+                            Log.d(TAG, "visi2 추가")
+                        }
+                    }
                 })
             .setNegativeButton("취소",
                 DialogInterface.OnClickListener { dialog, which ->
                     dialog.cancel()
                 })
         mBuilder.show()
+
+
     }
-/*    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_check, menu)
-        return true
-    }*/
-
-/*    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-        val mBuilder = AlertDialog.Builder(this)
-        when(item.itemId) {
-            android.R.id.home -> { cancelDialog(mBuilder) }
-            R.id.menu_check -> {
-                // FIXME: 2021-01-20 아무값 입력없이 추가 예외처리
-                mBuilder.setTitle("단어장으로 추가")
-                if (word.size == 0) {
-                    mBuilder.setMessage("작성된 단어가 없습니다. 이대로 단어장을 만드시겠습니까?")
-                } else {
-                    mBuilder.setMessage("입력한 단어를 단어장으로 만드시겠습니까?")
-                }
-                    .setNegativeButton("취소", null)
-                    .setPositiveButton("확인", DialogInterface.OnClickListener { dialog, _ ->
-                        Toast.makeText(this, "단어장 추가완료", Toast.LENGTH_SHORT).show()
-                        // TODO: 2021-01-27 잠시 키보드 넣음
-//                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-                        val intent = Intent()
-                        intent.putExtra("wordBookIdForAddOrEdit", wordBookIdForAddOrEdit)
-                        if (!checkActivity) {
-                            model?.insertAllDatas(word)
-                        } else {
-                            intent.putParcelableArrayListExtra("word", word)
-                        }
-                        setResult(COMPLETE_CODE, intent)
-                        dialog.dismiss()
-                        finish()
-                    })
-                mBuilder.create().show()
-            }
-        }
-        return true
-    }*/
     override fun onBackPressed() {
         cancelDialog(mBuilder = AlertDialog.Builder(this))
     }
-
     private fun cancelDialog(mBuilder: AlertDialog.Builder) {
         mBuilder.setTitle("단어장 취소")
             .setMessage("입력한 단어를 취소하고 이동하시겠습니까?")
@@ -328,30 +387,3 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     }
 
 }
-
-/*
- @SuppressLint("ClickableViewAccessibility")
-    private fun updateWordList(words: List<Word>?) {
-        addRecyclerAdapter = AddRecyclerAdapter(this)
-        addRecyclerAdapter.submitDataList(words as ArrayList<Word>)
-        val swipeHelperCallback = SwipeHelperCallback().apply {
-            setClamp(200f)
-        }
-        val itemTouchHelper = ItemTouchHelper(swipeHelperCallback)
-        itemTouchHelper.attachToRecyclerView(rv_list_item)
-        // 리사이클러뷰 설정
-        rv_list_item.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-//                            (layoutManager as LinearLayoutManager).stackFromEnd = true
-            setHasFixedSize(true)
-            // 어답터 장착
-            adapter = addRecyclerAdapter
-//            addItemDecoration(ItemDecoration())
-
-            setOnTouchListener { _, _ ->
-                swipeHelperCallback.removePreviousClamp(this)
-                false
-            }
-        }
-    }
-* */

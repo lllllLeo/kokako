@@ -1,13 +1,12 @@
 package com.example.kokako
 
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.example.kokako.databinding.FragmentTestResultBinding
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.fragment_test_result.*
@@ -77,7 +76,12 @@ class TestResultFragment : Fragment() {
             in 60..79 -> { binding.resultEmoji.setImageResource(R.drawable.ic_score_60_to_79) }
             in 80..100 -> { binding.resultEmoji.setImageResource(R.drawable.ic_score_80_to_100) }
         }
-        if (notMemorized == 0) { binding.oneMoreTest.isEnabled = false }
+        if (notMemorized == 0) {
+            binding.oneMoreTest.isEnabled = false
+            binding.oneMoreTest.setBackgroundColor(ContextCompat.getColor(activity!!.application,R.color.colorGray))
+        } else {
+            binding.oneMoreTest.setBackgroundColor(ContextCompat.getColor(activity!!.application,R.color.colorBlue))
+        }
 
 
 

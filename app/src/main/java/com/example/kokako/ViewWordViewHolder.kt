@@ -1,16 +1,13 @@
 package com.example.kokako
 
-import android.util.Log
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.ViewWordActivity.Companion.checkboxList
 import com.example.kokako.ViewWordActivity.Companion.visibleCheckboxList
 import com.example.kokako.model.CheckBoxData
-import com.example.kokako.model.TtsCheckBoxData
 import com.example.kokako.model.VisibleCheckBoxData
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_word_list.view.*
-import kotlin.collections.ArrayList
 
 class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWordRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener, View.OnLongClickListener {
     private var starButton = itemView.view_star
@@ -22,8 +19,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
     private var listenButton = itemView.view_listen_parent_layout
     private var visibleCheckBox = itemView.visible_check
     private var visibleCheckBoxLayout = itemView.visible_check_layout
-    private var after_visibilityOptions = 0
-    private var current_visibilityOptions = 0
     private var _visibilityOptions = 0
     private var viewWordRecyclerViewInterface : ViewWordRecyclerViewInterface? = null
     companion object {
@@ -46,12 +41,9 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         wordTextView.text = wordDatas[position].word
         meanTextView.text = wordDatas[position].mean
 
-        listenButton.tag = position
-
         isDeleteMode(deleteMode, wordDatas, position)
         setInitializeUnCheckedList(position, wordDatas)     // 처음 들어올 때 체크박스 전부 false
-        visibilityMode(visibilityOptions, position)         // 가리기 모드
-
+        setVisibilityMode(visibilityOptions, position)         // 가리기 모드
 
         setCheckedByLongClicked(position, currentLongClickPosition, wordDatas)      // 롱클릭 true로 바꿔줌
         // TODO: 2021-02-08 별도 스레드
@@ -60,7 +52,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
 
         wordCheckBox.isChecked = checkboxList[position].checked
         wordMeanLayout.isSelected = checkboxList[position].checked
-
         visibleCheckBox.isChecked = visibleCheckboxList[position].checked
         if (_visibilityOptions == 1) {
             if (visibleCheckboxList[position].checked) {
@@ -78,6 +69,7 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                 wordTextView.visibility = View.VISIBLE
                 meanTextView.visibility = View.INVISIBLE
             }
+            // TODO: 2021-03-17 랜덤
         }
     }
 
@@ -93,7 +85,6 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
             starButtonLayout.visibility = View.VISIBLE
             starButton.visibility = View.VISIBLE
             listenButton.visibility = View.VISIBLE
-
             // FIXME: 2021-02-21 이거 빼기
             if (wordDatas[position].bookMarkCheck == 1) {
                 starButton.setBackgroundResource(R.drawable.favorite_pressed_background)
@@ -112,9 +103,10 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         if (position >= checkboxList.size) {
             checkboxList.add(position, CheckBoxData(wordDatas[position].id, false))
             visibleCheckboxList.add(position, VisibleCheckBoxData(wordDatas[position].id, false))
+
         }
     }
-    private fun visibilityMode(showAndHideNumber: Int, position: Int) {
+    private fun setVisibilityMode(showAndHideNumber: Int, position: Int) {
         when (showAndHideNumber) {
             0 -> {
                 visibleCheckBoxLayout.visibility = View.GONE
@@ -149,27 +141,40 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
                     wordTextView.visibility = View.VISIBLE
                     meanTextView.visibility = View.INVISIBLE
                 }
-
-//                meanLayout.isSelected = visibleCheckboxList[position].checked
-//                current_visibilityOptions = 2
             }
             // FIXME: 2021-02-24 랜덤하기
-            3 -> {
+            /*3 -> {
                 visibleCheckBoxLayout.visibility = View.VISIBLE
                 visibleCheckBox.visibility = View.VISIBLE
+                    // TODO: 2021-03-17 5:5비율로나오게
                 val random = (1..10).shuffled().first()
-                Log.d(TAG, "bind: random 은 $random")
-                if (random % 2 == 0) {
-                    wordTextView.visibility = View.VISIBLE
-                    meanTextView.visibility = View.INVISIBLE
-                } else {
-                    wordTextView.visibility = View.INVISIBLE
-                    meanTextView.visibility = View.VISIBLE
-                }
-            }
-        }
-//        isVisibilityUnCheckedMode(showAndHideNumber)
+//                Log.d(TAG, "visibilityMode: all unchecked random bind $position / $random")
+//                if (random % 2 == 0) {
+//                    wordTextView.visibility = View.VISIBLE
+//                    meanTextView.visibility = View.INVISIBLE
+//                } else {
+//                    wordTextView.visibility = View.INVISIBLE
+//                    meanTextView.visibility = View.VISIBLE
+//                }
 
+
+//                if (visibleCheckboxList[position].checked) {
+//                    if (wordTextView.visibility == View.INVISIBLE) {
+//                        wordTextView.visibility = View.VISIBLE
+//                        isInvisibleItem = "word"
+//                    } else if (meanTextView.visibility == View.INVISIBLE) {
+//                        meanTextView.visibility = View.VISIBLE
+//                        isInvisibleItem = "mean"
+//                    }
+//                } else {
+//                    if (isInvisibleItem.equals("word")) {
+//                        wordTextView.visibility = View.INVISIBLE
+//                    } else {
+//                        meanTextView.visibility = View.INVISIBLE
+//                    }
+//                }
+            }*/
+        }
     }
 
     private fun isUnCheckedMode(num: Int, currentLongClickPosition: Int?) {
@@ -188,13 +193,11 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
             for (i in 0 until visibleCheckboxList.size) {
                 if (visibleCheckboxList[i].checked) {
                     visibleCheckboxList[i].checked = false
+                    visibleCheckBox.isSelected = visibleCheckboxList[i].checked
                 }
             }
         }
     }
-
-
-
     override fun onClick(v: View?) {
         when(v!!.id) {
             R.id.visible_check_layout -> {
@@ -225,21 +228,4 @@ class ViewWordViewHolder(itemView: View, viewWordRecyclerViewInterface: ViewWord
         return true
     }
 }
-
-
-/*
-                wordOptionsButton.isClickable = false
-
-                if(wordShowAndHideButton.isChecked) {
-                    wordShowAndHideButton.setBackgroundResource(R.drawable.ic_baseline_visibility_24)
-                    wordTextView.visibility = View.VISIBLE
-                    meanTextView.visibility = View.VISIBLE
-                } else {
-                    wordShowAndHideButton.setBackgroundResource(R.drawable.ic_baseline_visibility_off_24)
-                    wordTextView.visibility = View.INVISIBLE
-                    meanTextView.visibility = View.VISIBLE
-                }
-
-
-*/
 

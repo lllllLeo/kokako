@@ -1,11 +1,14 @@
 package com.example.kokako
 
-import android.text.TextWatcher
+import android.annotation.SuppressLint
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.os.Build
 import android.util.Log
 import android.view.View
-import android.widget.Button
 import android.widget.EditText
-import android.widget.FrameLayout
+import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.Word
 import kotlinx.android.synthetic.main.rv_add_list_item.view.*
@@ -15,10 +18,13 @@ import kotlinx.android.synthetic.main.rv_add_list_item.view.*
 class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInterface) : RecyclerView.ViewHolder(itemView), View.OnClickListener{
     var wordEditText: EditText =        itemView.rv_word
     var meanEditText: EditText =        itemView.rv_mean
-//    var removeButton: FrameLayout = itemView.rv_remove_word
-    var removeButton: Button =          itemView.rv_remove_word
+    var removeButton: ImageView =          itemView.rv_remove_word
 
     private var addRecyclerViewInterface : AddRecyclerViewInterface? = null
+
+    companion object {
+        const val TAG = "TAG AddViewHolder"
+    }
 
     // 기본 생성자
     init {
@@ -34,6 +40,8 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
     }
 
     //뷰와 데이터 묶기
+    @SuppressLint("ResourceAsColor")
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun bind(word: ArrayList<Word>, position:Int){
         wordEditText.tag = position
         meanEditText.tag = position
@@ -41,6 +49,16 @@ class AddViewHolder(itemView: View, addRecyclerViewInterface: AddRecyclerViewInt
         meanEditText.setText(word[position].mean)
         wordEditText.id = (position * 2) + 1
         meanEditText.id = position * 2
+        when {
+            wordEditText.text.toString().trim().isEmpty() -> {
+                Log.d(TAG, "bind: $position   wordedittext")
+                wordEditText.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#CD1818"))
+            }
+            meanEditText.text.toString().trim().isEmpty() -> {
+                Log.d(TAG, "bind: $position   meanedittext")
+                meanEditText.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#CD1818"))
+            }
+        }
 //        Log.d("     TAG", "===== AddViewHolder - bind 단어, 뜻 : ${word[position].word}, ${word[position].mean}")
     }
 

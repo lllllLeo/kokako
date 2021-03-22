@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordViewModel
-import kotlin.collections.ArrayList
 
 // Adapter 캐리어 ViewHolder는 인터셉터
 class MyWordRecyclerAdapter(myWordListRecyclerViewInterface: MyWordListRecyclerViewInterface) : RecyclerView.Adapter<MyWordViewHolder>(), ItemTouchHelperListener{

@@ -1,6 +1,7 @@
 package com.example.kokako
 
 import android.view.View
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.WordBook
 import kotlinx.android.synthetic.main.rv_wordbook_list.view.*
@@ -10,7 +11,7 @@ class MyWordViewHolder(itemView: View, myWordListRecyclerViewInterface: MyWordLi
     private val myWordMainTitle = itemView.my_word_main_title
     private val myWordMainCount = itemView.my_word_main_count
     private val myWordBookList = itemView.my_word_book_list
-    private val myWordBtnViewOption = itemView.word_show_and_hide
+    private val myWordBtnViewOption : ImageView = itemView.word_show_and_hide
 //    private val myWordBtnViewOption = itemView.my_word_text_view_options
     private var myWordListRecyclerViewInterface : MyWordListRecyclerViewInterface? = null
 

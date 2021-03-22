@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.android.gms.oss-licenses-plugin'
 
 android {
     compileSdkVersion 29
@@ -46,7 +47,10 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.android.gms:play-services-ads:18.0.0'
+    implementation 'com.google.android.gms:play-services-oss-licenses:17.0.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.preference:preference:1.1.1'
     def lifecycle_version = "2.2.0"
     def room_version = "2.2.3"
     def multidex_version = "2.0.1"
@@ -63,7 +67,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     implementation 'com.opencsv:opencsv:4.6' // csv
     implementation "androidx.multidex:multidex:$multidex_version" // minSdk20이하 AndroidX 사용하는 경우
-    implementation "androidx.documentfile:documentfile:1.0.1" //saf폴더생성
+
     kapt "androidx.room:room-compiler:$room_version"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

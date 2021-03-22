@@ -1,13 +1,15 @@
 package com.example.kokako
 
-import android.os.Parcelable
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import com.example.kokako.model.Word
 
 class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): ListAdapter<Word, AddViewHolder>(MyDiffCallback) {
@@ -21,6 +23,7 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
     }
 
     // 뷰와 뷰홀더가 묶였을때
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onBindViewHolder(holder: AddViewHolder, position: Int) {
         holder.bind(this.wordDatas,position)
         // 여기서 클릭리스너안함. MyViewHolder에 View.OnClickListener가 있으니까 발동된다
@@ -34,6 +37,7 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
         addViewHolder.wordEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun afterTextChanged(s: Editable?) {
                 Log.d("     TAG","===== AddViewHolder afterTextChanged wordEditText called")
 
@@ -42,12 +46,18 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
                     Log.d("     TAG",
                         "===== AddViewHolder wordEditText position : $position 값 : ${s.toString()}")
                     wordDatas[position].word = s.toString()
+                     if (addViewHolder.wordEditText.text.toString().trim().isEmpty()) {
+                            addViewHolder.wordEditText.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#CD1818"))
+                    } else {
+                         addViewHolder.wordEditText.backgroundTintList = ColorStateList.valueOf(Color.BLACK)
+                    }
                 }
             }
         })
         addViewHolder.meanEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { }
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun afterTextChanged(s: Editable?) {
                 Log.d("     TAG","===== AddViewHolder afterTextChanged meanEditText called")
                 if (addViewHolder.meanEditText.tag != null) {
@@ -55,6 +65,11 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
                     Log.d("     TAG",
                         "===== AddViewHolder meanEditText position : $position 값 : ${s.toString()}")
                     wordDatas[position].mean = s.toString()
+                    if (addViewHolder.meanEditText.text.toString().trim().isEmpty()) {
+                        addViewHolder.meanEditText.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#CD1818"))
+                    } else {
+                        addViewHolder.meanEditText.backgroundTintList = ColorStateList.valueOf(Color.BLACK)
+                    }
                 }
             }
         })

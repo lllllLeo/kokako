@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="sort_array">
+        <item>최신순</item>
         <item>등록순</item>
         <item>북마크순</item>
         <item>단어 ▲</item>
@@ -13,11 +14,40 @@
         <item>전체 보기</item>
         <item>단어 가리기</item>
         <item>뜻 가리기</item>
-        <item>랜덤 가리기</item>
     </string-array>
+    <!--        <item>랜덤 가리기</item>-->
     <string-array name="language_array">
         <item>영어</item>
+        <item>영어(영국)</item>
         <item>일본어</item>
         <item>중국어</item>
+        <item>스페인어</item>
+        <item>포르투갈어</item>
+        <item>독일어</item>
+        <item>프랑스어</item>
+        <item>러시아어</item>
+        <item>베트남어</item>
+        <item>한국어</item>
+    </string-array>
+    <!-- Reply Preference -->
+
+    <string-array name="reply_entries">
+        <item>Reply</item>
+        <item>Reply to all</item>
+    </string-array>
+
+    <string-array name="reply_values">
+        <item>reply</item>
+        <item>reply_all</item>
+    </string-array>
+
+    <string-array name="wordbook_sort_entries">
+        <item>등록순</item>
+        <item>이름순</item>
+    </string-array>
+
+    <string-array name="wordbook_sort_values">
+        <item>등록순</item>
+        <item>이름순</item>
     </string-array>
 </resources>

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:elevation="0dp">
@@ -49,7 +51,10 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_below="@+id/appbar_layout"
+        android:layout_above="@+id/adView"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        tools:ignore="NotSibling">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -192,10 +197,20 @@
                     >
                 </com.google.android.material.chip.Chip>
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/oldest_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="등록순"
+                    android:textColor="@color/colorWhite"
+                    app:chipBackgroundColor="@color/chip_background"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    >
+                </com.google.android.material.chip.Chip>
+                <com.google.android.material.chip.Chip
                     android:id="@+id/asc_word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="단어 오름차순"
+                    android:text="단어순"
                     android:textColor="@color/colorWhite"
                     app:chipBackgroundColor="@color/chip_background"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -222,13 +237,22 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="테스트 하기"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginBottom="100dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="12dp"
             android:backgroundTint="@color/colorBlue"
             style="@style/ButtonTheme"
             >
         </Button>
         </LinearLayout>
     </FrameLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id_for_test">
+    </com.google.android.gms.ads.AdView>
+</RelativeLayout>

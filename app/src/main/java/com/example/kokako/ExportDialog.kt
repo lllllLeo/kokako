@@ -3,13 +3,9 @@ package com.example.kokako
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -31,16 +27,19 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.kokako.databinding.ExportDialogBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.opencsv.CSVWriter
 import java.io.File
 import java.io.FileWriter
-import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 class ExportDialog : DialogFragment() {
+    private var adView : AdView? = null
     private var                     _binding : ExportDialogBinding? = null
     private val                     binding get() = _binding!!
     private var                     toolbar: Toolbar? = null
@@ -90,30 +89,40 @@ class ExportDialog : DialogFragment() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             binding.toolbarTitle.text = "내보내기"
             binding.toolbarTitle.gravity = Gravity.LEFT
-            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
-            binding.toolbarDialog.setOnMenuItemClickListener { item ->
-                dismiss()
-                true
-            }
+//            binding.toolbarTitle.gravity = Gravity.CENTER
+//            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
+//            binding.toolbarDialog.setOnMenuItemClickListener { item ->
+//                dismiss()
+//                true
+//            }
         }
+
+        MobileAds.initialize(requireContext(), getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)
+
         wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return WordViewModel(activity!!.application, wordBookIdForView!!) as T
             }
         }).get(WordViewModel::class.java)
-        wordList = wordModel?.getRecentOrder(wordBookIdForView!!)
+        wordList = wordModel?.getLatestOrder(wordBookIdForView!!)
 
 
 
 
         val btnListener = View.OnClickListener {
             when(it.id) {
+                R.id.export_close_btn -> {
+                    dismiss()
+                }
                 R.id.export_file_to_storage -> {
                     if (Build.VERSION.SDK_INT < 30) {
                         setupPermissions()
                     } else {
                         Toast.makeText(context,
-                            "현재 안드로이드 버전에서는 지원하지 않습니다. 파일로 공유하기를 이용해주세요.",
+                            "현재 안드로이드 버전에서는 지원하지 않습니다. 이메일로 공유하기를 이용해주세요.",
                             Toast.LENGTH_SHORT)
                             .show()
                     }
@@ -123,16 +132,17 @@ class ExportDialog : DialogFragment() {
 //                    ssaasdf()
 //                    writeTempCsvFile("$wordBookNameForView.csv")
                 }
-                R.id.export_text -> {
+                /*R.id.export_text -> {
                     exportText()
-                }
+                }*/
             }
         }
 
 
+        binding.exportCloseBtn.setOnClickListener(btnListener)
         binding.exportFileToStorage.setOnClickListener(btnListener)
         binding.exportFileToShare.setOnClickListener(btnListener)
-        binding.exportText.setOnClickListener(btnListener)
+//        binding.exportText.setOnClickListener(btnListener)
 
     }
 
@@ -158,15 +168,17 @@ class ExportDialog : DialogFragment() {
                 wordList!![i].option.toString())
             toText.add(item)
         }
-        val clipboard = activity!!.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+
+
+        /*val clipboard = activity!!.getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("복사한 단어", toText.toString())
         clipboard.setPrimaryClip(clip)
-        Toast.makeText(context, "클립보드에 단어를 복사하였습니다.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "클립보드에 단어를 복사하였습니다.", Toast.LENGTH_SHORT).show()*/
 
     }
 
     private fun ssaasdf() {
-        val extRoot: File? = context!!.getExternalFilesDir(null)
+        val extRoot: File? = requireContext().getExternalFilesDir(null)
         val someFile = "/test/some.csv"
 
         val xlsFile = File(extRoot, someFile)
@@ -174,8 +186,8 @@ class ExportDialog : DialogFragment() {
         shareIntent.type = "application/*" // 엑셀파일 공유 시
         shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         val contentUri: Uri = FileProvider.getUriForFile(
-            context!!,
-            context!!.applicationContext.packageName + ".fileprovider",
+            requireContext(),
+            requireContext().applicationContext.packageName + ".fileprovider",
             xlsFile)
         Log.d(TAG, "ssaasdf: $contentUri")
 //        content://com.example.kokako
@@ -317,27 +329,27 @@ class ExportDialog : DialogFragment() {
             } else {    // 공유하기 위해 임시로 내부저장소에 저장할 때
                 Log.d(TAG, "getExternalPath: sdk30이상")
                 Log.d(TAG,
-                    "getExternalPath: ${context!!.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.path.toString()}")
-                context!!.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.path.toString() // data/~~
+                    "getExternalPath: ${requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.path.toString()}")
+                requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.path.toString() // data/~~
 //                /storage/emulated/0/Android/data/com.example.kokako/files/Download/내보내기_2021-03-12 22:23_단어장.csv
             }
 //            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
 //            File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),"$folderName").toString()
         } else {
             Log.d(TAG, "getExternalPath: else문")
-            "${context!!.filesDir}/$folderName"
+            "${requireContext().filesDir}/$folderName"
         }
-        Log.d(TAG, "getExternalPath: 1 ${context!!.getExternalFilesDir(null)?.path.toString()}")
+        Log.d(TAG, "getExternalPath: 1 ${requireContext().getExternalFilesDir(null)?.path.toString()}")
                                     //        1 /storage/emulated/0/Android/data/com.example.kokako/files
         Log.d(TAG, "getExternalPath: 2 ${Environment.getExternalStorageDirectory().absolutePath + "/" + folderName}")
                                     //        2 /storage/emulated/0/1212121212121212
-        Log.d(TAG, "getExternalPath: 3 ${context!!.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.path.toString()}")
+        Log.d(TAG, "getExternalPath: 3 ${requireContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)?.path.toString()}")
                                     //        3 /storage/emulated/0/Android/data/com.example.kokako/files/Download
         Log.d(TAG, "getExternalPath: 4 ${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}")
                                     //        4 /storage/emulated/0/Download
-        Log.d(TAG, "getExternalPath: 5 ${context!!.getExternalFilesDir("temp")?.path.toString()}")
+        Log.d(TAG, "getExternalPath: 5 ${requireContext().getExternalFilesDir("temp")?.path.toString()}")
                                     //        5 /storage/emulated/0/Android/data/com.example.kokako/files/temp
-        Log.d(TAG, "getExternalPath: 6 ${context!!.getExternalFilesDir("temp")?.toString()}")
+        Log.d(TAG, "getExternalPath: 6 ${requireContext().getExternalFilesDir("temp")?.toString()}")
                                     //        6 /storage/emulated/0/Android/data/com.example.kokako/files/temp
 //        Log.d(TAG, "getExternalPath: sdPath $sdPath")
         return sdPath

@@ -10,18 +10,21 @@ import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AlphaAnimation
+import android.view.animation.Animation
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.FragmentManager
@@ -30,28 +33,25 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.kokako.databinding.ActivityViewWordBinding
 import com.example.kokako.model.CheckBoxData
-import com.example.kokako.model.TtsCheckBoxData
 import com.example.kokako.model.VisibleCheckBoxData
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_view_word.*
 import kotlinx.android.synthetic.main.modal_bottom_sheet.view.*
 import kotlinx.android.synthetic.main.rv_word_list.view.*
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.List
-import kotlin.collections.drop
-import kotlin.collections.hashMapOf
-import kotlin.collections.isNotEmpty
 import kotlin.collections.set
-import kotlin.collections.toMutableList
+
 
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, BottomSheetDialog.BottomSheetInterface, TestSettingDialog.OnDataPass {
-    //    private lateinit var            toolbarBinding: ActivityToolbarBinding
-    private var                     toolbar: Toolbar? = null
-
+    private var                     adView : AdView? = null
+    private var                     ttsStatus: Int? = 0
     private var                     _binding: ActivityViewWordBinding? = null
     private val                     binding get() = _binding!!
     private lateinit var            viewRecyclerAdapter: ViewWordRecyclerAdapter
@@ -67,17 +67,20 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     private var                     sortSelectedIndex = 0
     private var                     hideSelectedIndex = 0
     private var                     testValue : ArrayList<String>? = null
-    private var                     isInvisibleItem : String? = null
     private var                     language = 0
     private var                     ttsResult : Int = 0
     private var                     tts : TextToSpeech? = null
     private var                     ttsArrayList = ArrayList<LinearLayout>()
+    private var                     ttsCount = 0
+    private var                     ssb : SpannableStringBuilder? = null
+    private var                     anim : AlphaAnimation? = null
     /*private var                     currentShowSnackBarTime : Long = 0
     private var                     mLastClickTime : Long = 0L*/
     companion object {
 //        const val                     MIN_CLICK_INTERVAL = 600
-const val                           TAG = "TAG ViewWordActivity"
+    const val                           TAG = "TAG ViewWordActivity"
         var                         checkboxList = ArrayList<CheckBoxData>()
+        var                     isInvisibleItem : String? = null
         var                         visibleCheckboxList = ArrayList<VisibleCheckBoxData>()
         const val                   EDIT_WORD_CODE = 100
         const val                   GET_WORD_VIEW_CODE = 105
@@ -98,9 +101,37 @@ const val                           TAG = "TAG ViewWordActivity"
         val sortItems = resources.getStringArray(R.array.sort_array)
         val hideItems = resources.getStringArray(R.array.hide_array) // 발음 가리기 (3 items)
 
+
+        MobileAds.initialize(this, getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)
+
+
+
+
+
+
+
+
+
         /*---- Tool Bar ----*/
-        binding.toolbarTitle.gravity = Gravity.LEFT
+//        binding.toolbarTitle.gravity = Gravity.LEFT
+
+//        val span : Spannable = wordBookNameForView as Spannable
+        ssb = SpannableStringBuilder(wordBookNameForView)
+        Log.d(TAG, "onCreate: $wordBookNameForView")
+        ssb!!.setSpan(UnderlineSpan(), 0, wordBookNameForView!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+
+//        binding.toolbarTitle.gravity = Gravity.CENTER
+//        binding.toolbarTitle.text = ssb
         binding.toolbarTitle.text = wordBookNameForView
+        /*val span : Spannable = binding.toolbarTitle.text as Spannable
+        span.setSpan(UnderlineSpan(),0,wordBookNameForView!!.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        binding.toolbarTitle.text = span*/
+
+//        binding.toolbarTitle.text = wordBookNameForView
 
 
         ViewCompat.setOnApplyWindowInsetsListener(view) { view, insets ->
@@ -112,6 +143,7 @@ const val                           TAG = "TAG ViewWordActivity"
         viewRecyclerAdapter = ViewWordRecyclerAdapter(this)
         checkboxList.clear()
         isDeleteMode(0, -2)
+        setTtsProgressAnimation()
 
 
         wordBookModel = ViewModelProvider(this,
@@ -125,10 +157,9 @@ const val                           TAG = "TAG ViewWordActivity"
 
         language = wordBookModel?.getLanguageCode(wordBookIdForView)!!
         textToSpeechInit(language)  // tts 초기 셋팅
-        Log.d(TAG, "onCreate: 12121 $tts")
 //        tts!!.setOnUtteranceProgressListener(TtsUtteranceListener())
         Log.d(TAG, "onCreate: 22222 $tts")
-        wordList = wordModel?.getRecentOrder(wordBookIdForView)
+        wordList = wordModel?.getLatestOrder(wordBookIdForView)
 
 
         wordModel?.wordListLivedata?.observe(this, { updateWordList(it, sortId, wordList!!) })
@@ -150,6 +181,7 @@ const val                           TAG = "TAG ViewWordActivity"
                 }
                 R.id.view_cancel_btn -> {
                     isDeleteMode(0, -1)
+                    binding.hideSpinner.setSelection(0)
                 }
                 R.id.view_add_or_edit_btn -> {
                     val intent = Intent(this, AddWordActivity::class.java)
@@ -168,6 +200,7 @@ const val                           TAG = "TAG ViewWordActivity"
                         if (tts != null) {
                             Log.d(TAG, "onCreate: tts가 널이 아님")
                             textToSpeechAllWord()
+
                         }
                     } else {
                         Toast.makeText(this, "안드로이드 버전이 낮아서 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -220,10 +253,10 @@ const val                           TAG = "TAG ViewWordActivity"
                 if(position == hideSelectedIndex) {
                     tv.setTextColor(Color.BLACK)
                     tv.setTypeface(null, Typeface.BOLD)
-                    tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_check_24_black, 0);
-                    /*DrawableCompat.setTint(
+                    tv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_baseline_check_24_black, 0)
+/*                    DrawableCompat.setTint(
                         DrawableCompat.wrap(context.getDrawable(R.drawable.ic_baseline_check_24)!!),
-                        ContextCompat.getColor(context, R.color.colorBlack)
+                        ContextCompat.getColor(context, R.color.colorBlue)
                     )*/
                 }
                 return tv
@@ -241,79 +274,123 @@ const val                           TAG = "TAG ViewWordActivity"
                         viewRecyclerAdapter.showAndHide(0)
                     } // 전체보기
                     1 -> {
+                        for (i in 0 until visibleCheckboxList.size) {
+                            if (visibleCheckboxList[i].checked) {
+                                visibleCheckboxList[i].checked = false
+//                                visibleCheckBox.isSelected = visibleCheckboxList[i].checked
+                            }
+                        }
                         viewRecyclerAdapter.showAndHide(1)
                     } // 단어 가리기
                     2 -> {
+                        for (i in 0 until visibleCheckboxList.size) {
+                            if (visibleCheckboxList[i].checked) {
+                                visibleCheckboxList[i].checked = false
+//                                visibleCheckBox.isSelected = visibleCheckboxList[i].checked
+                            }
+                        }
                         viewRecyclerAdapter.showAndHide(2)
                     } // 뜻 가리기
-                    3 -> {
+                    /*3 -> {
+                        for (i in 0 until visibleCheckboxList.size) {
+                            if (visibleCheckboxList[i].checked) {
+                                visibleCheckboxList[i].checked = false
+//                                visibleCheckBox.isSelected = visibleCheckboxList[i].checked
+                            }
+                        }
                         viewRecyclerAdapter.showAndHide(3)
-                    } // 랜덤
+                    } // 랜덤*/
                 }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
+
         fab_test_word.setOnClickListener { _ ->
+
             if(wordList!!.size != 0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    isSpeakingTts()
+                }
                 openTestSettingDialog()
             } else {
                 Toast.makeText(this, "작성된 단어가 없습니다. 단어를 추가해주세요.", Toast.LENGTH_SHORT).show()
             }
         }
     }
-
+    private fun setTtsProgressAnimation() {
+        anim = AlphaAnimation(0.0f, 1.0f)
+        anim!!.duration = 100
+        anim!!.startOffset = 20
+        anim!!.repeatMode = Animation.REVERSE
+        anim!!.repeatCount = Animation.INFINITE
+    }
     private fun textToSpeechInit(language: Int) {
+        Log.d(TAG, "textToSpeechInit: $language")
+        // TODO: 2021-03-18 음성데이터가 없어도 재생이된다 갤s6에서
         tts = TextToSpeech(this, TextToSpeech.OnInitListener {
             when (language) {
                 0 -> { // 영어
                     ttsResult = tts?.setLanguage(Locale.ENGLISH)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
                 }
-                1 -> { // 일본어
+                1 -> { // 영어(영국)
+                    ttsResult = tts?.setLanguage(Locale.UK)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                2 -> { // 일본어
                     ttsResult = tts?.setLanguage(Locale.JAPANESE)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
                 }
-                2 -> { // 중국어
+                3 -> { // 중국어
                     ttsResult = tts?.setLanguage(Locale.CHINESE)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                4 -> { // 스페인어
+//                    val spanish : Locale = Locale("es", "ES")
+//                    configuration.locale = spanish
+//                    ttsResult = tts?.setLanguage(configuration.locale)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                    ttsResult = tts?.setLanguage(Locale("spa"))!!
+                }
+                5 -> { // 포르투갈어
+                    ttsResult = tts?.setLanguage(Locale("pt-PT"))!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                6 -> { // 독일어
+                    ttsResult = tts?.setLanguage(Locale.GERMAN)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                7 -> { // 프랑스어
+                    ttsResult = tts?.setLanguage(Locale.FRENCH)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                8 -> { // 러시아어
+                    ttsResult = tts?.setLanguage(Locale("ru"))!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                9 -> { // 베트남어
+                    ttsResult = tts?.setLanguage(Locale("vi"))!!
+                    Log.d(TAG, "textToSpeechInit: $language")
+                }
+                10 -> { // 한국어
+                    ttsResult = tts?.setLanguage(Locale.KOREAN)!!
+                    Log.d(TAG, "textToSpeechInit: $language")
                 }
             }
-            if (it == TextToSpeech.SUCCESS) {
-                when (ttsResult) {
-                    TextToSpeech.LANG_MISSING_DATA -> {
-                        Toast.makeText(this, "해당 언어의 음성 데이터가 없습니다. 음성 데이터를 설치해주세요.", Toast.LENGTH_SHORT).show()
-                    }
-                    TextToSpeech.LANG_NOT_SUPPORTED -> {
-                        Toast.makeText(this, "지원하지 않는 언어입니다", Toast.LENGTH_SHORT).show()
-                        return@OnInitListener
-                    }
-                    else -> {
-                        /*val speechListener = object : UtteranceProgressListener() {
-                            override fun onStart(utteranceId: String?) {
-                                Log.d(TAG, "onStart: IN")
-                                *//*v.view_listen_layout.setBackgroundResource(R.drawable.button_round)
-                                v.view_listen_imageview.setColorFilter(ContextCompat.getColor(v.context,
-                                    R.color.colorBlack))*//*
-                            }
-
-                            override fun onDone(utteranceId: String?) {
-                                Log.d(TAG, "onDone: IN")
-                                *//*v.view_listen_layout.setBackgroundResource(R.drawable.button_border)
-                                v.view_listen_imageview.setColorFilter(ContextCompat.getColor(v.context,
-                                    R.color.colorButtonGray))*//*
-                            }
-
-                            override fun onError(utteranceId: String?) {
-                                TODO("Not yet implemented")
-                            }
-                        }*/
-
-                    }
+            ttsStatus = it
+            if (ttsStatus == TextToSpeech.SUCCESS) {
+                if (ttsResult == TextToSpeech.LANG_MISSING_DATA or TextToSpeech.LANG_NOT_SUPPORTED) {
+                    Toast.makeText(this, "해당 언어의 음성 데이터가 없습니다. 음성 데이터를 설치해주세요.", Toast.LENGTH_SHORT).show()
                 }
             }
         })
 
     }
 
+    // TODO: 2021-03-18 낱개클릭, 전체클릭 난타하면 낱개 안꺼짐 한번씩 이럴애 거의업을테니까
+    @SuppressLint("RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private fun textToSpeechAllWord() {
         if (tts!!.isSpeaking) {  // 전체 듣기로 실행중일때 끄고 실행
@@ -322,24 +399,42 @@ const val                           TAG = "TAG ViewWordActivity"
                 binding.viewAllListenLayout.backgroundTintList =
                     ContextCompat.getColorStateList(this@ViewWordActivity,
                         R.color.colorButtonGray)
+                binding.viewTtsProgrssbar.clearAnimation()
+                binding.viewTtsProgrssbar.visibility = View.INVISIBLE
             }
+            for (i in ttsArrayList) {
+                i.view_listen_layout.setBackgroundResource(R.drawable.button_border)
+                i.view_listen_imageview.supportBackgroundTintList =
+                    ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorButtonGray)
+            }
+            ttsArrayList.clear()
         } else {
             tts!!.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {
+                    // TODO: 2021-03-17 단어가 많으면 시작할떄 좀 느리게 반응하네
+                    Log.d(TAG, "onStart: start with $utteranceId")
                     runOnUiThread {
+                        binding.viewTtsProgrssbar.visibility = View.VISIBLE
+                        binding.viewTtsProgrssbar.startAnimation(anim)
                         binding.viewAllListenLayout.backgroundTintList =
                             ContextCompat.getColorStateList(this@ViewWordActivity,
-                                R.color.colorPrimary)
-                        Log.d(TAG, "onStart: start with $utteranceId")
+                                R.color.colorBlue)
                     }
                 }
 
                 override fun onDone(utteranceId: String?) {
-                    runOnUiThread {
-                        binding.viewAllListenLayout.backgroundTintList =
-                            ContextCompat.getColorStateList(this@ViewWordActivity,
-                                R.color.colorButtonGray)
-                        Log.d(TAG, "onDone: done with $utteranceId")
+                    Log.d(TAG, "onDone: done with $utteranceId")
+                    ttsCount += 1
+                    if (ttsCount == wordList!!.size) {
+                        Log.d(TAG, "onDone: $ttsCount 번")
+                        runOnUiThread {
+                            binding.viewTtsProgrssbar.visibility = View.INVISIBLE
+                            binding.viewTtsProgrssbar.clearAnimation()
+                            binding.viewAllListenLayout.backgroundTintList =
+                                ContextCompat.getColorStateList(this@ViewWordActivity,
+                                    R.color.colorButtonGray)
+                        }
+                        ttsCount = 0
                     }
                 }
 
@@ -353,12 +448,12 @@ const val                           TAG = "TAG ViewWordActivity"
                 override fun onError(utteranceId: String?) {
                     Log.d(TAG, "onError: error with $utteranceId")
                 }
-
             })
             if (wordList != null) {
                 val utteranceId = UUID.randomUUID().toString()
                 val map = hashMapOf<String, String>()
                 map[TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID] = utteranceId
+
                 for (word in wordList!!) {
                     if (Build.VERSION.SDK_INT >= 21) {
                         tts?.speak(word.word, TextToSpeech.QUEUE_ADD, null, utteranceId)
@@ -369,17 +464,13 @@ const val                           TAG = "TAG ViewWordActivity"
                     }
                 }
             }
+
         }
     }
-
-    // FIXME: 2021-03-14 언어 설정 변경 ㄱㄱ / 중복클릭 / 전체듣기 일시정지
-
     @SuppressLint("ResourceAsColor", "RestrictedApi")
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun ontextToSpeechSpeakButtonClicked(v: View, adapterPosition: Int) {
-        if (tts!!.isSpeaking) {  // 전체 듣기로 실행중일때 끄고 실행
-            tts!!.stop()
-        }
+        isSpeakingTts()     // 전체 듣기로 실행중일때 끄고 실행
         tts!!.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             @SuppressLint("RestrictedApi")
             override fun onStart(utteranceId: String?) {
@@ -429,6 +520,26 @@ const val                           TAG = "TAG ViewWordActivity"
         }
 //        tts?.speak(wordList!![adapterPosition].word, TextToSpeech.QUEUE_ADD, null, null)
     }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun isSpeakingTts() {
+        if (tts!!.isSpeaking) {
+            tts!!.stop()
+            runOnUiThread {
+                binding.viewTtsProgrssbar.visibility = View.INVISIBLE
+                binding.viewTtsProgrssbar.clearAnimation()
+                binding.viewAllListenLayout.backgroundTintList =
+                    ContextCompat.getColorStateList(this@ViewWordActivity,
+                        R.color.colorButtonGray)
+    //                for (i in ttsArrayList) {   // 이거 넣으니까 중복 재생 할 때 마지막값만 켜지고 전값 다 꺼지네
+    //                    i.view_listen_layout.setBackgroundResource(R.drawable.button_border)
+    //                    i.view_listen_imageview.supportBackgroundTintList =
+    //                        ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorButtonGray)
+    //                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // TTS 객체가 남아있다면 실행을 중지하고 메모리에서 제거한다.
@@ -438,15 +549,6 @@ const val                           TAG = "TAG ViewWordActivity"
             tts = null
         }
     }
-
-
-
-
-
-
-
-
-
     private fun exportDialog() {
         val bundle = Bundle()
         val exportDialog = ExportDialog()
@@ -456,11 +558,9 @@ const val                           TAG = "TAG ViewWordActivity"
         exportDialog.arguments = bundle
         exportDialog.show(fragmentManager, "ExportDialog")
     }
-
     private fun openTestSettingDialog() {
         TestSettingDialog.display(supportFragmentManager)
     }
-
     override fun onDataPass(data: ArrayList<String>) {
         testValue = data
         Log.d(TAG, "onDataPass: testValue는 ${testValue.toString()}")
@@ -472,27 +572,16 @@ const val                           TAG = "TAG ViewWordActivity"
         startActivityForResult(intent, TEST_WORD_CODE)
     //            start result해야함 받고 livedata
     }
-
-/*    //  폴더생성
-    private fun getSaveFolder(): File? {
-        val dir = File(Environment.getExternalStorageDirectory()
-            .absolutePath + "/" + folderName)
-        if (!dir.exists()) {
-            Log.d(TAG, "getSaveFolder: 폴더 만듬")
-            dir.mkdirs()
-        }
-        Log.d(TAG, "getSaveFolder: dir ${dir.toString()}")
-        return dir
-    }*/
-
-
-
-
     @SuppressLint("SetTextI18n")
     private fun updateWordList(word: List<Word>, sortId: Int, wordList: ArrayList<Word>) {
-/*        Log.d(TAG, "updateWordList: word $word")
-        Log.d(TAG, "updateWordList: sortId $sortId")
-        Log.d(TAG, "updateWordList: wordList $wordList")*/
+//     이렇게 word, wordList 두개로 받는 이유는 데이터를 업뎃하면 viewmodel만들 때 작성해놓은 메서드에서 getall로 데이터를 가져오는데
+//        이 메서드가 등록된 순으로 가져오니까 만약 단어 오름차순에서 데이터업뎃(북마크, 단어편집)할 경우 단어 오름차순으로 정렬한게
+//        무너지고 등록된 순으로 가져오니까 맨밑에잇는 메서드로 다시 ordered wordlist로 받아와서 뿌려줌. 그래서 정렬된 상태(sortId != 0)에서 updateWordList를 하는경우는
+//        word는 단지 인자를 채우기 위해서 보내는 의미없는 인자이고 wordList가 찐 인자임
+
+        /*Log.d(TAG, "WordList: word 9090 $word")
+        Log.d(TAG, "updateWordList: 9090 sortId $sortId")
+        Log.d(TAG, "updateWordList: 9090 wordList $wordList")*/
         if (sortId == 0) {
 //            Log.d(TAG, "updateWordList: if문")
             viewRecyclerAdapter.submitList(word as ArrayList<Word>)
@@ -510,35 +599,23 @@ const val                           TAG = "TAG ViewWordActivity"
         } else {
 //            Log.d(TAG, "updateWordList: else문") // 리사이클러뷰만 살아잇는거임(이전데이터) 실제데이터는 사라짐
             viewRecyclerAdapter.submitList(wordList)
-            binding.currentCount.text = word.size.toString()
+            binding.currentCount.text = wordList.size.toString()
             binding.currentCount2.text = "개"
             if(wordList.isNotEmpty()) {
                 binding.emptyText.visibility = View.GONE
                 binding.emptyIcon.visibility = View.GONE
                 binding.fabTestWord.visibility = View.VISIBLE
             } else {
-                if(sortId == 1) { binding.emptyText.text = "북마크한 단어가 없습니다" }
+                if(sortId == 2) { binding.emptyText.text = "북마크한 단어가 없습니다" }
                 binding.emptyText.visibility = View.VISIBLE
                 binding.emptyIcon.visibility = View.VISIBLE
                 binding.fabTestWord.visibility = View.GONE
             }
         }
     }
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("SetTextI18n")
     override fun onCheckboxClicked(v: View, wordMeanLayout: LinearLayout, adapterPosition: Int) {
-        if(v.view_check.isChecked) {
-            checkboxList[adapterPosition].checked = true
-            checkboxCount += 1
-        } else {
-            checkboxList[adapterPosition].checked = false
-            checkboxCount -= 1
-        }
-        wordMeanLayout.isSelected = checkboxList[adapterPosition].checked
-        binding.toolbarTitle.text = "${checkboxCount.toString()} 개 선택됨"
-    }
-    override fun onViewClicked(v: View, wordMeanLayout: LinearLayout, adapterPosition: Int) {
-        if(v.view_check.visibility==View.VISIBLE) {
-            v.view_check.isChecked = !v.view_check.isChecked
             if (v.view_check.isChecked) {
                 checkboxList[adapterPosition].checked = true
                 checkboxCount += 1
@@ -546,14 +623,44 @@ const val                           TAG = "TAG ViewWordActivity"
                 checkboxList[adapterPosition].checked = false
                 checkboxCount -= 1
             }
+            isCheckboxCountEmpty()
             wordMeanLayout.isSelected = checkboxList[adapterPosition].checked
             binding.toolbarTitle.text = "${checkboxCount.toString()} 개 선택됨"
+}
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun onViewClicked(v: View, wordMeanLayout: LinearLayout, adapterPosition: Int) {
+            if (v.view_check.visibility == View.VISIBLE) {
+                v.view_check.isChecked = !v.view_check.isChecked
+                if (v.view_check.isChecked) {
+                    checkboxList[adapterPosition].checked = true
+                    checkboxCount += 1
+                } else {
+                    checkboxList[adapterPosition].checked = false
+                    checkboxCount -= 1
+                }
+                isCheckboxCountEmpty()
+                wordMeanLayout.isSelected = checkboxList[adapterPosition].checked
+                binding.toolbarTitle.text = "${checkboxCount.toString()} 개 선택됨"
+            } else {
+                val wordForBottomSheet = viewRecyclerAdapter.getItem()[adapterPosition]
+                val bottomSheetDialog = BottomSheetDialog(wordForBottomSheet, adapterPosition)
+                bottomSheetDialog.show(supportFragmentManager, "example-bottom-sheet")
+            }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun isCheckboxCountEmpty() {
+        if (checkboxCount == 0) {
+            binding.viewDeleteBtn.isEnabled = false
+            binding.viewDeleteBtn.imageTintList =
+                ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorButtonGray)
         } else {
-            val wordForBottomSheet = viewRecyclerAdapter.getItem()[adapterPosition]
-            val bottomSheetDialog = BottomSheetDialog(wordForBottomSheet, adapterPosition)
-            bottomSheetDialog.show(supportFragmentManager, "example-bottom-sheet")
+            binding.viewDeleteBtn.isEnabled = true
+            binding.viewDeleteBtn.imageTintList =
+                ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorWhite)
         }
     }
+
     private fun deleteCheckedWordDialog(checkboxList: ArrayList<CheckBoxData>) {
         Log.d(TAG, "deleteWordDialog 사이즈 : ${checkboxList.size}")
         for(i in 0 until checkboxList.size) {
@@ -578,7 +685,8 @@ const val                           TAG = "TAG ViewWordActivity"
                     }
                     if (j == 1) {
                         getSortWhen(sortId)
-                        Toast.makeText(this, "단어 삭제 완료", Toast.LENGTH_SHORT).show()
+                        Snackbar.make(binding.coordinatorLayout, "단어 삭제 완료", Snackbar.LENGTH_LONG).show()
+//                        Toast.makeText(this, "단어 삭제 완료", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(this, "삭제할 단어를 체크해주세요", Toast.LENGTH_SHORT).show()
                     }
@@ -595,25 +703,15 @@ const val                           TAG = "TAG ViewWordActivity"
     override fun onWordLongClicked(v: View, adapterPosition: Int) {
         if (v.view_check.visibility != View.VISIBLE) {
             isDeleteMode(1, adapterPosition)
-//            v.view_word_book_list.setBackgroundColor(ContextCompat.getColor(this, R.color.colorSelectItem))
         }
     }
-
-    override fun onVisibilityCheckboxLayoutClicked(
-        v: View,
-        _visibilityOptions: Int,
-        wordTextView: TextView,
-        meanTextView: TextView,
-        adapterPosition: Int,
-    ) {
-
+    override fun onVisibilityCheckboxLayoutClicked(v: View,_visibilityOptions: Int,wordTextView: TextView,
+        meanTextView: TextView,adapterPosition: Int,) {
         v.visible_check.isChecked = !v.visible_check.isChecked
         if (v.visible_check.isChecked) {
             visibleCheckboxList[adapterPosition].checked = true
-            Log.d(TAG, "onVisibilityCheckboxLayoutClicked: if")
         } else {
             visibleCheckboxList[adapterPosition].checked = false
-            Log.d(TAG, "onVisibilityCheckboxLayoutClicked: else")
         }
         if (_visibilityOptions == 1) {
             if (visibleCheckboxList[adapterPosition].checked) {
@@ -650,9 +748,7 @@ const val                           TAG = "TAG ViewWordActivity"
         }
         Log.d(TAG, "onVisibilityCheckboxLayoutClicked: ${v.visible_check.isChecked}")
     }
-
-    override fun onVisibilityCheckboxClicked(
-        v: View, _visibilityOptions: Int, wordTextView: TextView, meanTextView: TextView, adapterPosition: Int,
+    override fun onVisibilityCheckboxClicked(v: View, _visibilityOptions: Int, wordTextView: TextView, meanTextView: TextView, adapterPosition: Int,
     ) {
 
         if (v.visible_check.isChecked) {
@@ -698,10 +794,6 @@ const val                           TAG = "TAG ViewWordActivity"
         Log.d(TAG, "onVisibilityCheckboxClicked: ${v.visible_check.isChecked}")
         // FIXME: 2021-02-24 랜덤
     }
-
-
-
-
     @SuppressLint("SetTextI18n")
     private fun isDeleteMode(num: Int, adapterPosition: Int) {
         viewRecyclerAdapter.updateCheckbox(num, adapterPosition) // 처음 LongClick하면 들어옴
@@ -714,7 +806,12 @@ const val                           TAG = "TAG ViewWordActivity"
             binding.viewDeleteBtn.visibility = View.VISIBLE
             binding.viewCancelBtn.visibility = View.VISIBLE
             binding.ckboxCountTv.visibility = View.VISIBLE
+            binding.dummyForCenter.visibility = View.GONE
+
+            binding.toolbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBlack))
+            binding.toolbarTitle.gravity = Gravity.LEFT
             binding.toolbarTitle.text = "${checkboxCount.toString()} 개 선택됨"
+            binding.toolbarTitle.setTextColor(ContextCompat.getColor(this,R.color.colorWhite))
 
 //            binding.fabTestWord.visibility = View.INVISIBLE
             binding.hideSpinner.visibility = View.INVISIBLE
@@ -722,6 +819,7 @@ const val                           TAG = "TAG ViewWordActivity"
             binding.currentCount.visibility = View.GONE
             binding.currentCount2.visibility = View.GONE
             binding.viewAllListenLayout.visibility = View.GONE
+            binding.viewTtsProgrssbar.visibility = View.GONE
             binding.fabTestWord.visibility = View.GONE
         } else {
             isDelete = false
@@ -732,13 +830,20 @@ const val                           TAG = "TAG ViewWordActivity"
             binding.viewDeleteBtn.visibility = View.GONE
             binding.viewCancelBtn.visibility = View.GONE
             binding.ckboxCountTv.visibility = View.GONE
+            binding.dummyForCenter.visibility = View.INVISIBLE
+
+            binding.toolbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
+            binding.toolbarTitle.gravity = Gravity.CENTER
             binding.toolbarTitle.text = wordBookNameForView
+            binding.toolbarTitle.setTextColor(ContextCompat.getColor(this,R.color.colorBlack))
+//            binding.toolbarTitle.text = ssb
 
 //            binding.fabTestWord.visibility = View.VISIBLE
             binding.hideSpinner.visibility = View.VISIBLE
             binding.sortSpinner.visibility = View.VISIBLE
             binding.currentCount.visibility = View.VISIBLE
             binding.currentCount2.visibility = View.VISIBLE
+            binding.viewAllListenLayout.visibility = View.VISIBLE
             binding.viewAllListenLayout.visibility = View.VISIBLE
             binding.fabTestWord.visibility = View.VISIBLE
         }
@@ -777,13 +882,13 @@ const val                           TAG = "TAG ViewWordActivity"
                             wordModel?.insertAllDatas(word)
                             wordBookModel?.updateWordBookCount(wordBookIdForAddOrEdit)
                             getSortWhen(sortId)
+                            Snackbar.make(binding.listView, "단어장 수정 완료", Snackbar.LENGTH_LONG).show()
                         }
                         CANCEL_CODE -> {
                         }
                     }
                 }
                 TEST_WORD_CODE -> {
-                    Log.d(TAG, "onActivityResult: 들어옴~~~안녕~~")
 //                    wordBookIdForView 이거를 받아서 밑에 같이 넣어줘야하는거같은데
                     Log.d(TAG, "onActivityResult: wordBookIdForView $wordBookIdForView")
 //                    val wordBookIdForView = data!!.getLongExtra("wordBookIdForView", 0)
@@ -807,7 +912,6 @@ const val                           TAG = "TAG ViewWordActivity"
                 word.bookMarkCheck = 0
             }
             updateFavorite(word)
-        Log.d(TAG, "onFavoriteButtonClicked: ${word.bookMarkCheck}")
     }
 
     override fun onFavoriteButtonLayoutClicked(v: View, adapterPosition: Int) {
@@ -818,7 +922,6 @@ const val                           TAG = "TAG ViewWordActivity"
             word.bookMarkCheck = 0
         }
         updateFavorite(word)
-        Log.d(TAG, "onFavoriteButtonLayoutClicked: ${word.bookMarkCheck}")
     }
 
     private fun updateFavorite(word: Word) {
@@ -847,17 +950,20 @@ const val                           TAG = "TAG ViewWordActivity"
     override fun onUpdateButtonClicked(view: View, word: Word, isUpdated: Boolean) : Boolean {
 //                        TODO 특문제외
         var _isUpdated = isUpdated
-        if (view.bsd_input_word.text!!.trim().isNotEmpty() && view.bsd_input_mean.text!!.trim().isNotEmpty()) {
-            if (!(word.word!!).equals(view.bsd_input_word.text!!) && !(word.mean!!).equals(view.bsd_input_mean.text!!)) {
+        if (view.bsd_input_word.text!!.trim().isEmpty() && view.bsd_input_mean.text!!.trim().isEmpty()) {
+            Toast.makeText(this, "단어나 뜻을 입력해주세요", Toast.LENGTH_SHORT).show()
+            _isUpdated = false
+        } else {
+            if ((word.word!!) != view.bsd_input_word.text.toString() && (word.mean!!) != view.bsd_input_mean.text.toString()) {
+                // 이전 값들과 같지 않으면
                 imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                 word.word = view.bsd_input_word.text.toString()
                 word.mean = view.bsd_input_mean.text.toString()
                 wordModel?.update(word)
-                _isUpdated = true
+                getSortWhen(sortId)
             }
-        } else {
-            Toast.makeText(this, "단어, 뜻을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
-            _isUpdated = false
+//           // 이전값들과 같으면
+            _isUpdated = true
         }
         return _isUpdated
     }
@@ -897,71 +1003,81 @@ const val                           TAG = "TAG ViewWordActivity"
                 }
             }
         })*/
+        actionSnackbar.setActionTextColor(ContextCompat.getColor(this, R.color.colorBlue))
         actionSnackbar.show()
     }
     private fun getSortWhen(sortId: Int) {
         when (sortId) {
             0 -> {
-                getRecentOrder()
-            } // 등록순
+                getLatestOrder()
+            } // 최신순
             1 -> {
+                getOldestOrder()
+            } // 등록순
+            2 -> {
                 getWordFavoriteOrder()
             } // 별표순
-            2 -> {
+            3 -> {
                 getWordAscendingOrder()
             } // 단어순 ▲
-            3 -> {
+            4 -> {
                 getWordDescendingOrder()
             } // 단어순 ▼
-            4 -> {
+            5 -> {
                 getMeanAscendingOrder()
             } // 뜻 ▲
-            5 -> {
+            6 -> {
                 getMeanDescendingOrder()
             } // 뜻 ▼
-            6 -> {
+            7 -> {
                 getRandomOrder()
             } // 랜덤
         }
     }
-    private fun getRecentOrder() {
+    private fun getLatestOrder() {
         sortId = 0
         hide_spinner.setSelection(0)
-        wordList = wordModel?.getRecentOrder(wordBookIdForView)
+        wordList = wordModel?.getLatestOrder(wordBookIdForView)
+        updateWordList(wordList!!, sortId, wordList!!)
+    }
+    private fun getOldestOrder() {
+        sortId = 1
+        hide_spinner.setSelection(0)
+        wordList = wordModel?.getOldestOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
     private fun getWordFavoriteOrder() {
-        sortId = 1
+        sortId = 2
         hide_spinner.setSelection(0)
         wordList = wordModel?.getWordFavoriteOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
     private fun getWordAscendingOrder() {
-        sortId = 2
+        sortId = 3
         hide_spinner.setSelection(0)
         wordList = wordModel?.getWordAscendingOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
     private fun getWordDescendingOrder() {
-        sortId = 3
+        sortId = 4
         hide_spinner.setSelection(0)
         wordList = wordModel?.getWordDescendingOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
     private fun getMeanAscendingOrder() {
-        sortId = 4
+        sortId = 5
         hide_spinner.setSelection(0)
         wordList = wordModel?.getMeanAscendingOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
     private fun getMeanDescendingOrder() {
-        sortId = 5
+        sortId = 6
         hide_spinner.setSelection(0)
         wordList = wordModel?.getMeanDescendingOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)
     }
     private fun getRandomOrder() {
-        sortId = 6
+        sortId = 7
         hide_spinner.setSelection(0)
         wordList = wordModel?.getRandomOrder(wordBookIdForView)
         updateWordList(wordList!!, sortId, wordList!!)

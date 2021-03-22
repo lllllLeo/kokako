@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:elevation="0dp">
@@ -45,56 +46,69 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/adView"
+        android:layout_below="@+id/appbar_layout"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <LinearLayout
+<!--        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorDivision"
-            android:orientation="horizontal" />
+            android:orientation="horizontal" />-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
             >
-        <Button
-            android:id="@+id/export_file_to_storage"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="파일로 저장소에 내보내기 (.csv)"
-            android:layout_marginHorizontal="15dp"
-            style="@style/ButtonTheme"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginHorizontal="15dp"
-            android:text="※ 현재 안드로이드11 버전은 지원하지 않습니다. 파일로 공유하기를 이용해주세요."
-            android:layout_marginBottom="18dp"
-            android:textSize="8sp"
-            >
-        </TextView>
-        <Button
-            android:id="@+id/export_file_to_share"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="이메일로 공유하기 (.csv)"
-            android:layout_marginBottom="25dp"
-            android:layout_marginHorizontal="15dp"
-            style="@style/ButtonTheme"
-            >
-        </Button>
-        <Button
-            android:id="@+id/export_text"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:text="텍스트로 공유하기"
-            android:layout_marginHorizontal="15dp"
-            style="@style/ButtonTheme"
-            >
-        </Button>
+            <Button
+                android:id="@+id/export_file_to_storage"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="저장소에 파일로 내보내기 (.csv)"
+                android:layout_marginHorizontal="15dp"
+                style="@style/ButtonTheme"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="15dp"
+                android:text="※ 현재 안드로이드11 버전은 지원하지 않습니다. 이메일로 공유하기를 이용해주세요."
+                android:layout_marginBottom="18dp"
+                android:textSize="8sp"
+                >
+            </TextView>
+            <Button
+                android:id="@+id/export_file_to_share"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="이메일로 공유하기 (.csv)"
+                android:layout_marginBottom="25dp"
+                android:layout_marginHorizontal="15dp"
+                style="@style/ButtonTheme"
+                >
+            </Button>
+            <!--<Button
+                android:id="@+id/export_text"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="텍스트로 공유하기"
+                android:layout_marginHorizontal="15dp"
+                style="@style/ButtonTheme"
+                >
+            </Button>-->
         </LinearLayout>
     </FrameLayout>
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="center"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id_for_test">
+    </com.google.android.gms.ads.AdView>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>

@@ -6,27 +6,33 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.UnderlineSpan
 import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.GravityCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kokako.databinding.ActivityMain3Binding
 import com.example.kokako.databinding.ActivityMainBinding
 import com.example.kokako.model.WordBook
 import com.example.kokako.viewModel.WordBookViewModel
 import com.example.kokako.viewModel.WordViewModel
-import com.google.android.material.navigation.NavigationView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.android.synthetic.main.activity_view_word.*
@@ -36,7 +42,9 @@ import java.io.*
 
 
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, MyWordListRecyclerViewInterface, ImportDialog.OnDataPass {
+// NavigationView.OnNavigationItemSelectedListener
+class MainActivity : AppCompatActivity(), MyWordListRecyclerViewInterface, ImportDialog.OnDataPass {
+    private var adView : AdView? = null
     private var backPressedTime: Long = 0
     private lateinit var binding: ActivityMainBinding
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
@@ -46,13 +54,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private var wordBookIdForAdd: Long? = null
     private var getExcelWordBookId: Long? = null
     private var menu : Menu? = null
-
+    private var                     ssb : SpannableStringBuilder? = null
     private var language = 0
 
     private var folderName = "12121212121212123" // 어플이름 폴더이름
 
     companion object {
         const val TAG = "TAG MainActivity"
+        const val SETTING_CODE = 103
         const val ADD_WORDBOOK_CODE = 100
         const val COMPLETE_CODE = 10
         const val CANCEL_CODE = 11
@@ -70,32 +79,60 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
 
+
+/*        MobileAds.initialize(this, getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)*/
+//        adView!!.adListener = object : AdListener() {
+//            override fun onAdLoaded() {
+//                binding.rvWordBook.setPadding(0, 0, 0, adView!!.height)
+//                // recyclerView.setClipToPadding(false);
+//            }
+//        }
+
+
+
+
+
+
+
+
+
+
+
+        ssb = SpannableStringBuilder("내 단어장 목록")
+        ssb!!.setSpan(UnderlineSpan(), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
         /*---- Tool Bar ----*/
-        binding.toolbarTitle.text = "단어장 목록"
-        binding.toolbarTitle.gravity = Gravity.LEFT
+//        binding.toolbarTitle.text = ssb
+//        binding.toolbarTitle.text = "단어장 목록"
+//        binding.toolbarMain.title = "단어장 목록"
+//        binding.toolbarTitle.gravity = Gravity.CENTER
 
-        makeFolder()
+        makeFolder() // TODO 11버전은 안만들어짐
 
-        /*---- Navigation Drawer Menu ----*/
+    /*---- Navigation Drawer Menu ----*/
         /*
         * ActionBarDrawerToggle은 액션 바 아이콘과 네비게이션 드로어 사이의 적절한 상호작용을 가능하게 한다.*/
 
-        // Hide or show items
-//        var menu  = binding.navView.menu
-//        menu.findItem(R.id.nav_logout)?.isVisible = false
-//        menu.findItem(R.id.nav_profile)?.isVisible = false
+/*         Hide or show items
+        var menu  = binding.navView.menu
+        menu.findItem(R.id.nav_logout)?.isVisible = false
+        menu.findItem(R.id.nav_profile)?.isVisible = false*/
 
-        binding.navView.bringToFront()  // Bring view in front of everything
+/*        binding.navView.bringToFront()  // Bring view in front of everything
         val toggle = ActionBarDrawerToggle(this,
             binding.drawerLayout,
             binding.toolbarMain,
             R.string.navigation_drawer_open,
             R.string.navigation_drawer_close)
+
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()  // syncState()는 드로어를 왼쪽 또는 오른쪽으로 돌릴 때 회전하는 드로어 아이콘을 동기화하며, syncState()를 제거하려고 하면 동기화가 실패하여 버그가 회전하거나 작동되지도 않는다.
         binding.navView.setNavigationItemSelectedListener(this)
-        binding.navView.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음
-
+        binding.navView.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음*/
+    /*---- Navigation Drawer Menu ----*/
 
 
         wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
@@ -105,33 +142,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         }).get(WordViewModel::class.java)
         wordBookModel = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(
             this.application)).get(WordBookViewModel::class.java)
-        wordBookModel?.wordBookListLivedata?.observe(this, { updateWordBookList(it)})
+        wordBookModel?.wordBookListLivedata?.observe(this, { updateWordBookList(it) })
 
 
         myWordRecyclerAdapter = MyWordRecyclerAdapter(this)
-        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0){
+        ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
             override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
                 val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
                 return makeMovementFlags(dragFlags, 0)
             }
-            override fun onMove(recyclerView: RecyclerView,viewHolder: RecyclerView.ViewHolder,target: RecyclerView.ViewHolder,): Boolean {
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
                 myWordRecyclerAdapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
                 return true
             }
+
             override fun isLongPressDragEnabled(): Boolean {
                 return true // true시 롱클릭 감지
             }
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 wordBookModel?.updateAll(myWordRecyclerAdapter.getItem())
-                val v : View = (viewHolder as MyWordViewHolder).itemView.my_word_book_list
-                v.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.colorWhite))
+                val v: View = (viewHolder as MyWordViewHolder).itemView.my_word_book_list
+                v.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorWhite))
+                val division: View = (viewHolder as MyWordViewHolder).itemView.rv_word_book_division
+                division.visibility = View.VISIBLE
             }
 
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                 if (viewHolder != null) {
-                    val v : View = (viewHolder as MyWordViewHolder).itemView.my_word_book_list
-                    v.setBackgroundColor(ContextCompat.getColor(this@MainActivity,R.color.colorTouch))
+                    val v: View = (viewHolder as MyWordViewHolder).itemView.my_word_book_list
+                    v.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorSelectItem))
+                    val division: View = (viewHolder as MyWordViewHolder).itemView.rv_word_book_division
+                    division.visibility = View.INVISIBLE
                 }
             }
         }).attachToRecyclerView(binding.rvWordBook)
@@ -139,20 +187,29 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.rvWordBook.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             setHasFixedSize(true)
+//            isNestedScrollingEnabled = false
             adapter = myWordRecyclerAdapter
         }
 
-        binding.popUpMenu.setOnClickListener { view ->
-            when (view.id) {
+
+        val btnListener = View.OnClickListener {
+            when (it.id) {
                 R.id.pop_up_menu -> {
-                    onSubMenuPopupClicked(view)
+                    onSubMenuPopupClicked(binding.popUpMenu) // 원래 view엿는데 설정 고치다가 왼쪽하단에 뜨길래 인자를 바꿔줌
+                }
+                R.id.application_setting -> {
+                    val intent = Intent(this, SettingsActivity::class.java)
+//                    intent.putExtra("wordBookIdForSort", wordBookIdForAdd!!)
+                    startActivityForResult(intent, SETTING_CODE)
                 }
             }
         }
 
+        binding.popUpMenu.setOnClickListener(btnListener)
+        binding.applicationSetting.setOnClickListener(btnListener)
 
 
-        fab_add_note.setOnClickListener { view ->
+        binding.fabAddNote.setOnClickListener { view ->
             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
             val container = LinearLayout(this)
             container.orientation = LinearLayout.VERTICAL
@@ -206,7 +263,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 })
                 positiveBtn.setOnClickListener(View.OnClickListener {
                     if (dialogEditText.text!!.trim().isEmpty()) {
-                        Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, "단어장 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
 //                        특문제외
                     } else {
                         imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
@@ -246,10 +303,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         menuInflater.inflate(R.menu.sub_menu, popup.menu)
         popup.setOnMenuItemClickListener(
             PopupMenu.OnMenuItemClickListener {
-                Log.d(ViewWordActivity.TAG, "onExportPopupClicked: ${it.itemId}")
+                Log.d(TAG, "onExportPopupClicked: ${it.itemId}")
                 when (it.itemId) {
-                    R.id.menu_sort -> {
-                        /*val menuItem: MenuItem = menu!!.findItem(R.id.menu_sort)
+                    /*R.id.menu_sort -> {
+                        val menuItem: MenuItem = menu!!.findItem(R.id.menu_sort)
                         if (it.title == "등록순 정렬") {
                             getWordbookNameAscendingOrder()
                             menuItem.title = "이름순 정렬"
@@ -260,9 +317,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             menuItem.title = "등록순 정렬"
                             Log.d(TAG, "onSubMenuPopupClicked: ${menuItem.title}")
                             Log.d(TAG, "onSubMenuPopupClicked: 등록순 정렬")
-                        }*/
-                    }
+                        }
+                    }*/
                     R.id.menu_excel -> {
+//                        startActivity(Intent(this, MainActivity3::class.java))
                         importDialog()
                         getRecentOrder() // 이걸로 먼저 정렬하고 내보내기전에 어댑터에서 순서(값)저장해서 넣어놧다가 할까
                         Log.d(TAG, "onSubMenuPopupClicked: 되나")
@@ -308,11 +366,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val intent = Intent(this, ViewWordActivity::class.java)
         intent.putExtra("wordBookIdForView", myWordRecyclerAdapter.getItem()[adapterPosition].id)
         intent.putExtra("wordBookNameForView",
-        myWordRecyclerAdapter.getItem()[adapterPosition].title)
+            myWordRecyclerAdapter.getItem()[adapterPosition].title)
         startActivityForResult(intent, GET_WORD_VIEW_CODE)
     }
 
-    override fun onPopupMenuWordBookClicked(v: View,myWordBtnViewOption: Button,adapterPosition: Int,) {
+    override fun onPopupMenuWordBookClicked(v: View, myWordBtnViewOption: ImageView, adapterPosition: Int) {
         Log.d("     TAG", "onPopupMenuClicked called")
         val popup: PopupMenu = PopupMenu(this, myWordBtnViewOption)
         popup.inflate(R.menu.main_item_menu)
@@ -370,14 +428,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             val b: Button = mBuilder.getButton(AlertDialog.BUTTON_POSITIVE)
                             b.setOnClickListener(View.OnClickListener {
                                 if (dialogEditText.text!!.trim().isEmpty()) {
-                                    Toast.makeText(this, "단어장 이름을 정확히 입력해주세요", Toast.LENGTH_SHORT)
+                                    Toast.makeText(this, "단어장 이름을 입력해주세요", Toast.LENGTH_SHORT)
                                         .show()
 //                        TODO 특문제외
                                 } else {
                                     imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
                                     myWordRecyclerAdapter.getItem()[adapterPosition].title =
                                         dialogEditText.text.toString()
-                                    myWordRecyclerAdapter.getItem()[adapterPosition].language = dialogSpinner.selectedItemPosition
+                                    myWordRecyclerAdapter.getItem()[adapterPosition].language =
+                                        dialogSpinner.selectedItemPosition
                                     Log.d("     TAG",
                                         "===== MainActivity - 편집하기 - else문" + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
                                     updateWordBook(myWordRecyclerAdapter.getItem()[adapterPosition])
@@ -434,6 +493,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                     COMPLETE_CODE -> { // 10
                         val wordBookIdForComplete = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
                         updateWordBookCount(wordBookIdForComplete)
+                        Snackbar.make(binding.flMyWordView, "단어장 추가 완료", Snackbar.LENGTH_LONG).show()
                     }
                     CANCEL_CODE -> { // 11
                         val wordBookIdForCancel = data!!.getLongExtra("wordBookIdForAddOrEdit", 0)
@@ -495,26 +555,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onBackPressed() {
         val curTime : Long = System.currentTimeMillis();
         val gapTime : Long = curTime - backPressedTime;
+        if(0 <= gapTime && 2000 >= gapTime) { super.onBackPressed(); }
+        else {
+            backPressedTime = curTime;
+            Toast.makeText(this, "'뒤로'버튼을 한번만 더 누르시면 종료됩니다.", Toast.LENGTH_SHORT).show();
+        }
 //        ---- When ESC is pressed in a NavigationDrawer ----
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+    /*  if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawer(GravityCompat.START);
         } else {
 //            super.onBackPressed()
-            if(0 <= gapTime && 2000 >= gapTime) { super.onBackPressed(); }
-            else {
-                backPressedTime = curTime;
-                Toast.makeText(this, "'뒤로'버튼을 한번만 더 누르시면 종료됩니다.",Toast.LENGTH_SHORT).show();
-            }
-        }
+        }*/
     }
 
-    override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
+/*    override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
         when (menuItem.itemId) {
             R.id.nav_view -> return true
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START) // 네비게이션드로우 닫히고 인텐트전환
         return true // 네이게이션 아이템이 선택되면 true
-    }
+    }*/
 
 
     override fun onDestroy() {

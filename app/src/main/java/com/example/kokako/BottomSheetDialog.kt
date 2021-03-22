@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.Selection
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,9 +45,7 @@ class BottomSheetDialog(wordForBottomSheet: Word, adapterPosition: Int) : Bottom
             }
         }
         view.bsd_btn_move_left.setOnClickListener{ view.bsd_input_word.requestFocus() }
-        view.bsd_btn_move_right.setOnClickListener{
-            view.bsd_input_mean.requestFocus()
-        }
+        view.bsd_btn_move_right.setOnClickListener{ view.bsd_input_mean.requestFocus() }
         view.bsd_input_word.setText(word.word)
         view.bsd_input_mean.setText(word.mean)
         editableWord = view.bsd_input_word.text

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -86,8 +86,10 @@
     </androidx.appcompat.widget.Toolbar>
 
     <LinearLayout
+        android:id="@+id/black_line"
         android:layout_width="match_parent"
-        android:layout_height="1.5dp"
+        android:layout_height="1dp"
+        android:layout_below="@+id/toolbar_view"
         android:background="@color/colorBlack"
         android:orientation="horizontal" />
 
@@ -95,6 +97,7 @@
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:layout_below="@+id/black_line"
         android:weightSum="1"
         android:gravity="center"
         android:orientation="horizontal"
@@ -193,90 +196,123 @@
             android:background="@drawable/ic_baseline_visibility_24"
             android:layout_marginRight="15dp" />
     </LinearLayout>
-    <FrameLayout
-        android:id="@+id/list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorWhite"
-        >
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0.8dp"
-            android:background="@color/colorDivision"/>
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:id="@+id/coordinator_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_list_word_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:focusableInTouchMode="true"
-            android:descendantFocusability="beforeDescendants"
-            app:fastScrollEnabled="true"
-            app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
-            app:fastScrollHorizontalTrackDrawable="@drawable/line_drawable"
-            app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
-            app:fastScrollVerticalTrackDrawable="@drawable/line_drawable"
-            tools:listitem="@layout/rv_word_list"/>
 
-        <LinearLayout
+        <FrameLayout
+            android:id="@+id/list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:layout_gravity="center"
+            android:layout_above="@+id/adView"
+            android:layout_below="@+id/spinner"
+            android:background="@color/colorWhite"
             >
-            <ImageView
-                android:id="@+id/empty_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_baseline_error_outline_24"
-                />
-            <TextView
-                android:id="@+id/empty_text"
+            <View
                 android:layout_width="match_parent"
+                android:layout_height="0.8dp"
+                android:background="@color/colorDivision"/>
+            <androidx.coordinatorlayout.widget.CoordinatorLayout
+                android:id="@+id/coordinator_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_list_word_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:focusableInTouchMode="true"
+                    android:descendantFocusability="beforeDescendants"
+                    android:fillViewport="true"
+                    android:clipToPadding="false"
+                    android:paddingBottom="30dp"
+                    app:fastScrollEnabled="true"
+                    app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+                    app:fastScrollHorizontalTrackDrawable="@drawable/line_drawable"
+                    app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+                    app:fastScrollVerticalTrackDrawable="@drawable/line_drawable"
+                    tools:listitem="@layout/rv_word_list"/>
+<!--                    android:clipToPadding="false"-->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center"
+                    >
+                    <ImageView
+                        android:id="@+id/empty_icon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_baseline_error_outline_24"
+                        />
+                    <TextView
+                        android:id="@+id/empty_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="작성된 단어가 없습니다.\n단어를 추가해주세요"
+                        />
+                </LinearLayout>
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/fab_test_word"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|end"
+                    android:layout_margin="40dp"
+                    android:theme="@style/MaterialTheme"
+                    android:src="@drawable/ic_baseline_check_24_black"
+                    android:backgroundTint="@color/colorBlack"
+                    app:layout_behavior="com.example.kokako.FABBehavior"
+                    app:tint="@color/colorWhite"
+                    app:borderWidth="0dp"
+                    app:maxImageSize="38dp"
+                    android:layout_marginRight="50dp" />
+    <!--            android:backgroundTint="@color/colorBlack"-->
+
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+            <!--<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/fab_test_word"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="작성된 단어가 없습니다.\n단어를 추가해주세요"
-                />
-        </LinearLayout>
+                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom|center"
+                android:layout_centerHorizontal="true"
+                android:theme="@style/MaterialTheme"
+                android:layout_margin="30dp"
+                android:backgroundTint="@color/colorBlue"
+                android:text="단어테스트"
+                android:textColor="@color/colorWhite"
+                android:textStyle="bold"
+                app:iconTint="@color/colorWhite"
+                app:iconPadding="0dp"
+                app:icon="@drawable/ic_baseline_check_24"
+                />-->
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_test_word"
-            android:layout_width="wrap_content"
+        </FrameLayout>
+        <!--<LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="40dp"
-            android:theme="@style/MaterialTheme"
-            android:src="@drawable/ic_baseline_check_24_black"
-            android:backgroundTint="@color/colorBlack"
-            app:layout_behavior="com.example.kokako.FABBehavior"
-            app:tint="@color/colorWhite"
-            app:borderWidth="0dp"
-            app:maxImageSize="38dp"
-            />
-<!--            android:backgroundTint="@color/colorBlack"-->
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
-        <!--<com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/fab_test_word"
+            android:background="@color/colorWhite"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            >-->
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_gravity="bottom|center"
             android:layout_centerHorizontal="true"
-            android:theme="@style/MaterialTheme"
-            android:layout_margin="30dp"
-            android:backgroundTint="@color/colorBlue"
-            android:text="단어테스트"
-            android:textColor="@color/colorWhite"
-            android:textStyle="bold"
-            app:iconTint="@color/colorWhite"
-            app:iconPadding="0dp"
-            app:icon="@drawable/ic_baseline_check_24"
-            />-->
-    </FrameLayout>
-</LinearLayout>
+            ads:adSize="SMART_BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id_for_test">
+        </com.google.android.gms.ads.AdView>
+<!--        </LinearLayout>-->
+<!--
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />-->
+
+</RelativeLayout>

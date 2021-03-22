@@ -2,24 +2,24 @@ package com.example.kokako
 
 import android.app.Dialog
 import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.example.kokako.databinding.TestSettingDialogBinding
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.chip.Chip
 
 
 class TestSettingDialog : DialogFragment() {
+    private var adView : AdView? = null
     private var _binding : TestSettingDialogBinding? = null
     private val binding get() = _binding!!
-    private var toolbar: Toolbar? = null
     lateinit var dataPasser: OnDataPass
     companion object {
         const val TAG = "TAG TestSettingDialog"
@@ -62,14 +62,24 @@ class TestSettingDialog : DialogFragment() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             binding.toolbarTitle.text = "테스트 설정"
             binding.toolbarTitle.gravity = Gravity.LEFT
-            binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
+//            binding.toolbarTitle.gravity = Gravity.CENTER
+
+            /*binding.toolbarDialog.setNavigationOnClickListener { v -> dismiss() }
             binding.toolbarDialog.setOnMenuItemClickListener { item ->
                 dismiss()
                 true
-            }
+            }*/
         }
 
+        MobileAds.initialize(requireContext(), getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)
 
+
+
+
+        binding.testSettingCloseBtn.setOnClickListener { dismiss() }
         binding.testWord.setOnClickListener{
             val chipList = ArrayList<String>()
 //            var questionScope : Int = 0

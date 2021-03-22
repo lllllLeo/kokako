@@ -8,4 +8,27 @@
     <string name="add_widget">Add widget</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails</string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- AdMob-->
+    <string name="admob_app_id">ca-app-pub-5340165965253395~6434790453</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5340165965253395/3704685330</string>
+    <string name="banner_ad_unit_id_for_test">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="reward_ad_unit_id">ca-app-pub-5340165965253395~6434790453</string>
+    <string name="reward_ad_unit_id_for_test">ca-app-pub-3940256099942544/1033173712</string>
+    <string name="native_ad_unit_id_for_test">ca-app-pub-3940256099942544/2247696110</string>
+    <string name="native_ad_unit_id">ca-app-pub-5340165965253395~6434790453</string>
 </resources>

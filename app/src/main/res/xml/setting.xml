@@ -1,0 +1,81 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+<!--    <PreferenceCategory app:title="@string/messages_header">-->
+<!--    <PreferenceCategory app:title="단어장 설정">
+
+        &lt;!&ndash;<EditTextPreference
+            app:key="signature"
+            app:title="@string/signature_title"
+            app:useSimpleSummaryProvider="true" />&ndash;&gt;
+
+        <ListPreference
+            app:defaultValue="등록순"
+            app:entries="@array/wordbook_sort_entries"
+            app:entryValues="@array/wordbook_sort_entries"
+            app:key="sort"
+            app:title="정렬"
+            app:summary="단어장을 정렬할 방법을 선택하세요."
+            app:useSimpleSummaryProvider="true" />
+
+            &lt;!&ndash;app:entries="@array/reply_entries"
+            entries = 리스트에 표시되는 항목글씨
+            entryValues : 파일에 저장되는 값
+
+            app:entryValues="@array/reply_values"&ndash;&gt;
+&lt;!&ndash;            app:title="@string/reply_title"&ndash;&gt;
+
+    </PreferenceCategory>-->
+
+    <!--<PreferenceCategory app:title="위젯">
+
+        <Preference
+            app:title="위젯 설정"
+            app:fragment="com.example.SyncFragment"
+            />
+
+    </PreferenceCategory>-->
+
+    <PreferenceCategory app:title="개발자 살려주기">
+        <Preference
+            app:key="watch_ad_for_dev"
+            app:title="개발자를 위해 광고보기" />
+
+    </PreferenceCategory>
+    <PreferenceCategory app:title="앱 정보">
+        <Preference
+            app:key="feedback"
+            app:title="개발자에게 문의하기" />
+
+        <Preference
+            app:key="app_review"
+            app:title="앱 평가하기" />
+
+        <PreferenceScreen
+            app:key="open_license"
+            app:title="오픈소스 라이선스">
+                />
+<!--            <intent android:targetPackage="com.example.kokako"-->
+<!--                android:targetClass="com.example.kokako.OpenLicenseActivity"-->
+<!--            app:fragment="com.example.kokako.SettingsActivity$OpenLicenseFragment"-->
+        </PreferenceScreen>
+        <Preference
+            app:key="app_info"
+            app:title="버전"
+            app:summary=""
+            />
+    </PreferenceCategory>
+
+<!--    <PreferenceCategory android:title="dd">
+        <SwitchPreferenceCompat
+            app:key="sync"
+            app:title="@string/sync_title" />
+        <SwitchPreferenceCompat
+            app:dependency="sync"
+            app:key="attachment"
+            app:summaryOff="@string/attachment_summary_off"
+            app:summaryOn="@string/attachment_summary_on"
+            app:title="@string/attachment_title"
+            />
+    </PreferenceCategory>-->
+
+</PreferenceScreen>

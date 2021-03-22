@@ -2,16 +2,20 @@ package com.example.kokako
 
 import android.content.DialogInterface
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import com.example.kokako.databinding.ActivityTestBinding
 import com.example.kokako.model.Word
 import com.example.kokako.viewModel.WordViewModel
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 
 class TestActivity : AppCompatActivity(), TestResultFragment.OnFinishTestDataPass, TestFragment.OnCancelTest {
 //    private lateinit var toolbarBinding: ActivityToolbarBinding
+    private var adView : AdView? = null
     private var _binding : ActivityTestBinding? = null
     private val binding get() = _binding!!
     private var                     model : WordViewModel? = null
@@ -33,11 +37,16 @@ class TestActivity : AppCompatActivity(), TestResultFragment.OnFinishTestDataPas
         setContentView(view)
 //        toolbarBinding = binding.includeToolbar
 
+        MobileAds.initialize(this, getString(R.string.admob_app_id))
+        adView = binding.adView
+        val adRequest : AdRequest = AdRequest.Builder().build()
+        adView!!.loadAd(adRequest)
 
         wordBookIdForTest = intent.getLongExtra("wordBookIdForTest", 0)
         testScope = intent.getStringExtra("testScope")
         testCategory = intent.getStringExtra("testCategory")
         testSort = intent.getStringExtra("testSort")
+
 
 
         val testFragment = TestFragment()
