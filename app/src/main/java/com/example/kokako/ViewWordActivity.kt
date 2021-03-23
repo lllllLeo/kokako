@@ -593,6 +593,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 binding.fabTestWord.visibility = View.VISIBLE
             } else {
                 binding.emptyText.visibility = View.VISIBLE
+                binding.emptyText.text = "작성된 단어가 없습니다.\n단어를 추가해주세요"
                 binding.emptyIcon.visibility = View.VISIBLE
                 binding.fabTestWord.visibility = View.GONE
             }
@@ -606,7 +607,13 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 binding.emptyIcon.visibility = View.GONE
                 binding.fabTestWord.visibility = View.VISIBLE
             } else {
-                if(sortId == 2) { binding.emptyText.text = "북마크한 단어가 없습니다" }
+                if(sortId == 2) {
+                    Log.d(TAG, "updateWordList: if문 $sortId")
+                    binding.emptyText.text = "북마크한 단어가 없습니다"
+                } else {
+                    binding.emptyText.text = "작성된 단어가 없습니다.\n단어를 추가해주세요"
+                    Log.d(TAG, "updateWordList: else문 $sortId")
+                }
                 binding.emptyText.visibility = View.VISIBLE
                 binding.emptyIcon.visibility = View.VISIBLE
                 binding.fabTestWord.visibility = View.GONE
