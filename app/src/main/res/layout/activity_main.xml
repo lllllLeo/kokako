@@ -128,7 +128,7 @@
                                             android:layout_width="match_parent"
                                             android:layout_height="wrap_content"
                                             android:gravity="center"
-                                            android:text="작성된 단어장이 없습니다.\n새로운 단어장을 추가해보세요" />
+                                            android:text="단어장을 새로 추가해보세요" />
 
                                     </LinearLayout>
                         </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -147,7 +147,7 @@
             android:theme="@style/MaterialTheme"
             android:backgroundTint="@color/colorBlack"
             android:src="@drawable/ic_baseline_add_24"
-            app:layout_behavior="com.example.kokako.FABBehavior"
+            app:layout_behavior="com.yj.addwords.FABBehavior"
             app:tint="@color/colorWhite"
             app:borderWidth="0dp"
             app:maxImageSize="38dp" />

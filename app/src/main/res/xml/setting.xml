@@ -35,16 +35,11 @@
 
     </PreferenceCategory>-->
 
-    <PreferenceCategory app:title="개발자 살려주기">
-        <Preference
-            app:key="watch_ad_for_dev"
-            app:title="개발자를 위해 광고보기" />
 
-    </PreferenceCategory>
     <PreferenceCategory app:title="앱 정보">
         <Preference
             app:key="feedback"
-            app:title="개발자에게 문의하기" />
+            app:title="개발자에게 피드백" />
 
         <Preference
             app:key="app_review"
@@ -60,11 +55,17 @@
         </PreferenceScreen>
         <Preference
             app:key="app_info"
-            app:title="버전"
+            app:title="Addwords"
             app:summary=""
             />
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="">
+        <Preference
+            app:key="watch_ad_for_dev"
+            app:title="개발자를 위해 광고보기" />
+
+    </PreferenceCategory>
 <!--    <PreferenceCategory android:title="dd">
         <SwitchPreferenceCompat
             app:key="sync"

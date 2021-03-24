@@ -262,7 +262,7 @@
                     android:theme="@style/MaterialTheme"
                     android:src="@drawable/ic_baseline_check_24_black"
                     android:backgroundTint="@color/colorBlack"
-                    app:layout_behavior="com.example.kokako.FABBehavior"
+                    app:layout_behavior="com.yj.addwords.FABBehavior"
                     app:tint="@color/colorWhite"
                     app:borderWidth="0dp"
                     app:maxImageSize="38dp"
@@ -306,7 +306,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             ads:adSize="SMART_BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id_for_test">
+            ads:adUnitId="@string/banner_ad_unit_id">
         </com.google.android.gms.ads.AdView>
 <!--        </LinearLayout>-->
 <!--

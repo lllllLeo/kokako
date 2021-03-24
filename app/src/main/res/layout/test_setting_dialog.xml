@@ -167,7 +167,7 @@
                 android:id="@+id/filter3"
                 android:layout_width="wrap_content"
                 android:layout_height="20dp"
-                android:text="정렬"
+                android:text="문제 순서"
                 android:textColor="@color/colorBlack"
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="20dp"
@@ -253,6 +253,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id_for_test">
+        ads:adUnitId="@string/banner_ad_unit_id">
     </com.google.android.gms.ads.AdView>
 </RelativeLayout>

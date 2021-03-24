@@ -63,11 +63,13 @@
             android:layout_marginTop="15dp"
             >
             <TextView
+                android:id="@+id/tv1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginHorizontal="20dp"
-                android:text="▪ 휴대폰 저장소에 [   ] 폴더를 만든 후 단어를 작성한 .csv 파일을 넣어주세요."
+                android:bufferType="spannable"
+                android:text="▪ 휴대폰 저장소에 Addwords 폴더를 만든 후 단어를 작성한 .csv 파일을 넣고 아래 버튼을 클릭하여 파일을 가져오세요"
                 android:textSize="13sp"
                 android:layout_marginBottom="18dp"
                 >
@@ -116,7 +118,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginHorizontal="20dp"
-                android:text="구글 스프레드시트에서 작성 -> 파일 -> 다운로드 -> 쉼표로 구분된 값(.csv, 현재 시트)"
+                android:text="구글 스프레드시트 페이지 -> 작성 -> 파일 -> 다운로드 -> 쉼표로 구분된 값(.csv, 현재 시트)"
                 android:textSize="13sp"
                 >
             </TextView>
@@ -147,7 +149,7 @@
             android:layout_alignParentBottom="true"
             android:layout_gravity="center"
             ads:adSize="SMART_BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id_for_test">
+            ads:adUnitId="@string/banner_ad_unit_id">
         </com.google.android.gms.ads.AdView>
 
 </RelativeLayout>

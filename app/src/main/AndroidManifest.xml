@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.kokako">
+    package="com.yj.addwords">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
@@ -9,28 +9,29 @@
         tools:ignore="ScopedStorage" />
 
     <application
-        android:name=".App"
+        android:name="com.yj.addwords.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:debuggable="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity3"></activity>
+        <activity android:name="com.yj.addwords.MainActivity3"></activity>
         <!-- play-services-ads 17.0.0 이상부터는 앱 ID를 입력해줘야 합니다 -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/admob_app_id" />
 
-        <activity android:name=".OpenLicenseActivity" />
+        <activity android:name="com.yj.addwords.OpenLicenseActivity" />
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.yj.addwords.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/SettingsFragmentStyle" />
 
         <receiver
-            android:name=".NewAppWidget"
+            android:name="com.yj.addwords.NewAppWidget"
             android:label="2x1 Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -41,17 +42,17 @@
                 android:resource="@xml/new_app_widget_info" />
         </receiver>
 
-        <activity android:name=".TestActivity" />
-        <activity android:name=".ToolbarActivity" />
-        <activity android:name=".ImportActivity" />
+        <activity android:name="com.yj.addwords.TestActivity" />
+        <activity android:name="com.yj.addwords.ToolbarActivity" />
+        <activity android:name="com.yj.addwords.ImportActivity" />
         <activity
-            android:name=".ViewWordActivity"
+            android:name="com.yj.addwords.ViewWordActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".AddWordActivity"
+            android:name="com.yj.addwords.AddWordActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".MainActivity"
+            android:name="com.yj.addwords.MainActivity"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

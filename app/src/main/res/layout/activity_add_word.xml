@@ -212,19 +212,6 @@
         android:layout_height="match_parent"
         android:layout_below="@id/input_layout"
         android:layout_above="@id/layout_bottom">
-<!--        <LinearLayout-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="0.5dp"-->
-<!--            android:layout_below="@+id/info"-->
-<!--            android:background="@color/colorDivision"-->
-<!--            android:orientation="horizontal"-->
-<!--            />-->
-<!--        <View
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            android:layout_below="@id/info"
-            android:background="@color/colorDivision"/>-->
-<!--            android:layout_height="0.8dp"-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_list_item"
@@ -274,7 +261,7 @@
             android:layout_alignParentBottom="true"
             android:layout_gravity="center"
             ads:adSize="SMART_BANNER"
-            ads:adUnitId="@string/banner_ad_unit_id_for_test">
+            ads:adUnitId="@string/banner_ad_unit_id">
         </com.google.android.gms.ads.AdView>
         <LinearLayout
             android:id="@+id/btn_bottom"
