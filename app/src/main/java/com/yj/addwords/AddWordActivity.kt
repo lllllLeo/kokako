@@ -88,7 +88,9 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             }}).get(WordViewModel::class.java)
 
         addRecyclerAdapter = AddRecyclerAdapter(this)
-        word            = model?.getLatestOrder(wordBookIdForAddOrEdit)!!
+//        word            = model?.getLatestOrder(wordBookIdForAddOrEdit)!!
+        word            = model?.getOldestOrder(wordBookIdForAddOrEdit)!! // 원래는 getLatestOrder으로 뽑아야하는데 이거하고 역순false하고 position에0주고 추가로 하면 뷰에서 정렬이 최신순, 등록순이 반대로 나옴
+        Log.d(TAG, "onCreate: $word")
         addRecyclerAdapter.submitDataList(word)
 
         if(checkActivity) {
@@ -119,9 +121,8 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
 
         rv_list_item.apply {
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)
-            // TODO: 2021-01-31 위에 reverseLayout이랑 밑에꺼 같이하더라 일단 추가
-            (layoutManager as LinearLayoutManager).stackFromEnd = true
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)    // 역순  역순이니 맨 밑이 position 0
+            (layoutManager as LinearLayoutManager).stackFromEnd = true  // 역순
             if (checkActivity){
                 (layoutManager as LinearLayoutManager).scrollToPositionWithOffset(word.size,0)
             }
@@ -243,6 +244,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                                 0,
                                 9999,
                                 wordBookIdForAddOrEdit))
+                            rv_list_item.smoothScrollToPosition(word.size)  // 상단에 추가 후 스크롤을 맨 위로 올림
                             input_word.text.clear()
                             input_mean.text.clear()
                             input_word.requestFocus()

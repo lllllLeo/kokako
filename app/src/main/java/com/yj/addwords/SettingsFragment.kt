@@ -43,7 +43,6 @@ class SettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChan
         MobileAds.initialize(context, getString(R.string.admob_app_id))
         interstitialAd = InterstitialAd(context)
         interstitialAd!!.adUnitId = getString(R.string.reward_ad_unit_id)
-        Log.d(TAG, "onCreatePreferences: ${getString(R.string.reward_ad_unit_id_for_test)}")
         interstitialAd!!.loadAd(AdRequest.Builder().build())
 
 //        변화 이벤트가 일어났을 시 동작

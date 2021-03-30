@@ -190,7 +190,7 @@
                     android:id="@+id/recent_word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="최근순"
+                    android:text="최신순"
                     android:textColor="@color/colorWhite"
                     app:chipBackgroundColor="@color/chip_background"
                     style="@style/Widget.MaterialComponents.Chip.Choice"
@@ -253,6 +253,6 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id">
+        ads:adUnitId="@string/banner_ad_unit_id_for_test">
     </com.google.android.gms.ads.AdView>
 </RelativeLayout>

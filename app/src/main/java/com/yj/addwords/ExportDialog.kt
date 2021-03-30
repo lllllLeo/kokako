@@ -129,8 +129,6 @@ class ExportDialog : DialogFragment() {
                 }
                 R.id.export_file_to_share -> {
                     shareCsvFile()
-//                    ssaasdf()
-//                    writeTempCsvFile("$wordBookNameForView.csv")
                 }
                 /*R.id.export_text -> {
                     exportText()
@@ -198,57 +196,6 @@ class ExportDialog : DialogFragment() {
 //        startActivityForResult(Intent.createChooser(shareIntent, "엑셀 공유"), 100)
     }
 
-    /*@RequiresApi(Build.VERSION_CODES.KITKAT)
-    @SuppressLint("SimpleDateFormat")
-    private fun writeTempCsvFile(filePath: String) : String {
-        val time = System.currentTimeMillis()
-        val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm")
-        val date = Date(time)
-        val strTime = simpleDateFormat.format(date)
-//        val folderPath = getExternalPath(folderName)
-        val extRoot: File? = context!!.getExternalFilesDir(null)
-        Log.d(TAG, "writeTempCsvFile: extRoot $extRoot")
-//        /storage/emulated/0/Android/data/com.example.kokako/files
-        val someFile = "/temp/$filePath"
-        Log.d(TAG, "writeTempCsvFile: someFile $someFile")
-//        /temp/구글 시트 한자 2136.csv
-        val csvFile = File(extRoot, someFile)
-        Log.d(TAG, "writeTempCsvFile: csvFile $csvFile")
-//        /storage/emulated/0/Android/data/com.example.kokako/files/temp/구글 시트 한자 2136.csv
-//        /files/Android/data/com.example.kokako/files/temp/~~~~~~.csv
-        val folderPath = context!!.applicationContext.packageName + ".fileprovider"
-        Log.d(TAG, "writeTempCsvFile: folderPath $folderPath")
-//        com.example.kokako.fileprovider
-
-        val contentUri: Uri = FileProvider.getUriForFile(context!!,
-            context!!.applicationContext.packageName + ".fileprovider",
-            csvFile)
-
-        val csv = ArrayList<Array<String>>()
-        for (i in 0 until wordList!!.size) {
-            val item : Array<String> = arrayOf<String>(wordList!![i].word.toString(),
-                wordList!![i].mean.toString(),
-                wordList!![i].option.toString())
-            csv.add(item)
-        }
-//        /내보내기_${strTime}_
-        val writer = CSVWriter(FileWriter("$folderPath$csvFile"))
-
-//   com.example.kokako.fileprovider/storage/emulated/0/Android/data/com.example.kokako/files/temp/구글 시트 한자 2136.csv
-
-
-        val exportCSVName = "$folderPath$csvFile"
-        Log.d(TAG, "writeCsvFile: $folderPath$csvFile")
-//        /storage/emulated/0/1212121212121212
-//        /내보내기_
-//        2021-03-12 21:11
-//        _구글 시트 한자 2136.csv
-        writer.writeAll(csv)
-        writer.close()
-        Log.d(TAG, "writeTempCsvFile: exportCSVName $exportCSVName")
-        Log.d(TAG, "writeCsvFile: 완료")
-        return exportCSVName
-    }*/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == 100) {

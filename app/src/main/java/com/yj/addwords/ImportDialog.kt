@@ -165,8 +165,6 @@ class ImportDialog : DialogFragment() {
             val fileName = getFileName(uri)!!.split(".")[0]
             val fileNameFilenameExtension = getFileName(uri)!!.split(".")[0] + ".csv"
             Log.d(TAG, "readCsvFile: fileName $fileName")
-            // TODO: 2021-03-11 단어장 이름 어플 정해서 폴더가 없으면 이걸로 만들어 놓기. 그리고 여기서만 내보내기 ㄱㄴ,
-            // TODO: 2021-03-12 도움말에 가져오기 할 때 ~~폴더를 만들고 구글스프레드시트에서 만든 .csv 파일을 넣어주세요
             val folderAndName = "$folderName/$fileNameFilenameExtension"
             val reader =
                 CSVReaderBuilder(FileReader(getExternalPath(folderAndName))).withFieldAsNull(CSVReaderNullFieldIndicator.EMPTY_SEPARATORS)

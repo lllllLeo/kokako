@@ -92,8 +92,12 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
 
     }
     fun addItem(word: Word) {
-        wordDatas.add(word)
-        notifyDataSetChanged()
-
+        /*wordDatas.add(word)
+        notifyDataSetChanged()*/
+        /*wordDatas.add(0, word)
+        notifyItemInserted(0)*/
+        // 맨 위로 추가
+        wordDatas.add(wordDatas.size, word)
+        notifyItemInserted(wordDatas.size)
     }
 }

@@ -38,9 +38,8 @@ import java.io.*
 
 
 // TODO: 2021-01-23 종료할 떄 키보드 넣기
-// NavigationView.OnNavigationItemSelectedListener
 class MainActivity : AppCompatActivity(), MyWordListRecyclerViewInterface, ImportDialog.OnDataPass {
-    private var adView : AdView? = null
+//    private var adView : AdView? = null
     private var backPressedTime: Long = 0
     private lateinit var binding: ActivityMainBinding
     private lateinit var myWordRecyclerAdapter: MyWordRecyclerAdapter
@@ -100,35 +99,8 @@ class MainActivity : AppCompatActivity(), MyWordListRecyclerViewInterface, Impor
         ssb = SpannableStringBuilder("내 단어장 목록")
         ssb!!.setSpan(UnderlineSpan(), 0, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        /*---- Tool Bar ----*/
-//        binding.toolbarTitle.text = ssb
-//        binding.toolbarTitle.text = "단어장 목록"
-//        binding.toolbarMain.title = "단어장 목록"
-//        binding.toolbarTitle.gravity = Gravity.CENTER
+//        makeFolder() // TODO 11버전은 안만들어짐
 
-        makeFolder() // TODO 11버전은 안만들어짐
-
-    /*---- Navigation Drawer Menu ----*/
-        /*
-        * ActionBarDrawerToggle은 액션 바 아이콘과 네비게이션 드로어 사이의 적절한 상호작용을 가능하게 한다.*/
-
-/*         Hide or show items
-        var menu  = binding.navView.menu
-        menu.findItem(R.id.nav_logout)?.isVisible = false
-        menu.findItem(R.id.nav_profile)?.isVisible = false*/
-
-/*        binding.navView.bringToFront()  // Bring view in front of everything
-        val toggle = ActionBarDrawerToggle(this,
-            binding.drawerLayout,
-            binding.toolbarMain,
-            R.string.navigation_drawer_open,
-            R.string.navigation_drawer_close)
-
-        binding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()  // syncState()는 드로어를 왼쪽 또는 오른쪽으로 돌릴 때 회전하는 드로어 아이콘을 동기화하며, syncState()를 제거하려고 하면 동기화가 실패하여 버그가 회전하거나 작동되지도 않는다.
-        binding.navView.setNavigationItemSelectedListener(this)
-        binding.navView.setCheckedItem(R.id.nav_home)   // 제대로 모르겠음*/
-    /*---- Navigation Drawer Menu ----*/
 
 
         wordModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
@@ -167,7 +139,7 @@ class MainActivity : AppCompatActivity(), MyWordListRecyclerViewInterface, Impor
                 val v: View = (viewHolder as MyWordViewHolder).itemView.my_word_book_list
                 v.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorWhite))
                 val division: View = (viewHolder as MyWordViewHolder).itemView.rv_word_book_division
-                division.visibility = View.VISIBLE
+//                division.visibility = View.VISIBLE
             }
 
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
@@ -175,7 +147,7 @@ class MainActivity : AppCompatActivity(), MyWordListRecyclerViewInterface, Impor
                     val v: View = (viewHolder as MyWordViewHolder).itemView.my_word_book_list
                     v.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorSelectItem))
                     val division: View = (viewHolder as MyWordViewHolder).itemView.rv_word_book_division
-                    division.visibility = View.INVISIBLE
+//                    division.visibility = View.INVISIBLE
                 }
             }
         }).attachToRecyclerView(binding.rvWordBook)

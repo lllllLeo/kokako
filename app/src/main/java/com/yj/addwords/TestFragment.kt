@@ -81,7 +81,7 @@ class TestFragment : Fragment() {
 
         if (test == 0) { // 처음 테스트일 때
             Log.d(TAG, "onCreate: $testScope / $testCategory / $testSort / $wordBookIdForTest")
-            when {  // 0 : 북마크 안 함  1 : 북마크 함 2 : 모든 단어
+            when {  // 0 : 북마크 안 함  1 : 북마크 함 2 : 모든 단어  fixme 이렇게하면 나중에 언어대응할 때 막힘. 고치기
                 testScope!!.contains("모") -> {
                     testScope = "2"
                 }
@@ -153,6 +153,8 @@ class TestFragment : Fragment() {
             binding.btnFavorite.isEnabled = false
             binding.btnFavorite.imageTintList =
                 ContextCompat.getColorStateList(requireActivity().application, R.color.colorButtonGray)
+            binding.testListenLayout.isEnabled = false
+            binding.testListenImageview.isEnabled = false
         }
 
         val btnListener = View.OnClickListener { view ->
@@ -259,18 +261,6 @@ class TestFragment : Fragment() {
             tts!!.stop()
             binding.testListenImageview.supportBackgroundTintList =
                 ContextCompat.getColorStateList(requireActivity().application, R.color.colorButtonGray)
-            /*runOnUiThread {
-                binding.viewTtsProgrssbar.visibility = View.INVISIBLE
-                binding.viewTtsProgrssbar.clearAnimation()
-                binding.viewAllListenLayout.backgroundTintList =
-                    ContextCompat.getColorStateList(this@ViewWordActivity,
-                        R.color.colorButtonGray)
-//                for (i in ttsArrayList) {   // 이거 넣으니까 중복 재생 할 때 마지막값만 켜지고 전값 다 꺼지네
-//                    i.view_listen_layout.setBackgroundResource(R.drawable.button_border)
-//                    i.view_listen_imageview.supportBackgroundTintList =
-//                        ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorButtonGray)
-//                }
-            }*/
         }
         tts!!.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             @SuppressLint("RestrictedApi")
@@ -414,6 +404,15 @@ class TestFragment : Fragment() {
         onCancelTest.onCancelTest()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // TTS 객체가 남아있다면 실행을 중지하고 메모리에서 제거한다.
+        if (tts != null) {
+            tts!!.stop()
+            tts!!.shutdown()
+            tts = null
+        }
+    }
 
 }
 

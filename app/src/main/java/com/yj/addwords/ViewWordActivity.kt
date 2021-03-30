@@ -50,6 +50,7 @@ import kotlin.collections.set
 
 
 class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, BottomSheetDialog.BottomSheetInterface, TestSettingDialog.OnDataPass {
+    private var                     deleteCountForTts: Int = 0
     private var                     adView : AdView? = null
     private var                     ttsStatus: Int? = 0
     private var                     _binding: ActivityViewWordBinding? = null
@@ -428,7 +429,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 override fun onDone(utteranceId: String?) {
                     Log.d(TAG, "onDone: done with $utteranceId")
                     ttsCount += 1
-                    if (ttsCount == wordList!!.size) {
+                    Log.d(TAG, "onDone: ${ttsCount} ${wordList!!.size} ${deleteCountForTts}")
+                    if (ttsCount == (wordList!!.size - deleteCountForTts)) {
                         Log.d(TAG, "onDone: $ttsCount 번")
                         runOnUiThread {
                             binding.viewTtsProgrssbar.visibility = View.INVISIBLE
@@ -438,6 +440,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                                     R.color.colorButtonGray)
                         }
                         ttsCount = 0
+                        deleteCountForTts = 0
                     }
                 }
 
@@ -719,6 +722,20 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     override fun onVisibilityCheckboxLayoutClicked(v: View,_visibilityOptions: Int,wordTextView: TextView,
         meanTextView: TextView,adapterPosition: Int,) {
         v.visible_check.isChecked = !v.visible_check.isChecked
+        setVisivilityOptions(v, adapterPosition, _visibilityOptions, wordTextView, meanTextView)
+    }
+    override fun onVisibilityCheckboxClicked(v: View, _visibilityOptions: Int, wordTextView: TextView, meanTextView: TextView, adapterPosition: Int,
+    ) {
+        setVisivilityOptions(v, adapterPosition, _visibilityOptions, wordTextView, meanTextView)
+    }
+
+    private fun setVisivilityOptions(
+        v: View,
+        adapterPosition: Int,
+        _visibilityOptions: Int,
+        wordTextView: TextView,
+        meanTextView: TextView,
+    ) {
         if (v.visible_check.isChecked) {
             visibleCheckboxList[adapterPosition].checked = true
         } else {
@@ -742,7 +759,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             }
         } else if (_visibilityOptions == 3) {
             if (visibleCheckboxList[adapterPosition].checked) {
-                if(wordTextView.visibility == View.INVISIBLE) {
+                if (wordTextView.visibility == View.INVISIBLE) {
                     wordTextView.visibility = View.VISIBLE
                     isInvisibleItem = "word"
                 } else if (meanTextView.visibility == View.INVISIBLE) {
@@ -757,54 +774,8 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 }
             }
         }
-        Log.d(TAG, "onVisibilityCheckboxLayoutClicked: ${v.visible_check.isChecked}")
     }
-    override fun onVisibilityCheckboxClicked(v: View, _visibilityOptions: Int, wordTextView: TextView, meanTextView: TextView, adapterPosition: Int,
-    ) {
 
-        if (v.visible_check.isChecked) {
-            visibleCheckboxList[adapterPosition].checked = true
-            Log.d(TAG, "onVisibilityCheckboxClicked: if")
-        } else {
-            visibleCheckboxList[adapterPosition].checked = false
-            Log.d(TAG, "onVisibilityCheckboxClicked: else")
-        }
-        if (_visibilityOptions == 1) {
-            if (visibleCheckboxList[adapterPosition].checked) {
-                wordTextView.visibility = View.VISIBLE
-                meanTextView.visibility = View.VISIBLE
-            } else {
-                wordTextView.visibility = View.INVISIBLE
-                meanTextView.visibility = View.VISIBLE
-            }
-        } else if (_visibilityOptions == 2) {
-            if (visibleCheckboxList[adapterPosition].checked) {
-                wordTextView.visibility = View.VISIBLE
-                meanTextView.visibility = View.VISIBLE
-            } else {
-                wordTextView.visibility = View.VISIBLE
-                meanTextView.visibility = View.INVISIBLE
-            }
-        } else if (_visibilityOptions == 3) {
-            if (visibleCheckboxList[adapterPosition].checked) {
-                if(wordTextView.visibility == View.INVISIBLE) {
-                    wordTextView.visibility = View.VISIBLE
-                    isInvisibleItem = "word"
-                } else if (meanTextView.visibility == View.INVISIBLE) {
-                    meanTextView.visibility = View.VISIBLE
-                    isInvisibleItem = "mean"
-                }
-            } else {
-                if (isInvisibleItem.equals("word")) { 
-                    wordTextView.visibility = View.INVISIBLE
-                } else {
-                    meanTextView.visibility = View.INVISIBLE
-                }
-            }
-        }
-        Log.d(TAG, "onVisibilityCheckboxClicked: ${v.visible_check.isChecked}")
-        // FIXME: 2021-02-24 랜덤
-    }
     @SuppressLint("SetTextI18n")
     private fun isDeleteMode(num: Int, adapterPosition: Int) {
         viewRecyclerAdapter.updateCheckbox(num, adapterPosition) // 처음 LongClick하면 들어옴
@@ -965,13 +936,17 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             Toast.makeText(this, "단어나 뜻을 입력해주세요", Toast.LENGTH_SHORT).show()
             _isUpdated = false
         } else {
-            if ((word.word!!) != view.bsd_input_word.text.toString() && (word.mean!!) != view.bsd_input_mean.text.toString()) {
-                // 이전 값들과 같지 않으면
-                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
-                word.word = view.bsd_input_word.text.toString()
-                word.mean = view.bsd_input_mean.text.toString()
-                wordModel?.update(word)
-                getSortWhen(sortId)
+            try {
+                if ((word.word!!) != view.bsd_input_word.text.toString() || (word.mean!!) != view.bsd_input_mean.text.toString()) {
+                    // 하나라도 이전 값들과 같지 않으면
+                    imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0)
+                    word.word = view.bsd_input_word.text.toString()
+                    word.mean = view.bsd_input_mean.text.toString()
+                    wordModel?.update(word)
+                    getSortWhen(sortId)
+                }
+            } catch (e:NullPointerException) {
+                e.printStackTrace()
             }
 //           // 이전값들과 같으면
             _isUpdated = true
@@ -985,7 +960,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         viewRecyclerAdapter.notifyItemRemoved(position)
         binding.currentCount.text = "입력한 단어  " + (viewRecyclerAdapter.itemCount).toString()
         showActionSnackBar(word, mDeletedWord, mDeletedPosition)*/
-
+        deleteCountForTts -= 1
         wordModel?.delete(word)
         getSortWhen(sortId)
         showActionSnackBar(word)
@@ -1004,6 +979,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
 /*            viewRecyclerAdapter.getItem().add(mDeletedPosition, mDeletedWord)
             viewRecyclerAdapter.notifyItemInserted(mDeletedPosition)
             binding.currentCount.text = "입력한 단어  " + (viewRecyclerAdapter.itemCount).toString()*/
+            deleteCountForTts += 1
             wordModel?.insert(word)
             getSortWhen(sortId)
         }
