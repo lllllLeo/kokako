@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.activity_view_word.view.*
 // TODO: 2021-01-27 키보드를 아예 보이지말까
 // TODO: 2021-02-02 추가하면 스크롤 위로안감
 class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
-    private var adView : AdView? = null
+    private var                     adView : AdView? = null
     private var                     _binding : ActivityAddWordBinding? = null
     private val                     binding get() = _binding!!
     private lateinit var            addRecyclerAdapter: AddRecyclerAdapter
@@ -94,33 +94,21 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
         addRecyclerAdapter.submitDataList(word)
 
         if(checkActivity) {
+            // 편집으로 들어올때 0개로 들어올 수 있으니 0개면 버튼 비활성화
             binding.toolbarTitle.text = "[ 단어장 수정 ]"
             binding.emptyText.visibility = View.GONE
             if (word.size == 0) {
-                binding.btnAddFinishCheck.isEnabled = false // 편집으로 들어올때 0개로 들어올 수 있으니 0개면 버튼 비활성화
-                binding.btnAddFinishCheck.imageTintList =
-                    ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
-                binding.emptyText.visibility = View.VISIBLE
+                setCheckBtnDisable()
             }
         } else {
+//            // 처음 단어장 추가로 들어오면 단어가 없을테니까 버튼을 비활성화 초기설정
             binding.toolbarTitle.text = "[ 단어장 추가 ]"
-            binding.btnAddFinishCheck.isEnabled = false // 처음 단어장 추가로 들어오면 단어가 없을테니까 버튼을 비활성화 초기설정
-            binding.btnAddFinishCheck.imageTintList =
-                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
-            binding.emptyText.visibility = View.VISIBLE
+            setCheckBtnDisable()
         }
 
 
-
-
-
-
-
-
-
-
-
-        rv_list_item.apply {
+// TODO: 2021-04-05 apply대신  run 쓰네 
+        binding.rvListItem.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, true)    // 역순  역순이니 맨 밑이 position 0
             (layoutManager as LinearLayoutManager).stackFromEnd = true  // 역순
             if (checkActivity){
@@ -128,7 +116,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
             }
             setHasFixedSize(true)
 //            if(word.size != 0) smoothScrollToPosition(word.size - 1)    // 데이터가 없으면 에러
-// TODO: 2021-01-31 내폰은 ㄱㅊ은데 엄ㄴ마폰은 삭제가 이상하게됨 -> ㄱㅊ아졋음 다시한번해보기
+// TODO: 2021-01-31 내폰은 ㄱㅊ은데 엄마폰은 삭제가 이상하게됨 -> ㄱㅊ아졋음 다시한번해보기
             val recyclerViewState : Parcelable = rv_list_item.layoutManager?.onSaveInstanceState()!!
             rv_list_item.layoutManager!!.onRestoreInstanceState(recyclerViewState)
             adapter = addRecyclerAdapter
@@ -251,19 +239,13 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                             getCurrentCount("add")
                             if (checkActivity) { // 수정
                                 if (word.size != 0) {
-                                    binding.btnAddFinishCheck.isEnabled = true
-                                    binding.btnAddFinishCheck.imageTintList =
-                                        ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
-                                    binding.emptyText.visibility = View.GONE
+                                    setCheckBtnEnable()
                                     Log.d(TAG, "gone")
                                 }
                             } else {
                                 if (addRecyclerAdapter.itemCount != 0) {
                                     Log.d(TAG, "onCreate: ${addRecyclerAdapter.itemCount}")
-                                    binding.btnAddFinishCheck.isEnabled = true
-                                    binding.btnAddFinishCheck.imageTintList =
-                                        ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
-                                    binding.emptyText.visibility = View.GONE
+                                    setCheckBtnEnable()
                                     Log.d(TAG, "gone")
                                 }
                             }
@@ -300,7 +282,7 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onRemoveClicked(view: View, position: Int) {
         val mBuilder = AlertDialog.Builder(view.context)
-        mBuilder.setTitle("삭제")
+        mBuilder.setTitle("단어 삭제")
             .setMessage("단어 : " + addRecyclerAdapter.getItem()[position].word.toString() + "\n뜻 : " + addRecyclerAdapter.getItem()[position].mean.toString() + "\n이 단어 항목을 삭제하시겠습니까?")
             .setPositiveButton("확인",
                 DialogInterface.OnClickListener { _, _ ->
@@ -308,32 +290,20 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
                     getCurrentCount("remove")
                     if (checkActivity) {    // 수정
                         if (word.size != 0) {
-                            binding.btnAddFinishCheck.isEnabled = true
-                            binding.btnAddFinishCheck.imageTintList =
-                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
-                            binding.emptyText.visibility = View.GONE
+                            setCheckBtnEnable()
                             Log.d(TAG, "gone")
                         } else {
-                            binding.btnAddFinishCheck.isEnabled = false
-                            binding.btnAddFinishCheck.imageTintList =
-                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
-                            binding.emptyText.visibility = View.VISIBLE
+                            setCheckBtnDisable()
                             Log.d(TAG, "visi2 수정")
                         }
                     } else {
                         Log.d(TAG, "onCreate: 단어장추가로들어옴")
                         if (addRecyclerAdapter.itemCount != 0) {
                             Log.d(TAG, "onCreate: ${addRecyclerAdapter.itemCount}")
-                            binding.btnAddFinishCheck.isEnabled = true
-                            binding.btnAddFinishCheck.imageTintList =
-                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorBlack)
-                            binding.emptyText.visibility = View.GONE
+                            setCheckBtnEnable()
                             Log.d(TAG, "gone")
                         } else {
-                            binding.btnAddFinishCheck.isEnabled = false
-                            binding.btnAddFinishCheck.imageTintList =
-                                ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
-                            binding.emptyText.visibility = View.VISIBLE
+                            setCheckBtnDisable()
                             Log.d(TAG, "visi2 추가")
                         }
                     }
@@ -346,6 +316,23 @@ class AddWordActivity : AppCompatActivity(), AddRecyclerViewInterface {
 
 
     }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun setCheckBtnDisable() {
+        binding.btnAddFinishCheck.isEnabled = false
+        binding.btnAddFinishCheck.imageTintList =
+            ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorButtonGray)
+        binding.emptyText.visibility = View.VISIBLE
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun setCheckBtnEnable() {
+        binding.btnAddFinishCheck.isEnabled = true
+        binding.btnAddFinishCheck.imageTintList =
+            ContextCompat.getColorStateList(this@AddWordActivity, R.color.colorWhite)
+        binding.emptyText.visibility = View.GONE
+    }
+
     override fun onBackPressed() {
         cancelDialog(mBuilder = AlertDialog.Builder(this))
     }

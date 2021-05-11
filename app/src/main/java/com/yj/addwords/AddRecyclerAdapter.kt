@@ -75,10 +75,9 @@ class AddRecyclerAdapter(addRecyclerViewInterface: AddRecyclerViewInterface): Li
         })
         return addViewHolder
     }
-    fun getItem(): ArrayList<Word>{
-       return this.wordDatas
-    }
-    override fun getItemCount(): Int { return wordDatas.size }
+    fun getItem(): ArrayList<Word> = this.wordDatas
+
+    override fun getItemCount(): Int = wordDatas.size
 
     fun submitDataList(word: ArrayList<Word>){
         this.wordDatas = word

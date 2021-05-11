@@ -15,7 +15,7 @@ class MyWordRecyclerAdapter(myWordListRecyclerViewInterface: MyWordListRecyclerV
         this.myWordListRecyclerViewInterface = myWordListRecyclerViewInterface
     }
 
-    override fun getItemCount(): Int { return wordBookDatas.size }
+    override fun getItemCount(): Int = wordBookDatas.size
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyWordViewHolder {
         return MyWordViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.rv_wordbook_list, parent, false), this.myWordListRecyclerViewInterface!!)
@@ -27,9 +27,7 @@ class MyWordRecyclerAdapter(myWordListRecyclerViewInterface: MyWordListRecyclerV
     }
 
 //    내 단어장들 불러오는 메소드
-    fun getItem():ArrayList<WordBook> {
-        return this.wordBookDatas
-    }
+    fun getItem():ArrayList<WordBook> = this.wordBookDatas
 
     fun submitList(wordBook: ArrayList<WordBook>) {
         this.wordBookDatas = wordBook

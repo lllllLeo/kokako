@@ -420,7 +420,7 @@ class MainActivity : AppCompatActivity(), MyWordListRecyclerViewInterface, Impor
                         Log.d("     TAG",
                             "===== MainActivity - onRemoveClicked() IN " + myWordRecyclerAdapter.getItem()[adapterPosition].toString())
                         val mBuilder = AlertDialog.Builder(this)
-                        mBuilder.setTitle("삭제")
+                        mBuilder.setTitle("단어장 삭제")
                             .setMessage(myWordRecyclerAdapter.getItem()[adapterPosition].title.toString() + " 단어장을 삭제하시겠습니까?")
                             .setPositiveButton("확인",
                                 DialogInterface.OnClickListener { _, _ ->

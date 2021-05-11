@@ -151,6 +151,10 @@ class ImportDialog : DialogFragment() {
 
 //                        Snackbar.make(binding.importFramelayout, "단어장 추가 완료", Snackbar.LENGTH_LONG).show()
                     }
+/*                    data?.let {
+                        readCsvFile(it)
+                        dismiss()
+                    }*/
                 } catch (e: FileNotFoundException) {
                     e.printStackTrace()
                 }

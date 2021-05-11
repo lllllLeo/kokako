@@ -4,12 +4,12 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorPrimaryLight">#000000</color>
     <color name="colorBlue">#1675d1</color>
-<!--    <color name="colorPrimaryDark">#004a9f</color>-->
-<!--    <color name="colorPrimaryLight">#62a3ff</color>-->
-<!--    <color name="colorSelectItemBlue">#D0E4FF</color>-->
+    <!--    <color name="colorPrimaryDark">#004a9f</color>-->
+    <!--    <color name="colorPrimaryLight">#62a3ff</color>-->
+    <!--    <color name="colorSelectItemBlue">#D0E4FF</color>-->
     <color name="colorSelectItemBlue">#EAF3FF</color>
     <color name="colorSelectItem">#E0E0E0</color>
-<!--    <color name="colorSelectItem">#C8C8C8</color>-->
+    <!--    <color name="colorSelectItem">#C8C8C8</color>-->
     <color name="colorAccent">#1675d1</color>
     <!--    <color name="colorBlue">#FAA21A</color>-->
     <!--    <color name="colorPrimaryDark">#FFAF39</color>-->

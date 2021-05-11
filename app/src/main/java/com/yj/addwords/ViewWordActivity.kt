@@ -204,7 +204,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                         if (tts != null) {
                             Log.d(TAG, "onCreate: tts가 널이 아님")
                             textToSpeechAllWord()
-
                         }
                     } else {
                         Toast.makeText(this, "안드로이드 버전이 낮아서 실행할 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -497,7 +496,6 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
                 Log.d(TAG, "onDone: done with $utteranceId")
                 runOnUiThread {
                     for (i in ttsArrayList) {
-                        Log.d(TAG, "onDone: 제발시발")
                         i.view_listen_layout.setBackgroundResource(R.drawable.button_border)
                         i.view_listen_imageview.supportBackgroundTintList =
                             ContextCompat.getColorStateList(this@ViewWordActivity, R.color.colorButtonGray)
@@ -571,11 +569,12 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
     override fun onDataPass(data: ArrayList<String>) {
         testValue = data
         Log.d(TAG, "onDataPass: testValue는 ${testValue.toString()}")
-        val intent = Intent(this, TestActivity::class.java)
-        intent.putExtra("wordBookIdForTest", wordBookIdForView)
-        intent.putExtra("testScope", testValue!![0])
-        intent.putExtra("testCategory", testValue!![1])
-        intent.putExtra("testSort", testValue!![2])
+        val intent = Intent(this, TestActivity::class.java).apply {
+            putExtra("wordBookIdForTest", wordBookIdForView)
+            putExtra("testScope", testValue!![0])
+            putExtra("testCategory", testValue!![1])
+            putExtra("testSort", testValue!![2])
+        }
         startActivityForResult(intent, TEST_WORD_CODE)
     //            start result해야함 받고 livedata
     }
@@ -724,8 +723,7 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
         v.visible_check.isChecked = !v.visible_check.isChecked
         setVisivilityOptions(v, adapterPosition, _visibilityOptions, wordTextView, meanTextView)
     }
-    override fun onVisibilityCheckboxClicked(v: View, _visibilityOptions: Int, wordTextView: TextView, meanTextView: TextView, adapterPosition: Int,
-    ) {
+    override fun onVisibilityCheckboxClicked(v: View, _visibilityOptions: Int, wordTextView: TextView, meanTextView: TextView, adapterPosition: Int,) {
         setVisivilityOptions(v, adapterPosition, _visibilityOptions, wordTextView, meanTextView)
     }
 
@@ -790,10 +788,10 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             binding.ckboxCountTv.visibility = View.VISIBLE
             binding.dummyForCenter.visibility = View.GONE
 
-            binding.toolbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBlack))
+//            binding.toolbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBlack))
             binding.toolbarTitle.gravity = Gravity.LEFT
             binding.toolbarTitle.text = "${checkboxCount.toString()} 개 선택됨"
-            binding.toolbarTitle.setTextColor(ContextCompat.getColor(this,R.color.colorWhite))
+//            binding.toolbarTitle.setTextColor(ContextCompat.getColor(this,R.color.colorWhite))
 
 //            binding.fabTestWord.visibility = View.INVISIBLE
             binding.hideSpinner.visibility = View.INVISIBLE
@@ -814,10 +812,10 @@ class ViewWordActivity : AppCompatActivity(), ViewWordRecyclerViewInterface, Bot
             binding.ckboxCountTv.visibility = View.GONE
             binding.dummyForCenter.visibility = View.INVISIBLE
 
-            binding.toolbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
+//            binding.toolbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorWhite))
             binding.toolbarTitle.gravity = Gravity.CENTER
             binding.toolbarTitle.text = wordBookNameForView
-            binding.toolbarTitle.setTextColor(ContextCompat.getColor(this,R.color.colorBlack))
+//            binding.toolbarTitle.setTextColor(ContextCompat.getColor(this,R.color.colorBlack))
 //            binding.toolbarTitle.text = ssb
 
 //            binding.fabTestWord.visibility = View.VISIBLE

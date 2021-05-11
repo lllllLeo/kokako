@@ -6,8 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 
-
-class NewAppWidget : AppWidgetProvider() {
+/**
+ * 데이터 실시간 최신화
+   MainActivity에서 데이터가 바뀔때 AppWidgetManager를 import해서 "notifyAppWidgetViewDataChanged" 를 해주면 됨
+ */
+class AddWordsWidget : AppWidgetProvider() {
     /*
     위젯 갱신 주기에 따라 위젯을 갱신할때 호출
     위젯 xml에서 설정한 updatePeriodMillis에 따라 주기적으로 호출되는 메소드이며 초기 위젯 생성시의 initialize 작업도 수행, 보통 handler를 넣어준다
@@ -32,12 +35,13 @@ class NewAppWidget : AppWidgetProvider() {
         // Enter relevant functionality for when the last widget is disabled
     }
 }
-//  위젯에 반영
 internal fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-    val widgetText = context.getString(R.string.appwidget_text)
+    val widgetWord = "Word" // 여기에 단어 List
+    val widgetMean = "뜻"// 여기에 단어 List
     // Construct the RemoteViews object
-    val views = RemoteViews(context.packageName, R.layout.new_app_widget)
-    views.setTextViewText(R.id.appwidget_word, widgetText)
+    val views = RemoteViews(context.packageName, R.layout.add_words_widget)
+    views.setTextViewText(R.id.appwidget_word, widgetWord)  // 여기에 할당
+    views.setTextViewText(R.id.appwidget_mean, widgetMean)  // 여기에 할당
 
     // Instruct the widget manager to update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views)

@@ -26,16 +26,14 @@ class ViewWordRecyclerAdapter(viewWordRecyclerViewInterface: ViewWordRecyclerVie
         holder.bind(this.wordDatas, position, check, visibilityOptions, currentLongClickPosition)
     }
 
-    override fun getItemCount(): Int { return wordDatas.size }
+    override fun getItemCount(): Int = wordDatas.size
 
     fun submitList(words: ArrayList<Word>) {
         this.wordDatas = words
         notifyDataSetChanged() // 이거 넣으니까 별표나 뭐 눌러도 스크롤 안내려감 밑으로
     }
 
-    fun getItem() : ArrayList<Word> {
-        return this.wordDatas
-    }
+    fun getItem() : ArrayList<Word> = this.wordDatas
 
     fun updateCheckbox(num: Int, adapterPosition: Int) {
         check = num
