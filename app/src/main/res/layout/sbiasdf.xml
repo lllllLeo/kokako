@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/exxxx"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="플래시 카드시발"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:cornerRadius="2dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="2dp"
+        tools:ignore="MissingConstraints" />
+    <Button
+        android:id="@+id/ex22xxx"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="플래시 카드시발"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        app:cornerRadius="2dp"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="2dp"
+        tools:ignore="MissingConstraints" />
+</LinearLayout>

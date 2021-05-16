@@ -23,8 +23,8 @@ android {
         applicationId "com.yj.addwords"
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 3
-        versionName "1.0.1"
+        versionCode 4
+        versionName "1.0.2"
         multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -1,5 +1,6 @@
 package com.yj.addwords
 
+import android.R.attr.x
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
@@ -21,15 +22,19 @@ import com.yj.addwords.model.Word
 import com.yj.addwords.viewModel.WordBookViewModel
 import com.yj.addwords.viewModel.WordViewModel
 import kotlinx.android.synthetic.main.fragment_test.*
+import org.apache.commons.lang3.CharSetUtils.count
 import java.util.*
+import kotlin.collections.ArrayList
 
+
+// 플래시카드형
 class TestFragment : Fragment() {
     private var                     _binding : FragmentTestBinding? = null
     private val                     binding get() = _binding!!
     private var                     wordBookModel: WordBookViewModel? = null
     private var                     model : WordViewModel? = null
     private var                     wordBookIdForTest : Long = 0
-    private var                     test : Int = 0
+    private var                     test : Int = 0      // testStatus? testCount?
     private var                     language = 0
     private var                     ttsStatus: Int? = 0
     private var                     ttsResult : Int = 0
@@ -45,7 +50,8 @@ class TestFragment : Fragment() {
         const val TAG = "TAG TestFragment"
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentTestBinding.inflate(inflater, container, false)
         return binding.root
@@ -70,10 +76,11 @@ class TestFragment : Fragment() {
         wordBookModel = ViewModelProvider(this,
             ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)).get(
             WordBookViewModel::class.java)
-        model = ViewModelProvider(this, object : ViewModelProvider.Factory{
+        model = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 return WordViewModel(activity!!.application, wordBookIdForTest) as T
-            }}).get(WordViewModel::class.java)
+            }
+        }).get(WordViewModel::class.java)
 
         language = wordBookModel?.getLanguageCode(wordBookIdForTest)!!
         textToSpeechInit(language)
@@ -118,9 +125,12 @@ class TestFragment : Fragment() {
                 }
                 else -> {    // 북마크 안/한 단어
                     wordList = when {
-                        testSort!! == "latest" -> { model?.getTestBookmarkAllWordLatestOrder(wordBookIdForTest, testScope!!) }
-                        testSort!! == "oldest" -> { model?.getTestBookmarkAllWordOldestOrder(wordBookIdForTest, testScope!!) }
-                        testSort!! == "word" -> { model?.getTestBookmarkAllWordWordAscOrder(wordBookIdForTest, testScope!!) }
+                        testSort!! == "latest" -> { model?.getTestBookmarkAllWordLatestOrder(wordBookIdForTest,
+                            testScope!!) }
+                        testSort!! == "oldest" -> { model?.getTestBookmarkAllWordOldestOrder(wordBookIdForTest,
+                            testScope!!) }
+                        testSort!! == "word" -> { model?.getTestBookmarkAllWordWordAscOrder(wordBookIdForTest,
+                            testScope!!) }
                         else -> { model?.getTestBookmarkAllWordRandomOrder(wordBookIdForTest, testScope!!) }
                     }
                 }
@@ -141,7 +151,7 @@ class TestFragment : Fragment() {
                 binding.btnFavorite.setImageResource(R.drawable.favorite_normal_background)
             } else
                 binding.btnFavorite.setImageResource(R.drawable.favorite_pressed_background)
-        } else {
+        } else { // 설정 된 단어가 없을 경우
             binding.notMatchedTest.visibility = View.VISIBLE
             binding.notMatchedTest.text = "설정된 단어가 없습니다.\n북마크를 추가/해제 해주세요."
             binding.countTest.visibility = View.INVISIBLE
@@ -211,7 +221,7 @@ class TestFragment : Fragment() {
 //                        model?.updateFavoriteChecked(word) 이거는 테스트 끝낼때 한번에 ㄱㄱ 아이지 할떄해야지 계속 테스트를 하니까
                     }
                     R.id.answer_layout -> {
-                        if(binding.answerTest.visibility == View.INVISIBLE) {
+                        if (binding.answerTest.visibility == View.INVISIBLE) {
                             binding.answerTest.visibility = View.VISIBLE
                         } else
                             binding.answerTest.visibility = View.INVISIBLE
@@ -243,7 +253,7 @@ class TestFragment : Fragment() {
         setAnswerInvisible()
     }
 
-    private fun setTestResultFragment(bundle: Bundle,testResultFragment: TestResultFragment,ft: FragmentTransaction,) {
+    private fun setTestResultFragment(bundle: Bundle, testResultFragment: TestResultFragment, ft: FragmentTransaction) {
         bundle.putLong("wordBookIdForTest", wordBookIdForTest)
         bundle.putInt("test", test)
         bundle.putString("testScope", testScope)
@@ -356,12 +366,12 @@ class TestFragment : Fragment() {
                         Log.d(ViewWordActivity.TAG, "textToSpeechInit: $language")
                     }
                 }
-            ttsStatus = it
+                ttsStatus = it
             })
         }else {
             tts = TextToSpeech(requireActivity().application, TextToSpeech.OnInitListener {
-                    ttsResult = tts?.setLanguage(Locale.KOREAN)!!
-            ttsStatus = it
+                ttsResult = tts?.setLanguage(Locale.KOREAN)!!
+                ttsStatus = it
             })
         }
         if (ttsStatus == TextToSpeech.SUCCESS) {
@@ -387,7 +397,29 @@ class TestFragment : Fragment() {
         }
     }
 
-    private fun setTestText(index : Int) {
+// TODO 사지선다 할 때 단어가 3개면 사지선다 어떻게하지 같은 값이라도 뽑아야하나
+    private fun getRandom4Example() { //multiple choice
+        val rand = Random()
+        val list = ArrayList<String>()
+        var intArray = emptyArray<Int>()
+        var i = 0
+        while (i < wordList!!.size) {
+            intArray[i] = rand.nextInt(wordList!!.size)
+            for (j in 0 until i) {
+                if (intArray[i] == intArray[j]) {
+                    i--
+                    break
+                } // i번째 난수가 지금까지 도출된 난수와 비교하여 중복이라면 i번째 난수를 다시 출력하도록 i--
+            }
+            i++
+        }
+        for (i in 0..intArray.size) {
+            list[i] = wordList!![intArray[i]].mean.toString()
+            Log.d(TAG, "getRandom4Example: 중복으로 뽑은 값 : ${list[i]}")
+        }
+    }
+
+    private fun setTestText(index: Int) { // 단어 - 뜻 인지 뜻 - 단어인지
         if (testCategory!!.contains("단어 - 뜻")) {
             binding.questionTest.text = wordList!![index].word.toString()
             binding.answerTest.text = wordList!![index].mean.toString()

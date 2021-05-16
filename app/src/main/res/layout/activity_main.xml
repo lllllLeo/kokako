@@ -165,7 +165,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="bottom|center"
-        ads:adSize="SMART_BANNER"
+        ads:adSize="BANNER"
         ads:adUnitId="@string/banner_ad_unit_id_for_test"
         tools:ignore="MissingConstraints">
     </com.google.android.gms.ads.AdView>-->

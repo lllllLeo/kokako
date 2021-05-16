@@ -78,9 +78,9 @@ class TestResultFragment : Fragment() {
         }
         if (notMemorized == 0) {
             binding.oneMoreTest.isEnabled = false
-            binding.oneMoreTest.setBackgroundColor(ContextCompat.getColor(activity!!.application,R.color.colorGray))
+            binding.oneMoreTest.setBackgroundColor(ContextCompat.getColor(requireActivity().application,R.color.colorGray))
         } else {
-            binding.oneMoreTest.setBackgroundColor(ContextCompat.getColor(activity!!.application,R.color.colorBlue))
+            binding.oneMoreTest.setBackgroundColor(ContextCompat.getColor(requireActivity().application,R.color.colorBlue))
         }
 
 

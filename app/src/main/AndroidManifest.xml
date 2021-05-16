@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver android:name=".AddWordsWidget"
+        <!--<receiver android:name=".AddWordsWidget"
                   android:label="4x2 Widget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -26,7 +26,7 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/add_words_widget_info" />
-        </receiver>
+        </receiver>-->
 
         <activity android:name=".MainActivity3" /> <!-- play-services-ads 17.0.0 이상부터는 앱 ID를 입력해줘야 합니다 -->
         <meta-data

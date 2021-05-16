@@ -232,6 +232,29 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
             </LinearLayout>
+        <!--<com.google.android.material.button.MaterialButton
+            android:id="@+id/test_word3"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="테스트 하기3"
+            android:layout_marginHorizontal="20dp"
+            app:cornerRadius="2dp"
+            app:strokeColor="@color/colorPrimary"
+            app:strokeWidth="2dp"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        />
+        <Button
+            android:id="@+id/test_word2"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="테스트 하기2"
+            android:layout_marginHorizontal="20dp"
+            android:backgroundTint="@color/colorBlue"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            app:cornerRadius="2dp"
+            app:strokeColor="@color/colorPrimary"
+            app:strokeWidth="2dp">
+        </Button>-->
         <Button
             android:id="@+id/test_word"
             android:layout_width="match_parent"
@@ -240,8 +263,7 @@
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="12dp"
             android:backgroundTint="@color/colorBlue"
-            style="@style/ButtonTheme"
-            >
+            style="@style/ButtonTheme">
         </Button>
         </LinearLayout>
     </FrameLayout>
@@ -252,7 +274,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        ads:adSize="SMART_BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id_for_test">
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/banner_ad_unit_id">
     </com.google.android.gms.ads.AdView>
 </RelativeLayout>
